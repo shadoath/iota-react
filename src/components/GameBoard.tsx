@@ -55,8 +55,8 @@ const DroppableCell: React.FC<DroppableCellProps> = ({ cell, row, col, onDropCar
       ref={drop}
       style={{
         padding: "10px",
-        height: "100px",
-        width: "100px",
+        height: "80px",
+        width: "80px",
         backgroundColor: isOver ? (canDrop ? "lightgreen" : "lightcoral") : "white",
         border: "2px solid black",
         display: "flex",

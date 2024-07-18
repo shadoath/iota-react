@@ -6,18 +6,22 @@ import { CardType } from "../types"
 const getShapeSvg = (shape: string) => {
   switch (shape) {
     case "circle":
-      return <circle cx="50" cy="50" r="40" />
+      return <circle cx="25" cy="25" r="20" />
     case "square":
-      return <rect x="10" y="10" width="80" height="80" />
+      return <rect x="5" y="5" width="40" height="40" />
     case "triangle":
-      return <polygon points="50,10 90,90 10,90" />
+      return <polygon points="25,5 45,45 5,45" />
     case "cross":
       return (
         <>
-          <rect x="40" y="10" width="20" height="80" />
-          <rect x="10" y="40" width="80" height="20" />
+          <rect x="20" y="5" width="10" height="40" />
+          <rect x="5" y="20" width="40" height="10" />
         </>
       )
+    case "star":
+      return <polygon points="25,5 30,20 45,20 33,30 37,45 25,35 13,45 17,30 5,20 20,20" />
+    case "hexagon":
+      return <polygon points="25,5 40,15 40,35 25,45 10,35 10,15" />
     default:
       return null
   }
@@ -70,8 +74,8 @@ const Card = ({ shape, color, number }: CardType) => {
         opacity: isDragging ? 0.5 : 1,
         backgroundColor: "white",
         border: `2px solid ${color}`,
-        height: "100px",
-        width: "100px",
+        height: "80px",
+        width: "80px",
         display: "flex",
         flexDirection: "column",
         justifyContent: "center",
@@ -79,7 +83,7 @@ const Card = ({ shape, color, number }: CardType) => {
         position: "relative",
       }}
     >
-      <svg height="100" width="100" style={{ fill: color }}>
+      <svg height="50" width="50" style={{ fill: color }}>
         {getShapeSvg(shape)}
       </svg>
       {["top-left", "top-right", "bottom-left", "bottom-right"].map((position) => (
