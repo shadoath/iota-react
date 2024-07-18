@@ -1,6 +1,34 @@
-import "@/styles/globals.css";
-import type { AppProps } from "next/app";
+import React from "react"
+import { AppProps } from "next/app"
+import { ThemeProvider, CssBaseline, createTheme } from "@mui/material"
+import Head from "next/head"
 
-export default function App({ Component, pageProps }: AppProps) {
-  return <Component {...pageProps} />;
+// Create a MUI theme
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: "#1976d2",
+    },
+    secondary: {
+      main: "#dc004e",
+    },
+  },
+})
+
+function MyApp({ Component, pageProps }: AppProps) {
+  return (
+    <>
+      <Head>
+        <title>Iota Game</title>
+        <meta name="viewport" content="initial-scale=1, width=device-width" />
+      </Head>
+      <ThemeProvider theme={theme}>
+        {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
+        <CssBaseline />
+        <Component {...pageProps} />
+      </ThemeProvider>
+    </>
+  )
 }
+
+export default MyApp
