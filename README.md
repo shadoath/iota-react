@@ -1,36 +1,142 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Iota Card Game
 
-## Getting Started
+A web-based implementation of the Iota card game built with React, TypeScript, Next.js, and Material-UI.
 
-First, run the development server:
+## 🎮 Game Overview
 
+Iota is a strategic card game played on a grid where players place cards to form lines. Each card has three attributes:
+- **Number**: 1-4
+- **Color**: Red, Green, Blue, or Yellow
+- **Shape**: Triangle, Square, Circle, or Cross
+
+## 🎯 Game Rules
+
+### Objective
+Score points by placing cards to form lines where each attribute (number, color, shape) follows a consistent pattern.
+
+### Core Rules
+1. **Line Formation**: Cards form lines horizontally and vertically
+2. **Attribute Rule**: In any line, each attribute must be either:
+   - **All the SAME** across all cards, OR
+   - **All DIFFERENT** across all cards
+3. **Turn Rules**:
+   - Play 1-4 cards per turn
+   - All cards in a turn must be placed in the same row or column
+   - Cards must be placed adjacent to existing cards
+4. **Scoring**: Sum of all numbers in each line formed/extended by your placed cards
+5. **Line Limit**: Maximum 4 cards per line
+
+### Example Valid Lines
+- ✅ Red Triangle 1, Red Triangle 2, Red Triangle 3 (same color & shape, different numbers)
+- ✅ Blue Circle 2, Red Square 2, Yellow Triangle 2 (same number, all different colors & shapes)
+- ❌ Red Triangle 1, Red Square 2, Blue Square 3 (invalid - colors neither all same nor all different)
+
+## 🚀 Getting Started
+
+### Prerequisites
+- Node.js 14+ 
+- npm or yarn
+
+### Installation
 ```bash
+# Clone the repository
+git clone https://github.com/yourusername/iota-react.git
+cd iota-react
+
+# Install dependencies
+npm install
+
+# Run development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) to play the game.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🎨 Features
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+- **Interactive Grid**: Dynamic game board that expands as you play
+- **Smart Validation**: Real-time feedback on valid/invalid placements
+- **Detailed Error Messages**: Explains exactly why a placement is invalid
+- **Visual Indicators**:
+  - Green squares for valid placements
+  - Dark gray circles for impossible positions
+  - Pending points display
+- **Zoom Controls**: Zoom in/out to see more of the board
+- **Turn Management**: Complete Turn and Undo buttons
+- **Score Tracking**: Live score updates with pending points
+- **Toast Notifications**: Non-intrusive game feedback
 
-## Learn More
+## 🛠️ Built With
 
-To learn more about Next.js, take a look at the following resources:
+- **React** - UI framework
+- **TypeScript** - Type safety
+- **Next.js** - React framework
+- **Material-UI** - Component library
+- **react-hot-toast** - Toast notifications
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 📁 Project Structure
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+```
+src/
+├── components/
+│   ├── Game.tsx          # Main game component
+│   ├── BoardComponent.tsx # Game board grid
+│   ├── GameCard.tsx      # Individual card component
+│   ├── PlayerHand.tsx    # Player's hand display
+│   └── Sidebar.tsx       # Game menu sidebar
+├── types/
+│   └── game.ts          # TypeScript interfaces
+└── utils/
+    ├── gameLogic.ts      # Core game mechanics
+    ├── turnValidation.ts # Turn validation rules
+    ├── validationMessages.ts # Error message generation
+    └── impossibleSquares.ts  # Invalid position detection
+```
 
-## Deploy on Vercel
+## 🎮 How to Play
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. **Select a Card**: Click a card from your hand at the bottom
+2. **Place the Card**: Click a green square on the board
+3. **Build Lines**: Place 1-4 cards in the same row/column
+4. **Complete Turn**: Click "Complete Turn" to score and draw new cards
+5. **Strategic Tips**:
+   - Look for intersections where you can score in multiple directions
+   - Watch for impossible positions (gray circles)
+   - Plan multi-card turns for maximum points
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+## 🔧 Development
+
+```bash
+# Run development server
+npm run dev
+
+# Build for production
+npm run build
+
+# Start production server
+npm start
+
+# Run linting
+npm run lint
+```
+
+## 📱 Deployment
+
+This project is configured for easy deployment on Vercel:
+
+1. Push your code to GitHub
+2. Import the repository in Vercel
+3. Deploy with default Next.js settings
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## 📄 License
+
+This project is licensed under the MIT License.
+
+## 🙏 Acknowledgments
+
+- Inspired by the original Iota card game by Gamewright
+- Built with Next.js create-next-app template
