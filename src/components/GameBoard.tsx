@@ -1,8 +1,7 @@
 // src/components/GameBoard.tsx
-import React from 'react'
-import { Grid, Paper } from '@mui/material'
-import { useDrop } from 'react-dnd'
-import { CardType } from '../types'
+import type React from 'react'
+import { Paper, Grid } from '@mui/material'
+import type { CardType } from '../types'
 
 interface GameBoardProps {
   grid: (CardType | null)[][]
@@ -13,10 +12,10 @@ const GameBoard: React.FC<GameBoardProps> = ({ grid, onDropCard }) => {
   return (
     <Grid container spacing={1}>
       {grid.map((row, rowIndex) => (
-        <Grid item xs={12 / grid.length} key={rowIndex}>
+        <Grid size={12 / grid.length} key={rowIndex}>
           <Grid container spacing={1}>
             {row.map((cell, colIndex) => (
-              <Grid item xs={12 / grid[rowIndex].length} key={colIndex}>
+              <Grid size={12 / grid[rowIndex].length} key={colIndex}>
                 <DroppableCell
                   cell={cell}
                   row={rowIndex}
@@ -45,21 +44,14 @@ const DroppableCell: React.FC<DroppableCellProps> = ({
   col,
   onDropCard,
 }) => {
-  const [{ isOver }, drop] = useDrop(() => ({
-    accept: 'CARD',
-    drop: (item: CardType) => onDropCard(item, row, col),
-    collect: (monitor) => ({
-      isOver: !!monitor.isOver(),
-    }),
-  }))
-
   return (
     <Paper
-      ref={drop}
+      onClick={() => onDropCard({} as CardType, row, col)}
       style={{
         height: '100px',
         width: '100px',
-        backgroundColor: isOver ? 'lightgreen' : 'white',
+        backgroundColor: 'white',
+        cursor: 'pointer',
       }}
     >
       {cell ? (

@@ -1,26 +1,27 @@
-import React, { useState } from 'react';
-import { 
-  Drawer, 
-  IconButton, 
-  Box, 
-  Typography, 
-  Button, 
-  Paper, 
+import type React from 'react'
+import { useState } from 'react'
+import {
+  Drawer,
+  IconButton,
+  Box,
+  Typography,
+  Button,
+  Paper,
   Divider,
-  Chip 
-} from '@mui/material';
-import MenuIcon from '@mui/icons-material/Menu';
-import CloseIcon from '@mui/icons-material/Close';
+  Chip,
+} from '@mui/material'
+import MenuIcon from '@mui/icons-material/Menu'
+import CloseIcon from '@mui/icons-material/Close'
 
 interface SidebarProps {
-  cardsLeft: number;
-  lastTurnScore: number | null;
-  pendingPoints: number;
-  pendingCount: number;
-  turnInProgress: boolean;
-  onNewGame: () => void;
-  onCompleteTurn: () => void;
-  onUndoLast: () => void;
+  cardsLeft: number
+  lastTurnScore: number | null
+  pendingPoints: number
+  pendingCount: number
+  turnInProgress: boolean
+  onNewGame: () => void
+  onCompleteTurn: () => void
+  onUndoLast: () => void
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -33,7 +34,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onCompleteTurn,
   onUndoLast,
 }) => {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(false)
 
   return (
     <>
@@ -54,14 +55,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <MenuIcon />
       </IconButton>
 
-      <Drawer
-        anchor="left"
-        open={open}
-        onClose={() => setOpen(false)}
-      >
+      <Drawer anchor='left' open={open} onClose={() => setOpen(false)}>
         <Box sx={{ width: 280, padding: 2 }}>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-            <Typography variant="h5" sx={{ fontWeight: 'bold' }}>
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              mb: 2,
+            }}
+          >
+            <Typography variant='h5' sx={{ fontWeight: 'bold' }}>
               Game Menu
             </Typography>
             <IconButton onClick={() => setOpen(false)}>
@@ -73,41 +77,37 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             <Paper sx={{ padding: 2 }}>
-              <Typography variant="subtitle2" color="text.secondary">
+              <Typography variant='subtitle2' color='text.secondary'>
                 Cards Remaining
               </Typography>
-              <Typography variant="h4">
-                {cardsLeft}
-              </Typography>
+              <Typography variant='h4'>{cardsLeft}</Typography>
             </Paper>
 
             {lastTurnScore !== null && (
-              <Paper sx={{ padding: 2, backgroundColor: '#10b981', color: 'white' }}>
-                <Typography variant="subtitle2">
-                  Last Turn Score
-                </Typography>
-                <Typography variant="h4">
-                  +{lastTurnScore}
-                </Typography>
+              <Paper
+                sx={{ padding: 2, backgroundColor: '#10b981', color: 'white' }}
+              >
+                <Typography variant='subtitle2'>Last Turn Score</Typography>
+                <Typography variant='h4'>+{lastTurnScore}</Typography>
               </Paper>
             )}
 
             {pendingCount > 0 && (
-              <Chip 
+              <Chip
                 label={`Pending: +${pendingPoints} points`}
-                color="warning"
+                color='warning'
                 sx={{ fontSize: '1rem', padding: '8px' }}
               />
             )}
 
             <Divider sx={{ my: 2 }} />
 
-            <Button 
-              variant="contained" 
+            <Button
+              variant='contained'
               fullWidth
               onClick={() => {
-                onNewGame();
-                setOpen(false);
+                onNewGame()
+                setOpen(false)
               }}
               sx={{
                 backgroundColor: '#2563eb',
@@ -118,10 +118,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
             >
               New Game
             </Button>
-
           </Box>
         </Box>
       </Drawer>
     </>
-  );
-};
+  )
+}

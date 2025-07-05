@@ -1,22 +1,22 @@
-import React from 'react';
-import { Box, Typography, Button, Chip } from '@mui/material';
-import { Card } from '../types/game';
-import { GameCard } from './GameCard';
+import type React from 'react'
+import { Box, Typography, Button, Chip } from '@mui/material'
+import type { Card } from '../types/game'
+import { GameCard } from './GameCard'
 
 interface PlayerHandProps {
-  cards: Card[];
-  selectedCard: Card | null;
-  onSelectCard: (card: Card) => void;
-  turnInProgress: boolean;
-  pendingCount: number;
-  pendingPoints: number;
-  onCompleteTurn: () => void;
-  onUndoLast: () => void;
+  cards: Card[]
+  selectedCard: Card | null
+  onSelectCard: (card: Card) => void
+  turnInProgress: boolean
+  pendingCount: number
+  pendingPoints: number
+  onCompleteTurn: () => void
+  onUndoLast: () => void
 }
 
-export const PlayerHand: React.FC<PlayerHandProps> = ({ 
-  cards, 
-  selectedCard, 
+export const PlayerHand: React.FC<PlayerHandProps> = ({
+  cards,
+  selectedCard,
   onSelectCard,
   turnInProgress,
   pendingCount,
@@ -39,10 +39,10 @@ export const PlayerHand: React.FC<PlayerHandProps> = ({
             zIndex: 1000,
           }}
         >
-          <Button 
-            variant="contained" 
-            color="success"
-            size="large"
+          <Button
+            variant='contained'
+            color='success'
+            size='large'
             onClick={onCompleteTurn}
             disabled={pendingCount === 0}
             sx={{
@@ -53,10 +53,10 @@ export const PlayerHand: React.FC<PlayerHandProps> = ({
           >
             Complete Turn
           </Button>
-          <Button 
-            variant="outlined" 
-            color="error"
-            size="small"
+          <Button
+            variant='outlined'
+            color='error'
+            size='small'
             onClick={onUndoLast}
             disabled={pendingCount === 0}
           >
@@ -64,7 +64,7 @@ export const PlayerHand: React.FC<PlayerHandProps> = ({
           </Button>
         </Box>
       )}
-      
+
       <Box
         sx={{
           position: 'fixed',
@@ -74,17 +74,20 @@ export const PlayerHand: React.FC<PlayerHandProps> = ({
           backgroundColor: 'white',
           padding: '12px',
           borderRadius: '12px 12px 0 0',
-          boxShadow: '0 -4px 6px -1px rgba(0, 0, 0, 0.1), 0 -2px 4px -1px rgba(0, 0, 0, 0.06)',
+          boxShadow:
+            '0 -4px 6px -1px rgba(0, 0, 0, 0.1), 0 -2px 4px -1px rgba(0, 0, 0, 0.06)',
           minWidth: 'fit-content',
           zIndex: 1000,
         }}
       >
-        <div style={{
-          display: 'flex',
-          gap: '12px',
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}>
+        <div
+          style={{
+            display: 'flex',
+            gap: '12px',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
           {cards.map((card) => (
             <GameCard
               key={card.id}
@@ -96,5 +99,5 @@ export const PlayerHand: React.FC<PlayerHandProps> = ({
         </div>
       </Box>
     </>
-  );
-};
+  )
+}

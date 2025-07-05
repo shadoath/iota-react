@@ -1,6 +1,7 @@
 // src/App.tsx
-import React, { useState } from 'react'
-import { CardType, GameState, SHAPES, COLORS, NUMBERS } from './types'
+import type React from 'react'
+import { useState } from 'react'
+import { type CardType, type GameState, SHAPES, COLORS, NUMBERS } from './types'
 import ControlPanel from './components/ControlPanel'
 import GameBoard from './components/GameBoard'
 import Hand from './components/Hand'
@@ -41,9 +42,46 @@ const App: React.FC = () => {
     // Handle end turn logic
   }
 
+  const handleDropCard = (card: CardType, row: number, col: number) => {
+    // Check if the cell is empty
+    if (gameState.grid[row][col] !== null) {
+      return
+    }
+
+    // Update the grid with the new card
+    const newGrid = gameState.grid.map((gridRow, rowIndex) =>
+      gridRow.map((cell, colIndex) => {
+        if (rowIndex === row && colIndex === col) {
+          return card
+        }
+        return cell
+      })
+    )
+
+    // Remove the card from the player's hand
+    const newPlayerHands = [...gameState.playerHands]
+    const currentPlayerHand = newPlayerHands[gameState.currentPlayer]
+    const cardIndex = currentPlayerHand.findIndex(
+      (c) =>
+        c.shape === card.shape &&
+        c.color === card.color &&
+        c.number === card.number
+    )
+
+    if (cardIndex !== -1) {
+      currentPlayerHand.splice(cardIndex, 1)
+    }
+
+    setGameState({
+      ...gameState,
+      grid: newGrid,
+      playerHands: newPlayerHands,
+    })
+  }
+
   return (
     <div>
-      <GameBoard grid={gameState.grid} />
+      <GameBoard grid={gameState.grid} onDropCard={handleDropCard} />
       <Hand cards={gameState.playerHands[gameState.currentPlayer]} />
       <ControlPanel onEndTurn={endTurn} />
     </div>

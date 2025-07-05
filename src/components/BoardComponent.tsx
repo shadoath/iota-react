@@ -1,59 +1,70 @@
-import React from 'react';
-import { Box } from '@mui/material';
-import { PlacedCard, GridPosition, Card } from '../types/game';
-import { GameCard } from './GameCard';
-import { getValidPlacements } from '../utils/gameLogic';
-import { isImpossibleSquare } from '../utils/impossibleSquares';
+import type React from 'react'
+import { Box } from '@mui/material'
+import type { PlacedCard, GridPosition, Card } from '../types/game'
+import { GameCard } from './GameCard'
+import { getValidPlacements } from '../utils/gameLogic'
+import { isImpossibleSquare } from '../utils/impossibleSquares'
 
 interface BoardComponentProps {
-  board: PlacedCard[];
-  pendingPlacements: PlacedCard[];
-  onPlaceCard: (position: GridPosition) => void;
-  selectedCard: Card | null;
-  zoomLevel?: number;
+  board: PlacedCard[]
+  pendingPlacements: PlacedCard[]
+  onPlaceCard: (position: GridPosition) => void
+  selectedCard: Card | null
+  zoomLevel?: number
 }
 
-export const BoardComponent: React.FC<BoardComponentProps> = ({ board, pendingPlacements, onPlaceCard, selectedCard, zoomLevel = 1 }) => {
-  const validPlacements = selectedCard ? getValidPlacements(board, pendingPlacements) : [];
-  
+export const BoardComponent: React.FC<BoardComponentProps> = ({
+  board,
+  pendingPlacements,
+  onPlaceCard,
+  selectedCard,
+  zoomLevel = 1,
+}) => {
+  const validPlacements = selectedCard
+    ? getValidPlacements(board, pendingPlacements)
+    : []
+
   // Calculate scaled sizes
-  const cellSize = 44 * zoomLevel;
-  const cardSize = 40 * zoomLevel;
-  const gap = 2 * zoomLevel;
-  
+  const cellSize = 44 * zoomLevel
+  const cardSize = 40 * zoomLevel
+  const gap = 2 * zoomLevel
+
   // Combine board and pending for display
-  const allPlacements = [...board, ...pendingPlacements];
-  
+  const allPlacements = [...board, ...pendingPlacements]
+
   // Calculate board bounds
-  let minRow = 0, maxRow = 0, minCol = 0, maxCol = 0;
+  let minRow = 0
+  let maxRow = 0
+  let minCol = 0
+  let maxCol = 0
   if (allPlacements.length > 0) {
-    allPlacements.forEach(({ position }) => {
-      minRow = Math.min(minRow, position.row);
-      maxRow = Math.max(maxRow, position.row);
-      minCol = Math.min(minCol, position.col);
-      maxCol = Math.max(maxCol, position.col);
-    });
+    for (const { position } of allPlacements) {
+      minRow = Math.min(minRow, position.row)
+      maxRow = Math.max(maxRow, position.row)
+      minCol = Math.min(minCol, position.col)
+      maxCol = Math.max(maxCol, position.col)
+    }
   }
-  
+
   // Add padding for valid placements
-  minRow -= 1;
-  maxRow += 1;
-  minCol -= 1;
-  maxCol += 1;
-  
-  const rows = maxRow - minRow + 1;
-  const cols = maxCol - minCol + 1;
-  
+  minRow -= 1
+  maxRow += 1
+  minCol -= 1
+  maxCol += 1
+
+  const rows = maxRow - minRow + 1
+  const cols = maxCol - minCol + 1
+
   const isValidPlacement = (row: number, col: number) => {
-    return validPlacements.some(pos => pos.row === row && pos.col === col);
-  };
-  
+    return validPlacements.some((pos) => pos.row === row && pos.col === col)
+  }
+
   const getPlacedCard = (row: number, col: number) => {
-    return allPlacements.find(placed => 
-      placed.position.row === row && placed.position.col === col
-    );
-  };
-  
+    return allPlacements.find(
+      (placed) => placed.position.row === row && placed.position.col === col
+    )
+  }
+
   return (
     <Box
       sx={{
@@ -77,12 +88,13 @@ export const BoardComponent: React.FC<BoardComponentProps> = ({ board, pendingPl
         }}
       >
         {Array.from({ length: rows * cols }).map((_, index) => {
-          const row = Math.floor(index / cols) + minRow;
-          const col = (index % cols) + minCol;
-          const placedCard = getPlacedCard(row, col);
-          const isValid = isValidPlacement(row, col);
-          const isImpossible = !placedCard && isImpossibleSquare({ row, col }, allPlacements);
-          
+          const row = Math.floor(index / cols) + minRow
+          const col = (index % cols) + minCol
+          const placedCard = getPlacedCard(row, col)
+          const isValid = isValidPlacement(row, col)
+          const isImpossible =
+            !placedCard && isImpossibleSquare({ row, col }, allPlacements)
+
           return (
             <div
               key={`${row}-${col}`}
@@ -93,23 +105,27 @@ export const BoardComponent: React.FC<BoardComponentProps> = ({ board, pendingPl
                 alignItems: 'center',
                 justifyContent: 'center',
                 borderRadius: `${8 * zoomLevel}px`,
-                backgroundColor: isValid && selectedCard ? '#bbf7d0' : 'transparent',
-                cursor: isValid && selectedCard && !isImpossible ? 'pointer' : 'default',
+                backgroundColor:
+                  isValid && selectedCard ? '#bbf7d0' : 'transparent',
+                cursor:
+                  isValid && selectedCard && !isImpossible
+                    ? 'pointer'
+                    : 'default',
                 transition: 'background-color 0.2s',
               }}
               onMouseEnter={(e) => {
                 if (isValid && selectedCard && !isImpossible) {
-                  e.currentTarget.style.backgroundColor = '#86efac';
+                  e.currentTarget.style.backgroundColor = '#86efac'
                 }
               }}
               onMouseLeave={(e) => {
                 if (isValid && selectedCard && !isImpossible) {
-                  e.currentTarget.style.backgroundColor = '#bbf7d0';
+                  e.currentTarget.style.backgroundColor = '#bbf7d0'
                 }
               }}
               onClick={() => {
                 if (isValid && selectedCard && !isImpossible) {
-                  onPlaceCard({ row, col });
+                  onPlaceCard({ row, col })
                 }
               }}
             >
@@ -119,25 +135,29 @@ export const BoardComponent: React.FC<BoardComponentProps> = ({ board, pendingPl
                 </div>
               )}
               {!placedCard && isValid && selectedCard && !isImpossible && (
-                <div style={{
-                  width: `${cardSize}px`,
-                  height: `${cardSize}px`,
-                  border: `${2 * zoomLevel}px dashed #22c55e`,
-                  borderRadius: `${8 * zoomLevel}px`,
-                }} />
+                <div
+                  style={{
+                    width: `${cardSize}px`,
+                    height: `${cardSize}px`,
+                    border: `${2 * zoomLevel}px dashed #22c55e`,
+                    borderRadius: `${8 * zoomLevel}px`,
+                  }}
+                />
               )}
               {!placedCard && isImpossible && (
-                <div style={{
-                  width: `${cardSize}px`,
-                  height: `${cardSize}px`,
-                  backgroundColor: '#292929',
-                  borderRadius: '50%',
-                }} />
+                <div
+                  style={{
+                    width: `${cardSize}px`,
+                    height: `${cardSize}px`,
+                    backgroundColor: '#292929',
+                    borderRadius: '50%',
+                  }}
+                />
               )}
             </div>
-          );
+          )
         })}
       </div>
     </Box>
-  );
-};
+  )
+}
