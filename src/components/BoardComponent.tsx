@@ -3,20 +3,31 @@ import { Box } from '@mui/material';
 import { PlacedCard, GridPosition, Card } from '../types/game';
 import { GameCard } from './GameCard';
 import { getValidPlacements } from '../utils/gameLogic';
+import { isImpossibleSquare } from '../utils/impossibleSquares';
 
 interface BoardComponentProps {
   board: PlacedCard[];
+  pendingPlacements: PlacedCard[];
   onPlaceCard: (position: GridPosition) => void;
   selectedCard: Card | null;
+  zoomLevel?: number;
 }
 
-export const BoardComponent: React.FC<BoardComponentProps> = ({ board, onPlaceCard, selectedCard }) => {
-  const validPlacements = selectedCard ? getValidPlacements(board) : [];
+export const BoardComponent: React.FC<BoardComponentProps> = ({ board, pendingPlacements, onPlaceCard, selectedCard, zoomLevel = 1 }) => {
+  const validPlacements = selectedCard ? getValidPlacements(board, pendingPlacements) : [];
+  
+  // Calculate scaled sizes
+  const cellSize = 44 * zoomLevel;
+  const cardSize = 40 * zoomLevel;
+  const gap = 2 * zoomLevel;
+  
+  // Combine board and pending for display
+  const allPlacements = [...board, ...pendingPlacements];
   
   // Calculate board bounds
   let minRow = 0, maxRow = 0, minCol = 0, maxCol = 0;
-  if (board.length > 0) {
-    board.forEach(({ position }) => {
+  if (allPlacements.length > 0) {
+    allPlacements.forEach(({ position }) => {
       minRow = Math.min(minRow, position.row);
       maxRow = Math.max(maxRow, position.row);
       minCol = Math.min(minCol, position.col);
@@ -38,18 +49,31 @@ export const BoardComponent: React.FC<BoardComponentProps> = ({ board, onPlaceCa
   };
   
   const getPlacedCard = (row: number, col: number) => {
-    return board.find(placed => 
+    return allPlacements.find(placed => 
       placed.position.row === row && placed.position.col === col
     );
   };
   
   return (
-    <Box className="relative overflow-auto max-h-[600px] max-w-full p-8 bg-gray-100 rounded-lg">
-      <div 
-        className="grid gap-2 w-fit mx-auto"
+    <Box
+      sx={{
+        position: 'relative',
+        overflow: 'auto',
+        maxHeight: '600px',
+        maxWidth: '100%',
+        padding: '32px',
+        backgroundColor: '#f3f4f6',
+        borderRadius: '8px',
+      }}
+    >
+      <div
         style={{
-          gridTemplateColumns: `repeat(${cols}, minmax(88px, 1fr))`,
-          gridTemplateRows: `repeat(${rows}, minmax(104px, 1fr))`,
+          display: 'grid',
+          gap: `${gap}px`,
+          width: 'fit-content',
+          margin: '0 auto',
+          gridTemplateColumns: `repeat(${cols}, ${cellSize}px)`,
+          gridTemplateRows: `repeat(${rows}, ${cellSize}px)`,
         }}
       >
         {Array.from({ length: rows * cols }).map((_, index) => {
@@ -57,26 +81,58 @@ export const BoardComponent: React.FC<BoardComponentProps> = ({ board, onPlaceCa
           const col = (index % cols) + minCol;
           const placedCard = getPlacedCard(row, col);
           const isValid = isValidPlacement(row, col);
+          const isImpossible = !placedCard && isImpossibleSquare({ row, col }, allPlacements);
           
           return (
             <div
               key={`${row}-${col}`}
-              className={`
-                w-22 h-26 flex items-center justify-center rounded-lg
-                ${isValid && selectedCard ? 'bg-green-200 cursor-pointer hover:bg-green-300' : ''}
-                ${!placedCard && !isValid ? 'bg-transparent' : ''}
-              `}
+              style={{
+                width: `${cellSize}px`,
+                height: `${cellSize}px`,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderRadius: `${8 * zoomLevel}px`,
+                backgroundColor: isValid && selectedCard ? '#bbf7d0' : 'transparent',
+                cursor: isValid && selectedCard && !isImpossible ? 'pointer' : 'default',
+                transition: 'background-color 0.2s',
+              }}
+              onMouseEnter={(e) => {
+                if (isValid && selectedCard && !isImpossible) {
+                  e.currentTarget.style.backgroundColor = '#86efac';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (isValid && selectedCard && !isImpossible) {
+                  e.currentTarget.style.backgroundColor = '#bbf7d0';
+                }
+              }}
               onClick={() => {
-                if (isValid && selectedCard) {
+                if (isValid && selectedCard && !isImpossible) {
                   onPlaceCard({ row, col });
                 }
               }}
             >
               {placedCard && (
-                <GameCard card={placedCard.card} disabled />
+                <div style={{ transform: `scale(${zoomLevel})` }}>
+                  <GameCard card={placedCard.card} disabled />
+                </div>
               )}
-              {!placedCard && isValid && selectedCard && (
-                <div className="w-20 h-24 border-2 border-dashed border-green-500 rounded-lg" />
+              {!placedCard && isValid && selectedCard && !isImpossible && (
+                <div style={{
+                  width: `${cardSize}px`,
+                  height: `${cardSize}px`,
+                  border: `${2 * zoomLevel}px dashed #22c55e`,
+                  borderRadius: `${8 * zoomLevel}px`,
+                }} />
+              )}
+              {!placedCard && isImpossible && (
+                <div style={{
+                  width: `${cardSize}px`,
+                  height: `${cardSize}px`,
+                  backgroundColor: '#292929',
+                  borderRadius: '50%',
+                }} />
               )}
             </div>
           );

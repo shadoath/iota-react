@@ -19,10 +19,18 @@ export interface PlacedCard {
   position: GridPosition;
 }
 
+export interface PendingPlacement {
+  card: Card;
+  position: GridPosition;
+}
+
 export interface GameState {
   deck: Card[];
   playerHand: Card[];
   board: PlacedCard[];
   currentPlayer: number;
   score: number;
+  pendingPlacements: PendingPlacement[];
+  turnInProgress: boolean;
+  lastTurnScore: number | null;
 }

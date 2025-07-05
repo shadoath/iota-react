@@ -1,11 +1,17 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Container, Box, Typography, Button, Alert, Paper } from '@mui/material';
-import { Card, GameState, GridPosition } from '../types/game';
+import { Container, Box, Typography, Paper, IconButton } from '@mui/material';
+import ZoomInIcon from '@mui/icons-material/ZoomIn';
+import ZoomOutIcon from '@mui/icons-material/ZoomOut';
+import toast, { Toaster } from 'react-hot-toast';
+import { Card, GameState, GridPosition, PendingPlacement } from '../types/game';
 import { createDeck, isValidPlacement, calculateScore } from '../utils/gameLogic';
+import { isPlacementInSameLineAsPending } from '../utils/turnValidation';
+import { getDetailedValidationError } from '../utils/validationMessages';
 import { BoardComponent } from './BoardComponent';
 import { PlayerHand } from './PlayerHand';
+import { Sidebar } from './Sidebar';
 
 export const Game: React.FC = () => {
   const [gameState, setGameState] = useState<GameState>({
@@ -14,10 +20,13 @@ export const Game: React.FC = () => {
     board: [],
     currentPlayer: 1,
     score: 0,
+    pendingPlacements: [],
+    turnInProgress: false,
+    lastTurnScore: null,
   });
   
   const [selectedCard, setSelectedCard] = useState<Card | null>(null);
-  const [message, setMessage] = useState<string>('');
+  const [zoomLevel, setZoomLevel] = useState(1.0);
 
   // Initialize game
   useEffect(() => {
@@ -42,101 +51,219 @@ export const Game: React.FC = () => {
       board,
       currentPlayer: 1,
       score: 0,
+      pendingPlacements: [],
+      turnInProgress: false,
+      lastTurnScore: null,
     });
     
     setSelectedCard(null);
-    setMessage('Game started! Select a card from your hand to play.');
+    toast.success('New game started!');
   };
 
   const handleSelectCard = (card: Card) => {
     if (selectedCard?.id === card.id) {
       setSelectedCard(null);
-      setMessage('');
     } else {
       setSelectedCard(card);
-      setMessage('Click on a valid position (green squares) to place your card.');
     }
   };
 
   const handlePlaceCard = (position: GridPosition) => {
     if (!selectedCard) return;
     
-    if (!isValidPlacement(selectedCard, position, gameState.board)) {
-      setMessage('Invalid placement! Cards must share at least one attribute with adjacent cards.');
+    // Check if placement is in same line as other pending placements
+    if (!isPlacementInSameLineAsPending(position, gameState.pendingPlacements)) {
+      toast.error('All cards in a turn must be placed in the same row or column!');
       return;
     }
     
-    // Place the card
-    const placedCard = {
-      card: selectedCard,
+    // Check against both board and pending placements
+    const allPlacements = [...gameState.board, ...gameState.pendingPlacements];
+    
+    // Get detailed validation error
+    const validationResult = getDetailedValidationError(selectedCard, position, allPlacements);
+    
+    if (!validationResult.isValid) {
+      toast.error(validationResult.errorMessage || 'Invalid placement!');
+      return;
+    }
+    
+    // Add to pending placements with a special ID prefix
+    const newPending: PendingPlacement = {
+      card: { ...selectedCard, id: `pending-${selectedCard.id}` },
       position
     };
     
-    // Calculate score
-    const points = calculateScore(placedCard, gameState.board);
-    
-    // Update game state
-    const newHand = gameState.playerHand.filter(c => c.id !== selectedCard.id);
-    const newCard = gameState.deck[0];
-    
     setGameState(prev => ({
       ...prev,
-      board: [...prev.board, placedCard],
-      playerHand: newCard ? [...newHand, newCard] : newHand,
-      deck: prev.deck.slice(1),
-      score: prev.score + points,
+      pendingPlacements: [...prev.pendingPlacements, newPending],
+      playerHand: prev.playerHand.filter(c => c.id !== selectedCard.id),
+      turnInProgress: true,
     }));
     
     setSelectedCard(null);
-    setMessage(`Card placed! You scored ${points} points.`);
     
-    // Check game end
-    if (newHand.length === 0 && !newCard) {
-      setMessage(`Game Over! Final Score: ${gameState.score + points}`);
+    if (gameState.pendingPlacements.length + 1 >= 4) {
+      toast('Maximum 4 cards per turn!', { icon: '⚠️' });
     }
   };
 
+  const completeTurn = () => {
+    if (gameState.pendingPlacements.length === 0) {
+      toast.error('You must place at least one card!');
+      return;
+    }
+    
+    // Calculate score for all placed cards
+    const points = calculateScore(gameState.pendingPlacements, gameState.board);
+    
+    // Move pending to board
+    const newBoard = [...gameState.board, ...gameState.pendingPlacements];
+    
+    // Draw new cards
+    const cardsNeeded = 4 - gameState.playerHand.length;
+    const newCards = gameState.deck.slice(0, cardsNeeded);
+    const newDeck = gameState.deck.slice(cardsNeeded);
+    const newHand = [...gameState.playerHand, ...newCards];
+    
+    setGameState(prev => ({
+      ...prev,
+      board: newBoard,
+      playerHand: newHand,
+      deck: newDeck,
+      score: prev.score + points,
+      pendingPlacements: [],
+      turnInProgress: false,
+      lastTurnScore: points,
+    }));
+    
+    toast.success(`Turn complete! You scored ${points} points!`, {
+      duration: 3000,
+      icon: '🎉',
+    });
+    
+    // Check game end
+    if (newHand.length === 0) {
+      toast.success(`Game Over! Final Score: ${gameState.score + points}`, {
+        duration: 5000,
+        icon: '🏆',
+      });
+    }
+  };
+
+  const undoLastPlacement = () => {
+    if (gameState.pendingPlacements.length === 0) return;
+    
+    const lastPlacement = gameState.pendingPlacements[gameState.pendingPlacements.length - 1];
+    // Remove the 'pending-' prefix to get original card
+    const originalCard = { ...lastPlacement.card, id: lastPlacement.card.id.replace('pending-', '') };
+    
+    setGameState(prev => ({
+      ...prev,
+      pendingPlacements: prev.pendingPlacements.slice(0, -1),
+      playerHand: [...prev.playerHand, originalCard],
+      turnInProgress: prev.pendingPlacements.length > 1,
+    }));
+    
+    toast('Placement undone', { icon: '↩️' });
+  };
+
   return (
-    <Container maxWidth="xl" className="py-8">
-      <Box className="text-center mb-6">
-        <Typography variant="h3" className="font-bold text-gray-800 mb-4">
-          Iota Card Game
-        </Typography>
-        <Box className="flex justify-center gap-8 mb-4">
-          <Paper className="px-4 py-2">
-            <Typography variant="h6">Score: {gameState.score}</Typography>
-          </Paper>
-          <Paper className="px-4 py-2">
-            <Typography variant="h6">Cards Left: {gameState.deck.length}</Typography>
-          </Paper>
-          <Button 
-            variant="contained" 
-            onClick={startNewGame}
-            className="bg-blue-600 hover:bg-blue-700"
-          >
-            New Game
-          </Button>
-        </Box>
-        {message && (
-          <Alert severity="info" className="max-w-md mx-auto">
-            {message}
-          </Alert>
-        )}
-      </Box>
+    <>
+      <Toaster position="top-center" />
       
-      <Box className="mb-8">
+      <Sidebar
+        cardsLeft={gameState.deck.length}
+        lastTurnScore={gameState.lastTurnScore}
+        pendingPoints={gameState.pendingPlacements.length > 0 ? calculateScore(gameState.pendingPlacements, gameState.board) : 0}
+        pendingCount={gameState.pendingPlacements.length}
+        turnInProgress={gameState.turnInProgress}
+        onNewGame={startNewGame}
+        onCompleteTurn={completeTurn}
+        onUndoLast={undoLastPlacement}
+      />
+      
+      <Paper
+        sx={{
+          position: 'fixed',
+          top: 16,
+          left: '50%',
+          transform: 'translateX(-50%)',
+          padding: '12px 24px',
+          backgroundColor: 'white',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+          zIndex: 1100,
+          borderRadius: '24px',
+          textAlign: 'center',
+        }}
+      >
+        <Typography variant="h5" sx={{ fontWeight: 'bold' }}>
+          Score: {gameState.score}
+        </Typography>
+        {gameState.pendingPlacements.length > 0 && (
+          <Typography variant="body2" sx={{ color: '#f59e0b', fontWeight: 'medium' }}>
+            +{calculateScore(gameState.pendingPlacements, gameState.board)} pending
+          </Typography>
+        )}
+      </Paper>
+
+      <Box
+        sx={{
+          position: 'fixed',
+          top: 16,
+          right: 16,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 1,
+          zIndex: 1100,
+        }}
+      >
+        <IconButton
+          onClick={() => setZoomLevel(Math.min(zoomLevel + 0.1, 1.5))}
+          sx={{
+            backgroundColor: 'white',
+            boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+            '&:hover': {
+              backgroundColor: '#f5f5f5',
+            },
+          }}
+        >
+          <ZoomInIcon />
+        </IconButton>
+        <IconButton
+          onClick={() => setZoomLevel(Math.max(zoomLevel - 0.1, 0.5))}
+          sx={{
+            backgroundColor: 'white',
+            boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+            '&:hover': {
+              backgroundColor: '#f5f5f5',
+            },
+          }}
+        >
+          <ZoomOutIcon />
+        </IconButton>
+      </Box>
+
+      <Container maxWidth="xl" sx={{ paddingTop: '10px', paddingBottom: '10px' }}>
         <BoardComponent
           board={gameState.board}
+          pendingPlacements={gameState.pendingPlacements}
           onPlaceCard={handlePlaceCard}
-          selectedCard={selectedCard}
+          selectedCard={gameState.pendingPlacements.length < 4 ? selectedCard : null}
+          zoomLevel={zoomLevel}
         />
-      </Box>
+      </Container>
       
       <PlayerHand
         cards={gameState.playerHand}
         selectedCard={selectedCard}
         onSelectCard={handleSelectCard}
+        turnInProgress={gameState.turnInProgress}
+        pendingCount={gameState.pendingPlacements.length}
+        pendingPoints={gameState.pendingPlacements.length > 0 ? calculateScore(gameState.pendingPlacements, gameState.board) : 0}
+        onCompleteTurn={completeTurn}
+        onUndoLast={undoLastPlacement}
       />
-    </Container>
+    </>
   );
 };

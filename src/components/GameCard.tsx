@@ -11,22 +11,22 @@ interface GameCardProps {
 
 const shapeComponents: Record<string, React.FC<{ color: string }>> = {
   triangle: ({ color }) => (
-    <svg width="40" height="40" viewBox="0 0 40 40">
+    <svg width="20" height="20" viewBox="0 0 40 40">
       <polygon points="20,5 35,35 5,35" fill={color} />
     </svg>
   ),
   square: ({ color }) => (
-    <svg width="40" height="40" viewBox="0 0 40 40">
+    <svg width="20" height="20" viewBox="0 0 40 40">
       <rect x="5" y="5" width="30" height="30" fill={color} />
     </svg>
   ),
   circle: ({ color }) => (
-    <svg width="40" height="40" viewBox="0 0 40 40">
+    <svg width="20" height="20" viewBox="0 0 40 40">
       <circle cx="20" cy="20" r="15" fill={color} />
     </svg>
   ),
   cross: ({ color }) => (
-    <svg width="40" height="40" viewBox="0 0 40 40">
+    <svg width="20" height="20" viewBox="0 0 40 40">
       <path d="M10,10 L30,30 M30,10 L10,30" stroke={color} strokeWidth="6" strokeLinecap="round" />
     </svg>
   ),
@@ -46,18 +46,32 @@ export const GameCard: React.FC<GameCardProps> = ({ card, onClick, selected, dis
   return (
     <Box
       onClick={disabled ? undefined : onClick}
-      className={`
-        relative w-20 h-24 bg-white rounded-lg shadow-md cursor-pointer
-        transition-all duration-200 flex flex-col items-center justify-center
-        ${selected ? 'ring-4 ring-blue-500 scale-105' : 'hover:scale-105'}
-        ${disabled ? 'opacity-50 cursor-not-allowed' : 'hover:shadow-lg'}
-      `}
+      className="game-card"
       sx={{
-        border: '2px solid #e0e0e0',
+        position: 'relative',
+        width: '40px',
+        height: '40px',
+        backgroundColor: 'white',
+        borderRadius: '4px',
+        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+        cursor: disabled ? 'not-allowed' : 'pointer',
+        transition: 'all 0.2s',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        border: '1px solid #e0e0e0',
+        opacity: disabled ? 0.5 : 1,
+        transform: selected ? 'scale(1.05)' : 'scale(1)',
+        boxShadow: selected ? '0 0 0 2px #3b82f6' : '0 2px 4px rgba(0, 0, 0, 0.1)',
+        '&:hover': disabled ? {} : {
+          transform: 'scale(1.05)',
+          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+        },
       }}
     >
       <ShapeComponent color={color} />
-      <span className="text-2xl font-bold mt-1" style={{ color }}>
+      <span style={{ fontSize: '0.75rem', fontWeight: 'bold', marginTop: '2px', color }}>
         {card.number}
       </span>
     </Box>
