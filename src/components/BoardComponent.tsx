@@ -4,6 +4,7 @@ import type { PlacedCard, GridPosition, Card } from '../types/game'
 import { GameCard } from './GameCard'
 import { getValidPlacements } from '../utils/gameLogic'
 import { isImpossibleSquare } from '../utils/impossibleSquares'
+import { useState, useEffect } from 'react'
 
 interface BoardComponentProps {
   board: PlacedCard[]
@@ -20,14 +21,29 @@ export const BoardComponent: React.FC<BoardComponentProps> = ({
   selectedCard,
   zoomLevel = 1,
 }) => {
+  // Detect if we're on mobile
+  const [isMobile, setIsMobile] = useState(false)
+  
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
   const validPlacements = selectedCard
     ? getValidPlacements(board, pendingPlacements)
     : []
 
-  // Calculate scaled sizes
-  const cellSize = 44 * zoomLevel
-  const cardSize = 40 * zoomLevel
-  const gap = 2 * zoomLevel
+  // Calculate scaled sizes - larger on desktop
+  const baseCellSize = isMobile ? 60 : 80
+  const baseCardSize = isMobile ? 56 : 76
+  const baseGap = isMobile ? 3 : 4
+  
+  const cellSize = baseCellSize * zoomLevel
+  const cardSize = baseCardSize * zoomLevel
+  const gap = baseGap * zoomLevel
 
   // Combine board and pending for display
   const allPlacements = [...board, ...pendingPlacements]
@@ -70,11 +86,14 @@ export const BoardComponent: React.FC<BoardComponentProps> = ({
       sx={{
         position: 'relative',
         overflow: 'auto',
-        maxHeight: '600px',
+        maxHeight: '80vh',
         maxWidth: '100%',
-        padding: '32px',
+        padding: { xs: '16px', md: '32px' },
         backgroundColor: '#f3f4f6',
         borderRadius: '8px',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'flex-start',
       }}
     >
       <div

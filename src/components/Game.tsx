@@ -251,7 +251,7 @@ export const Game: React.FC = () => {
         }}
       >
         <IconButton
-          onClick={() => setZoomLevel(Math.min(zoomLevel + 0.1, 1.5))}
+          onClick={() => setZoomLevel(Math.min(zoomLevel + 0.1, 3.0))}
           sx={{
             backgroundColor: 'white',
             boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
@@ -263,7 +263,7 @@ export const Game: React.FC = () => {
           <ZoomInIcon />
         </IconButton>
         <IconButton
-          onClick={() => setZoomLevel(Math.max(zoomLevel - 0.1, 0.5))}
+          onClick={() => setZoomLevel(Math.max(zoomLevel - 0.1, 0.25))}
           sx={{
             backgroundColor: 'white',
             boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
@@ -276,9 +276,15 @@ export const Game: React.FC = () => {
         </IconButton>
       </Box>
 
-      <Container
-        maxWidth='xl'
-        sx={{ paddingTop: '10px', paddingBottom: '10px' }}
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          minHeight: 'calc(100vh - 200px)',
+          paddingTop: '80px',
+          paddingBottom: '10px',
+        }}
       >
         <BoardComponent
           board={gameState.board}
@@ -289,7 +295,7 @@ export const Game: React.FC = () => {
           }
           zoomLevel={zoomLevel}
         />
-      </Container>
+      </Box>
 
       <PlayerHand
         cards={gameState.playerHand}

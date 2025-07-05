@@ -12,8 +12,8 @@ interface GameCardProps {
 const shapeComponents: Record<string, React.FC<{ color: string }>> = {
   triangle: ({ color }) => (
     <svg
-      width='20'
-      height='20'
+      width='28'
+      height='28'
       viewBox='0 0 40 40'
       aria-label='Triangle'
       role='img'
@@ -23,8 +23,8 @@ const shapeComponents: Record<string, React.FC<{ color: string }>> = {
   ),
   square: ({ color }) => (
     <svg
-      width='20'
-      height='20'
+      width='28'
+      height='28'
       viewBox='0 0 40 40'
       aria-label='Square'
       role='img'
@@ -34,8 +34,8 @@ const shapeComponents: Record<string, React.FC<{ color: string }>> = {
   ),
   circle: ({ color }) => (
     <svg
-      width='20'
-      height='20'
+      width='28'
+      height='28'
       viewBox='0 0 40 40'
       aria-label='Circle'
       role='img'
@@ -45,8 +45,8 @@ const shapeComponents: Record<string, React.FC<{ color: string }>> = {
   ),
   cross: ({ color }) => (
     <svg
-      width='20'
-      height='20'
+      width='28'
+      height='28'
       viewBox='0 0 40 40'
       aria-label='Cross'
       role='img'
@@ -83,9 +83,9 @@ export const GameCard: React.FC<GameCardProps> = ({
       className='game-card'
       sx={{
         position: 'relative',
-        width: '40px',
-        height: '40px',
-        backgroundColor: 'white',
+        width: '56px',
+        height: '56px',
+        backgroundColor: 'black',
         borderRadius: '4px',
         cursor: disabled ? 'not-allowed' : 'pointer',
         transition: 'all 0.2s',
@@ -110,7 +110,7 @@ export const GameCard: React.FC<GameCardProps> = ({
       <ShapeComponent color={color} />
       <span
         style={{
-          fontSize: '0.75rem',
+          fontSize: '1rem',
           fontWeight: 'bold',
           marginTop: '2px',
           color,
