@@ -8,24 +8,24 @@ interface TurnTimerProps {
   resetKey: number // changes to reset the timer (e.g. turn index)
 }
 
-export const TurnTimer: React.FC<TurnTimerProps> = ({
+/**
+ * Inner component that resets via key prop (avoids setState in effect).
+ */
+function TurnTimerInner({
   timeLimit,
   onTimeout,
   isActive,
-  resetKey,
-}) => {
+}: Omit<TurnTimerProps, 'resetKey'>) {
   const [remaining, setRemaining] = useState(timeLimit)
   const onTimeoutRef = useRef(onTimeout)
-  onTimeoutRef.current = onTimeout
 
-  // Reset on turn change
   useEffect(() => {
-    setRemaining(timeLimit)
-  }, [resetKey, timeLimit])
+    onTimeoutRef.current = onTimeout
+  }, [onTimeout])
 
-  // Count down
+  const isExpired = remaining <= 0
   useEffect(() => {
-    if (!isActive || remaining <= 0) return
+    if (!isActive || isExpired) return
 
     const interval = setInterval(() => {
       setRemaining(prev => {
@@ -40,7 +40,7 @@ export const TurnTimer: React.FC<TurnTimerProps> = ({
     }, 1000)
 
     return () => clearInterval(interval)
-  }, [isActive, remaining <= 0]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [isActive, isExpired])
 
   const fraction = remaining / timeLimit
   const colorClass = fraction > 0.5 ? styles.green : fraction > 0.2 ? styles.yellow : styles.red
@@ -59,4 +59,12 @@ export const TurnTimer: React.FC<TurnTimerProps> = ({
       </div>
     </div>
   )
+}
+
+/** Wrapper that remounts the timer via key to reset it. */
+export const TurnTimer: React.FC<TurnTimerProps> = ({
+  resetKey,
+  ...props
+}) => {
+  return <TurnTimerInner key={resetKey} {...props} />
 }

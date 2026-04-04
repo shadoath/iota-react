@@ -6,28 +6,31 @@ type Theme = 'light' | 'dark' | 'system'
 
 const STORAGE_KEY = 'nodusnexus-theme'
 
-export function useTheme() {
-  const [theme, setThemeState] = useState<Theme>('system')
+function getStoredTheme(): Theme {
+  if (typeof window === 'undefined') return 'system'
+  return (localStorage.getItem(STORAGE_KEY) as Theme) || 'system'
+}
 
-  // Initialize from localStorage
+export function useTheme() {
+  const [theme, setThemeState] = useState<Theme>(getStoredTheme)
+
+  // Apply theme on mount and when it changes
   useEffect(() => {
-    const stored = localStorage.getItem(STORAGE_KEY) as Theme | null
-    if (stored) {
-      setThemeState(stored)
-      applyTheme(stored)
-    }
-  }, [])
+    applyTheme(theme)
+  }, [theme])
 
   const setTheme = useCallback((newTheme: Theme) => {
     setThemeState(newTheme)
     localStorage.setItem(STORAGE_KEY, newTheme)
-    applyTheme(newTheme)
   }, [])
 
   const toggle = useCallback(() => {
-    const next = theme === 'light' ? 'dark' : theme === 'dark' ? 'system' : 'light'
-    setTheme(next)
-  }, [theme, setTheme])
+    setThemeState(prev => {
+      const next = prev === 'light' ? 'dark' : prev === 'dark' ? 'system' : 'light'
+      localStorage.setItem(STORAGE_KEY, next)
+      return next
+    })
+  }, [])
 
   return { theme, setTheme, toggle }
 }
