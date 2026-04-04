@@ -180,13 +180,27 @@ export const BoardComponent: React.FC<BoardComponentProps> = ({
             valid && selectedCard && !impossible && styles.cellValid,
           ].filter(Boolean).join(' ')
 
+          const isClickable = valid && selectedCard && !impossible
+          const cellLabel = placedCard
+            ? `Card: ${placedCard.card.isWild ? 'Wild' : `${placedCard.card.number} ${placedCard.card.color} ${placedCard.card.shape}`} at row ${row}, column ${col}`
+            : isClickable
+            ? `Place card at row ${row}, column ${col}${scoreHints?.[`${row},${col}`] ? ` for ${scoreHints[`${row},${col}`]} points` : ''}`
+            : undefined
+
           return (
             <div
               key={`${row}-${col}`}
               className={cellClass}
               style={{ width: cellSize, height: cellSize }}
+              role={isClickable ? 'button' : undefined}
+              tabIndex={isClickable ? 0 : undefined}
+              aria-label={cellLabel}
               onClick={() => {
-                if (valid && selectedCard && !impossible) {
+                if (isClickable) onPlaceCard({ row, col })
+              }}
+              onKeyDown={(e) => {
+                if (isClickable && (e.key === 'Enter' || e.key === ' ')) {
+                  e.preventDefault()
                   onPlaceCard({ row, col })
                 }
               }}
