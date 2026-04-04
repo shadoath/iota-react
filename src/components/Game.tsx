@@ -17,6 +17,9 @@ import { ScoreBoard } from './ScoreBoard'
 import { ModeSelect } from './ModeSelect'
 import { Tutorial } from './Tutorial/Tutorial'
 import { TurnTimer } from './TurnTimer'
+import { Lobby } from './Lobby'
+import { MultiplayerGame } from './MultiplayerGame'
+import { useSocket } from '../multiplayer/useSocket'
 import { GameProvider, useGame } from '../context/GameContext'
 import styles from './Game.module.css'
 
@@ -27,6 +30,8 @@ function GameInner() {
   const [lastSettings, setLastSettings] = useState<GameSettings | null>(null)
   const [showTutorial, setShowTutorial] = useState(false)
   const [selectedMode, setSelectedMode] = useState<GameMode>('classic')
+  const [showMultiplayer, setShowMultiplayer] = useState(false)
+  const socket = useSocket()
 
   const currentPlayer = game.players[game.currentPlayerIndex]
   const isHumanTurn = currentPlayer?.type === 'human'
@@ -184,6 +189,29 @@ function GameInner() {
     return hints
   }, [game.hintsEnabled, selectedCard, isHumanTurn, game.board, game.pendingPlacements])
 
+  // --- Multiplayer ---
+  if (showMultiplayer) {
+    // If in a game, show the multiplayer game view
+    if (socket.gameState) {
+      return (
+        <MultiplayerGame
+          socket={socket}
+          onLeave={() => {
+            socket.leaveRoom()
+            setShowMultiplayer(false)
+          }}
+        />
+      )
+    }
+    // Otherwise show lobby
+    return (
+      <Lobby
+        socket={socket}
+        onBack={() => setShowMultiplayer(false)}
+      />
+    )
+  }
+
   // --- Tutorial ---
   if (showTutorial) {
     return (
@@ -206,6 +234,7 @@ function GameInner() {
       <ModeSelect
         onSelectMode={handleSelectMode}
         onTutorial={() => setShowTutorial(true)}
+        onMultiplayer={() => setShowMultiplayer(true)}
       />
     )
   }
