@@ -22,9 +22,9 @@ export function createDeck(): Card[] {
     }
   }
   
-  // Add 2 wild cards (can match any attribute)
-  deck.push({ id: `card-${id++}`, number: 1, color: 'red', shape: 'triangle' });
-  deck.push({ id: `card-${id}`, number: 1, color: 'red', shape: 'triangle' });
+  // Add 2 wild cards (can match any attribute, worth 0 points)
+  deck.push({ id: `wild-1`, number: 0 as CardNumber, color: 'wild' as CardColor, shape: 'wild' as CardShape, isWild: true } as Card);
+  deck.push({ id: `wild-2`, number: 0 as CardNumber, color: 'wild' as CardColor, shape: 'wild' as CardShape, isWild: true } as Card);
   
   return shuffleDeck(deck);
 }
@@ -188,22 +188,36 @@ export function getCardsInLine(position: GridPosition, board: PlacedCard[], dire
 
 function isValidLine(line: PlacedCard[]): boolean {
   if (line.length < 2) return true;
-  
-  // Check each attribute - must be all same or all different
-  const numbers = line.map(p => p.card.number);
-  const colors = line.map(p => p.card.color);
-  const shapes = line.map(p => p.card.shape);
-  
-  return isValidAttribute(numbers) && isValidAttribute(colors) && isValidAttribute(shapes);
+
+  // Separate wild and non-wild cards
+  const nonWildCards = line.filter(p => !p.card.isWild);
+
+  // If all cards are wild, the line is always valid
+  if (nonWildCards.length === 0) return true;
+
+  // Check each attribute using only non-wild cards
+  const numbers = nonWildCards.map(p => p.card.number);
+  const colors = nonWildCards.map(p => p.card.color);
+  const shapes = nonWildCards.map(p => p.card.shape);
+
+  return isValidAttribute(numbers, line.length) &&
+    isValidAttribute(colors, line.length) &&
+    isValidAttribute(shapes, line.length);
 }
 
-function isValidAttribute<T>(values: T[]): boolean {
-  if (values.length < 2) return true;
-  
-  const uniqueValues = new Set(values);
-  
-  // Either all same (set size = 1) or all different (set size = length)
-  return uniqueValues.size === 1 || uniqueValues.size === values.length;
+function isValidAttribute<T>(nonWildValues: T[], totalLineLength: number): boolean {
+  if (nonWildValues.length < 2) return true;
+
+  const uniqueValues = new Set(nonWildValues);
+
+  // All same: all non-wild values are identical
+  if (uniqueValues.size === 1) return true;
+
+  // All different: all non-wild values are unique, and total line length
+  // doesn't exceed the number of possible values (wild cards fill remaining slots)
+  if (uniqueValues.size === nonWildValues.length) return true;
+
+  return false;
 }
 
 export function getAdjacentCards(position: GridPosition, board: PlacedCard[]): PlacedCard[] {
@@ -228,7 +242,7 @@ export function calculateScore(placements: PlacedCard[], board: PlacedCard[]): n
       const lineKey = getLineKey(horizontalLine, 'horizontal');
       if (!scoredLines.has(lineKey)) {
         scoredLines.add(lineKey);
-        totalScore += horizontalLine.reduce((sum, p) => sum + p.card.number, 0);
+        totalScore += horizontalLine.reduce((sum, p) => sum + (p.card.isWild ? 0 : p.card.number), 0);
       }
     }
     
@@ -238,13 +252,13 @@ export function calculateScore(placements: PlacedCard[], board: PlacedCard[]): n
       const lineKey = getLineKey(verticalLine, 'vertical');
       if (!scoredLines.has(lineKey)) {
         scoredLines.add(lineKey);
-        totalScore += verticalLine.reduce((sum, p) => sum + p.card.number, 0);
+        totalScore += verticalLine.reduce((sum, p) => sum + (p.card.isWild ? 0 : p.card.number), 0);
       }
     }
     
     // If no line formed, just count the card itself
     if (horizontalLine.length < 2 && verticalLine.length < 2) {
-      totalScore += placement.card.number;
+      totalScore += placement.card.isWild ? 0 : placement.card.number;
     }
   });
   

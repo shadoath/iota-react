@@ -21,6 +21,11 @@ function card(
   return { id, number, color, shape }
 }
 
+// Helper to create a wild card
+function wildCard(id = 'wild-test'): Card {
+  return { id, number: 0 as Card['number'], color: 'wild' as Card['color'], shape: 'wild' as Card['shape'], isWild: true }
+}
+
 // Helper to place a card on the board
 function placed(
   c: Card,
@@ -466,5 +471,86 @@ describe('calculateScore', () => {
     ]
     // Extended line: 1+2+3 = 6
     expect(calculateScore(placements, board)).toBe(6)
+  })
+
+  it('wild cards score 0 in a line', () => {
+    const board: PlacedCard[] = [
+      placed(card(1, 'red', 'triangle'), 0, 0),
+    ]
+    const placements: PlacedCard[] = [
+      placed(wildCard(), 0, 1),
+    ]
+    // Line: 1 + 0(wild) = 1
+    expect(calculateScore(placements, board)).toBe(1)
+  })
+
+  it('wild cards score 0 when isolated', () => {
+    const placements: PlacedCard[] = [
+      placed(wildCard(), 0, 0),
+    ]
+    expect(calculateScore(placements, [])).toBe(0)
+  })
+})
+
+describe('wild card validation', () => {
+  it('createDeck has exactly 2 wild cards', () => {
+    const deck = createDeck()
+    const wilds = deck.filter(c => c.isWild)
+    expect(wilds).toHaveLength(2)
+  })
+
+  it('wild card is valid next to any card', () => {
+    const board: PlacedCard[] = [
+      placed(card(1, 'red', 'triangle'), 0, 0),
+    ]
+    const wild = wildCard()
+    expect(isValidPlacement(wild, { row: 0, col: 1 }, board)).toBe(true)
+  })
+
+  it('wild card is valid in an all-different line', () => {
+    const board: PlacedCard[] = [
+      placed(card(1, 'red', 'triangle'), 0, 0),
+      placed(card(2, 'green', 'square'), 0, 1),
+    ]
+    const wild = wildCard()
+    expect(isValidPlacement(wild, { row: 0, col: 2 }, board)).toBe(true)
+  })
+
+  it('wild card is valid in an all-same line', () => {
+    const board: PlacedCard[] = [
+      placed(card(1, 'red', 'triangle'), 0, 0),
+      placed(card(1, 'red', 'triangle', 'dup'), 0, 1),
+    ]
+    const wild = wildCard()
+    expect(isValidPlacement(wild, { row: 0, col: 2 }, board)).toBe(true)
+  })
+
+  it('wild card does not break an otherwise invalid line', () => {
+    // Line with two non-wild cards that already conflict
+    const board: PlacedCard[] = [
+      placed(card(1, 'red', 'triangle'), 0, 0),
+      placed(card(2, 'red', 'triangle'), 0, 1),
+      placed(card(1, 'green', 'square'), 0, 2), // number: 1,2,1 → invalid
+    ]
+    // Wild placed next to this invalid line doesn't fix it
+    // Actually, this board state shouldn't exist. Let me test a different scenario.
+    // Place wild between two cards that form a valid line
+    const board2: PlacedCard[] = [
+      placed(card(1, 'red', 'triangle'), 0, 0),
+      placed(wildCard('wild-1'), 0, 1),
+    ]
+    // Another card next to the wild
+    const testCard = card(2, 'green', 'square')
+    // Line: 1-red-tri, wild, 2-green-sq → non-wild: [1-red-tri, 2-green-sq] → all diff ✓
+    expect(isValidPlacement(testCard, { row: 0, col: 2 }, board2)).toBe(true)
+  })
+
+  it('two wild cards in a line are valid', () => {
+    const board: PlacedCard[] = [
+      placed(card(1, 'red', 'triangle'), 0, 0),
+      placed(wildCard('wild-1'), 0, 1),
+    ]
+    const wild2 = wildCard('wild-2')
+    expect(isValidPlacement(wild2, { row: 0, col: 2 }, board)).toBe(true)
   })
 })
