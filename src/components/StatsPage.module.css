@@ -1,0 +1,217 @@
+.container {
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: var(--color-bg);
+  padding: var(--space-xl);
+}
+
+.inner {
+  max-width: 600px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.backBtn {
+  background: transparent;
+  border: 1px solid #ddd;
+  border-radius: var(--radius-md);
+  padding: var(--space-xs) var(--space-md);
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  transition: all var(--transition-fast);
+}
+
+.backBtn:hover {
+  border-color: var(--color-text);
+  color: var(--color-text);
+}
+
+.title {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  flex: 1;
+}
+
+/* Stat grid */
+.statGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-sm);
+}
+
+.statCard {
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+  text-align: center;
+  box-shadow: var(--shadow-sm);
+}
+
+.statLabel {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.statValue {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  font-variant-numeric: tabular-nums;
+  margin-top: 2px;
+}
+
+.statHighlight {
+  border-left: 3px solid var(--color-success);
+}
+
+/* Section headers */
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.sectionTitle {
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text);
+}
+
+/* Achievement list */
+.achievementGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: var(--space-sm);
+}
+
+.achievement {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-sm) var(--space-md);
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.locked {
+  opacity: 0.4;
+}
+
+.achieveIcon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+  width: 36px;
+  text-align: center;
+}
+
+.achieveInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.achieveName {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+}
+
+.achieveDesc {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.achieveDate {
+  font-size: 9px;
+  color: var(--color-success);
+  margin-top: 2px;
+}
+
+/* Recent games */
+.gameList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.gameRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  font-size: var(--font-size-sm);
+}
+
+.gameMode {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  width: 60px;
+  text-transform: capitalize;
+}
+
+.gameResult {
+  flex: 1;
+  font-weight: var(--font-weight-medium);
+}
+
+.gameWin { color: var(--color-success); }
+.gameLoss { color: var(--color-error); }
+
+.gameScore {
+  font-weight: var(--font-weight-bold);
+  font-variant-numeric: tabular-nums;
+  width: 40px;
+  text-align: right;
+}
+
+.gameDate {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  width: 60px;
+  text-align: right;
+}
+
+/* Win rate bar */
+.winRateBar {
+  height: 8px;
+  background: #e5e5e5;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-top: var(--space-xs);
+}
+
+.winRateFill {
+  height: 100%;
+  background: var(--color-success);
+  border-radius: 4px;
+  transition: width var(--transition-slow);
+}
+
+.noData {
+  text-align: center;
+  color: var(--color-text-muted);
+  padding: var(--space-2xl);
+  font-size: var(--font-size-sm);
+}
+
+@media (max-width: 768px) {
+  .statGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .achievementGrid {
+    grid-template-columns: 1fr;
+  }
+}
