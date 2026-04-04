@@ -203,6 +203,25 @@
   border-radius: var(--radius-md);
 }
 
+.analysisHint {
+  color: var(--color-warning);
+  font-weight: var(--font-weight-medium);
+}
+
+.analysisOptimal {
+  color: var(--color-success);
+  font-weight: var(--font-weight-medium);
+}
+
+.analysisSummary {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  text-align: center;
+  padding: var(--space-xs) var(--space-md);
+  background: var(--color-surface-alt);
+  border-radius: var(--radius-pill);
+}
+
 @media (max-width: 768px) {
   .turnList {
     display: none;
