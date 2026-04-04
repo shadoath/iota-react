@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:mp": "npx tsx server.ts",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
@@ -16,7 +17,9 @@
     "next": "14.2.5",
     "react": "^18",
     "react-dom": "^18",
-    "react-hot-toast": "^2.5.2"
+    "react-hot-toast": "^2.5.2",
+    "socket.io": "^4.8.3",
+    "socket.io-client": "^4.8.3"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.9.1",

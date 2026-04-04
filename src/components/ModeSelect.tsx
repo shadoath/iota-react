@@ -5,6 +5,7 @@ import styles from './ModeSelect.module.css'
 interface ModeSelectProps {
   onSelectMode: (mode: GameMode) => void
   onTutorial: () => void
+  onMultiplayer: () => void
 }
 
 const modes: Array<{ id: GameMode; name: string; icon: string; desc: string }> = [
@@ -31,6 +32,7 @@ const modes: Array<{ id: GameMode; name: string; icon: string; desc: string }> =
 export const ModeSelect: React.FC<ModeSelectProps> = ({
   onSelectMode,
   onTutorial,
+  onMultiplayer,
 }) => {
   return (
     <div className={styles.container}>
@@ -54,6 +56,18 @@ export const ModeSelect: React.FC<ModeSelectProps> = ({
             </button>
           ))}
         </div>
+
+        <button
+          className={styles.modeBtn}
+          onClick={onMultiplayer}
+        >
+          <span className={styles.modeIcon}>{'\uD83C\uDF10'}</span>
+          <div className={styles.modeInfo}>
+            <div className={styles.modeName}>Multiplayer</div>
+            <div className={styles.modeDesc}>Play online with friends via room code</div>
+          </div>
+          <span className={styles.modeArrow}>&rarr;</span>
+        </button>
 
         <div className={styles.divider} />
 
