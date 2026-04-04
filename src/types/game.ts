@@ -54,11 +54,16 @@ export interface TurnRecord {
   score: number;
 }
 
-export type GamePhase = 'setup' | 'playing' | 'ended';
+export type GamePhase = 'menu' | 'setup' | 'playing' | 'ended';
+
+export type GameMode = 'classic' | 'practice' | 'timed';
 
 export interface GameSettings {
   playerCount: number;
   aiPlayers: Array<{ name: string; difficulty: AIDifficulty }>;
+  mode: GameMode;
+  turnTimeLimit?: number; // seconds, for timed mode
+  hintsEnabled?: boolean; // for practice mode
 }
 
 export interface GameState {
@@ -70,7 +75,10 @@ export interface GameState {
   turnInProgress: boolean;
   lastTurnScore: number | null;
   gamePhase: GamePhase;
+  gameMode: GameMode;
   turnHistory: TurnRecord[];
+  turnTimeLimit: number | null; // seconds, null = untimed
+  hintsEnabled: boolean;
 
   // Legacy single-player compat (derived from players[0])
   playerHand: Card[];

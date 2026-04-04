@@ -45,6 +45,20 @@
   min-height: 0;
 }
 
+/* Practice mode badge */
+.hintBadge {
+  position: fixed;
+  top: 72px;
+  right: var(--space-lg);
+  z-index: var(--z-controls);
+  background: #dbeafe;
+  color: #1e40af;
+  padding: var(--space-xs) var(--space-md);
+  border-radius: var(--radius-pill);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+}
+
 @media (max-width: 768px) {
   .scoreBar {
     padding: var(--space-xs) var(--space-lg);

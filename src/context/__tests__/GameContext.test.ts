@@ -60,7 +60,10 @@ function createTestState(overrides: Partial<GameState> = {}): AppState {
       turnInProgress: false,
       lastTurnScore: null,
       gamePhase: 'playing',
+      gameMode: 'classic',
       turnHistory: [],
+      turnTimeLimit: null,
+      hintsEnabled: false,
       // Legacy compat
       playerHand: players[0].hand,
       score: players[0].score,
@@ -79,6 +82,7 @@ describe('gameReducer', () => {
       const settings: GameSettings = {
         playerCount: 2,
         aiPlayers: [{ name: 'Dot', difficulty: 'medium' }],
+        mode: 'classic',
       }
       const state = createTestState()
       state.game.gamePhase = 'setup'
@@ -98,6 +102,7 @@ describe('gameReducer', () => {
           { name: 'Dot', difficulty: 'easy' },
           { name: 'Dash', difficulty: 'hard' },
         ],
+        mode: 'classic',
       }
       const state = createTestState()
       const next = gameReducer(state, { type: 'START_GAME', settings })
@@ -110,6 +115,7 @@ describe('gameReducer', () => {
       const settings: GameSettings = {
         playerCount: 2,
         aiPlayers: [{ name: 'Dot', difficulty: 'easy' }],
+        mode: 'classic',
       }
       const state = createTestState()
       const next = gameReducer(state, { type: 'START_GAME', settings })
