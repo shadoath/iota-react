@@ -320,8 +320,18 @@ function GameInner() {
   const humanHand = humanPlayer?.hand ?? []
 
   return (
-    <div className={styles.layout}>
+    <div className={styles.layout} role='main'>
       <Toaster position='top-center' />
+
+      {/* Screen reader announcements */}
+      <div
+        aria-live='polite'
+        aria-atomic='true'
+        className='sr-only'
+        style={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', clip: 'rect(0,0,0,0)' }}
+      >
+        {lastActionResult?.message}
+      </div>
 
       <Sidebar
         cardsLeft={game.deck.length}

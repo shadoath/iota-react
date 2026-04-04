@@ -40,7 +40,7 @@
   gap: 0;
   border-radius: var(--radius-md);
   overflow: hidden;
-  border: 1px solid #ddd;
+  border: 1px solid var(--color-border);
 }
 
 .tab {
@@ -56,7 +56,7 @@
 }
 
 .tab:first-child {
-  border-right: 1px solid #ddd;
+  border-right: 1px solid var(--color-border);
 }
 
 .tabActive {
@@ -80,7 +80,7 @@
 
 .input {
   padding: var(--space-sm) var(--space-md);
-  border: 1px solid #ddd;
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   font-size: var(--font-size-md);
   color: var(--color-text);
@@ -110,7 +110,7 @@
 .countBtn {
   flex: 1;
   padding: var(--space-sm);
-  border: 1px solid #ddd;
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   background: var(--color-surface);
   cursor: pointer;
@@ -220,7 +220,7 @@
 .secondaryBtn {
   padding: var(--space-sm) var(--space-md);
   background: transparent;
-  border: 1px solid #ddd;
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   font-size: var(--font-size-sm);
   color: var(--color-text-muted);
@@ -245,7 +245,7 @@
 
 .divider {
   height: 1px;
-  background: #e5e5e5;
+  background: var(--color-divider);
 }
 
 .connectionStatus {

@@ -1,5 +1,6 @@
 import type React from 'react'
 import { useState, useCallback } from 'react'
+import { useTheme } from '../hooks/useTheme'
 import styles from './Sidebar.module.css'
 
 interface SidebarProps {
@@ -22,10 +23,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
 }) => {
   const [open, setOpen] = useState(false)
 
+  const { theme, toggle: toggleTheme } = useTheme()
+
   const handleNewGame = useCallback(() => {
     onNewGame()
     setOpen(false)
   }, [onNewGame])
+
+  const themeLabel = theme === 'light' ? 'Light' : theme === 'dark' ? 'Dark' : 'System'
+  const themeIcon = theme === 'light' ? '\u2600' : theme === 'dark' ? '\u{1F319}' : '\u{1F4BB}'
 
   return (
     <>
@@ -77,6 +83,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
         )}
 
         <div className={styles.divider} />
+
+        <button className={styles.themeBtn} onClick={toggleTheme}>
+          {themeIcon} Theme: {themeLabel}
+        </button>
 
         <button className={styles.newGameBtn} onClick={handleNewGame}>
           New Game

@@ -83,7 +83,7 @@
   align-items: center;
   justify-content: center;
   background: var(--color-surface);
-  border: 1px solid #ddd;
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   cursor: pointer;
   font-size: var(--font-size-lg);
