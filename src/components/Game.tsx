@@ -30,6 +30,8 @@ import { Replay } from './Replay'
 import { PatternTrainer } from './PatternTrainer'
 import { useOnlineStatus } from '../hooks/useOnlineStatus'
 import { useInstallPrompt } from '../hooks/useInstallPrompt'
+import { useHelpers } from '../hooks/useHelpers'
+import { findLotCompletingCards, findBestMove, getAttributeHint } from '../utils/helpers'
 import { DailyChallenge } from './DailyChallenge'
 import { recordDailyResult } from '../stats/dailyChallenge'
 import styles from './Game.module.css'
@@ -52,6 +54,7 @@ function GameInner() {
   const socket = useSocket()
   const { isOnline } = useOnlineStatus()
   const { canInstall, promptInstall } = useInstallPrompt()
+  const { helpers, toggleHelper } = useHelpers()
 
   const currentPlayer = game.players[game.currentPlayerIndex]
   const isHumanTurn = currentPlayer?.type === 'human'
@@ -59,6 +62,27 @@ function GameInner() {
   const selectedCard = isHumanTurn
     ? (game.players[game.currentPlayerIndex]?.hand.find(c => c.id === selectedCardId) ?? null)
     : null
+
+  // --- Keyboard card selection (1-4) and Escape to deselect ---
+  useEffect(() => {
+    if (game.gamePhase !== 'playing' || !isHumanTurn) return
+
+    const humanPlayer = game.players.find(p => p.type === 'human')
+    if (!humanPlayer) return
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const num = parseInt(e.key, 10)
+      if (num >= 1 && num <= 4 && num <= humanPlayer.hand.length) {
+        const card = humanPlayer.hand[num - 1]
+        dispatch({ type: 'SELECT_CARD', cardId: card.id })
+      } else if (e.key === 'Escape') {
+        dispatch({ type: 'DESELECT_CARD' })
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [game.gamePhase, isHumanTurn, game.players, dispatch])
 
   // Show toast for action results
   const lastResultRef = useRef(lastActionResult)
@@ -272,6 +296,33 @@ function GameInner() {
     return hints
   }, [game.hintsEnabled, selectedCard, isHumanTurn, game.board, game.pendingPlacements])
 
+  // --- Helper computations ---
+  const lotCompletingCards = React.useMemo(() => {
+    if (!helpers.setCompletion || !isHumanTurn || game.gamePhase !== 'playing') return new Set<string>()
+    const humanPlayer = game.players.find(p => p.type === 'human')
+    if (!humanPlayer) return new Set<string>()
+    return findLotCompletingCards(humanPlayer.hand, game.board, game.pendingPlacements)
+  }, [helpers.setCompletion, isHumanTurn, game.gamePhase, game.players, game.board, game.pendingPlacements])
+
+  const bestMoveData = React.useMemo(() => {
+    if (!helpers.bestMove || !isHumanTurn || game.gamePhase !== 'playing') return null
+    const humanPlayer = game.players.find(p => p.type === 'human')
+    if (!humanPlayer) return null
+    return findBestMove(humanPlayer.hand, game.board, game.pendingPlacements)
+  }, [helpers.bestMove, isHumanTurn, game.gamePhase, game.players, game.board, game.pendingPlacements])
+
+  const attributeHints = React.useMemo(() => {
+    if (!helpers.attributeGuide || !selectedCard || !isHumanTurn) return null
+    const allPlacements = [...game.board, ...game.pendingPlacements]
+    const validPositions = getValidPlacements(game.board, game.pendingPlacements)
+    const hints: Record<string, string> = {}
+    for (const pos of validPositions) {
+      const hint = getAttributeHint(pos, allPlacements)
+      if (hint) hints[`${pos.row},${pos.col}`] = hint
+    }
+    return hints
+  }, [helpers.attributeGuide, selectedCard, isHumanTurn, game.board, game.pendingPlacements])
+
   // --- Pattern Trainer ---
   // --- Daily Challenge ---
   if (showDaily) {
@@ -392,6 +443,8 @@ function GameInner() {
         onNewGame={() => dispatch({ type: 'SHOW_MENU' })}
         onCompleteTurn={() => dispatch({ type: 'COMPLETE_TURN' })}
         onUndoLast={() => dispatch({ type: 'UNDO_PLACEMENT' })}
+        helpers={helpers}
+        onToggleHelper={toggleHelper}
       />
 
       {/* Multi-player scoreboard */}
@@ -431,6 +484,8 @@ function GameInner() {
           zoomLevel={zoomLevel}
           onZoomChange={(zoom) => dispatch({ type: 'SET_ZOOM', zoom })}
           scoreHints={scoreHints}
+          bestMove={bestMoveData}
+          attributeHints={attributeHints}
         />
       </div>
 
@@ -444,6 +499,7 @@ function GameInner() {
         pendingPoints={pendingPoints}
         onCompleteTurn={() => dispatch({ type: 'COMPLETE_TURN' })}
         onUndoLast={() => dispatch({ type: 'UNDO_PLACEMENT' })}
+        lotCompletingCards={lotCompletingCards}
       />
 
       {/* Game Over overlay */}

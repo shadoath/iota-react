@@ -1,5 +1,5 @@
 import { Card, CardColor, CardNumber, CardShape, PlacedCard, GridPosition } from '../types/game';
-import { CARD_NUMBERS, CARD_COLORS, CARD_SHAPES } from '../constants/game';
+import { CARD_NUMBERS, CARD_COLORS, CARD_SHAPES, MAX_LINE_LENGTH } from '../constants/game';
 
 export function createDeck(): Card[] {
   const numbers: CardNumber[] = [...CARD_NUMBERS];
@@ -243,11 +243,21 @@ export function getAdjacentCards(position: GridPosition, board: PlacedCard[]): P
   );
 }
 
+/**
+ * Score a line: sum of card numbers (wild = 0).
+ * A "lot" (complete line of 4) doubles the line's score.
+ */
+function scoreLine(line: PlacedCard[]): number {
+  const base = line.reduce((sum, p) => sum + (p.card.isWild ? 0 : p.card.number), 0);
+  // Lot bonus: a complete line of 4 (max length) doubles the score
+  return line.length === MAX_LINE_LENGTH ? base * 2 : base;
+}
+
 export function calculateScore(placements: PlacedCard[], board: PlacedCard[]): number {
   let totalScore = 0;
   const allCards = [...board, ...placements];
   const scoredLines = new Set<string>();
-  
+
   // For each placed card, find all lines it's part of
   placements.forEach(placement => {
     // Check horizontal line
@@ -256,26 +266,26 @@ export function calculateScore(placements: PlacedCard[], board: PlacedCard[]): n
       const lineKey = getLineKey(horizontalLine, 'horizontal');
       if (!scoredLines.has(lineKey)) {
         scoredLines.add(lineKey);
-        totalScore += horizontalLine.reduce((sum, p) => sum + (p.card.isWild ? 0 : p.card.number), 0);
+        totalScore += scoreLine(horizontalLine);
       }
     }
-    
+
     // Check vertical line
     const verticalLine = getCardsInLine(placement.position, allCards, 'vertical');
     if (verticalLine.length >= 2) {
       const lineKey = getLineKey(verticalLine, 'vertical');
       if (!scoredLines.has(lineKey)) {
         scoredLines.add(lineKey);
-        totalScore += verticalLine.reduce((sum, p) => sum + (p.card.isWild ? 0 : p.card.number), 0);
+        totalScore += scoreLine(verticalLine);
       }
     }
-    
+
     // If no line formed, just count the card itself
     if (horizontalLine.length < 2 && verticalLine.length < 2) {
       totalScore += placement.card.isWild ? 0 : placement.card.number;
     }
   });
-  
+
   return totalScore;
 }
 

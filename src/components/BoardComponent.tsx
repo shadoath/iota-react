@@ -15,6 +15,8 @@ interface BoardComponentProps {
   zoomLevel: number
   onZoomChange: (zoom: number) => void
   scoreHints?: Record<string, number> | null
+  bestMove?: { cardId: string; position: GridPosition; score: number } | null
+  attributeHints?: Record<string, string> | null
 }
 
 export const BoardComponent: React.FC<BoardComponentProps> = ({
@@ -25,6 +27,8 @@ export const BoardComponent: React.FC<BoardComponentProps> = ({
   zoomLevel,
   onZoomChange,
   scoreHints,
+  bestMove,
+  attributeHints,
 }) => {
   const viewportRef = useRef<HTMLDivElement>(null)
   const [isMobile, setIsMobile] = useState(false)
@@ -61,7 +65,7 @@ export const BoardComponent: React.FC<BoardComponentProps> = ({
     ? getValidPlacements(board, pendingPlacements)
     : []
 
-  const cellSize = isMobile ? 58 : 72
+  const cellSize = isMobile ? 62 : 68
   const gap = isMobile ? 3 : 4
   const allPlacements = [...board, ...pendingPlacements]
 
@@ -225,18 +229,26 @@ export const BoardComponent: React.FC<BoardComponentProps> = ({
               {placedCard && (
                 <GameCard card={placedCard.card} disabled boardCard placed={isPending} />
               )}
-              {!placedCard && valid && selectedCard && !impossible && (
-                <div
-                  className={styles.placeholder}
-                  style={{ width: cellSize - 12, height: cellSize - 12 }}
-                >
-                  {scoreHints && scoreHints[`${row},${col}`] !== undefined && (
-                    <span className={styles.scoreHint}>
-                      +{scoreHints[`${row},${col}`]}
-                    </span>
-                  )}
-                </div>
-              )}
+              {!placedCard && valid && selectedCard && !impossible && (() => {
+                const isBest = bestMove && bestMove.position.row === row && bestMove.position.col === col
+                const attrHint = attributeHints?.[`${row},${col}`]
+                return (
+                  <div
+                    className={`${styles.placeholder} ${isBest ? styles.bestMovePlaceholder : ''}`}
+                    style={{ width: cellSize - 12, height: cellSize - 12 }}
+                  >
+                    {isBest && <span className={styles.bestMoveStar}>&#9733;</span>}
+                    {scoreHints && scoreHints[`${row},${col}`] !== undefined && (
+                      <span className={styles.scoreHint}>
+                        +{scoreHints[`${row},${col}`]}
+                      </span>
+                    )}
+                    {attrHint && (
+                      <span className={styles.attrHint}>{attrHint}</span>
+                    )}
+                  </div>
+                )
+              })()}
               {!placedCard && impossible && (
                 <div className={styles.impossible} />
               )}
