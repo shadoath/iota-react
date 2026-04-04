@@ -5,7 +5,7 @@
 
 import type { Card, PlacedCard, PendingPlacement, GridPosition } from '../types/game'
 import type { RoomState, RoomSettings, RoomPlayer, MultiplayerGameState, MultiplayerPlayerView } from './protocol'
-import { createDeck, isValidPlacement, calculateScore, getValidPlacements } from '../utils/gameLogic'
+import { createDeck, isValidPlacement, calculateScore, getValidPlacements, shuffleDeck } from '../utils/gameLogic'
 import { isPlacementInSameLineAsPending } from '../utils/turnValidation'
 import { HAND_SIZE, MAX_LINE_LENGTH } from '../constants/game'
 
@@ -294,10 +294,7 @@ export class RoomManager {
     game.deck.push(...toSwap)
 
     // Shuffle deck
-    for (let i = game.deck.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1))
-      ;[game.deck[i], game.deck[j]] = [game.deck[j], game.deck[i]]
-    }
+    game.deck = shuffleDeck(game.deck)
 
     // Draw same number
     const drawn = game.deck.splice(0, toSwap.length)
