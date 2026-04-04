@@ -1,84 +1,136 @@
-# NodusNexus Card Game
+# NodusNexus
 
-A web-based strategic card game built with React, TypeScript, and Next.js.
+A strategic card game of matching patterns. Play solo against AI, practice your skills, or challenge friends online.
 
-## Game Overview
+**[Play now at nodusnexus.com](https://nodusnexus.com)**
 
-NodusNexus is a strategic card game played on a grid where players place cards to form lines. Each card has three attributes:
-- **Number**: 1-4
-- **Color**: Red, Green, Blue, or Yellow
-- **Shape**: Triangle, Square, Circle, or Cross
+## How It Works
 
-## Game Rules
+66 cards. Each has three attributes:
 
-### Objective
-Score points by placing cards to form lines where each attribute (number, color, shape) follows a consistent pattern.
+| Attribute | Values |
+|-----------|--------|
+| **Number** | 1, 2, 3, 4 |
+| **Color** | Red, Green, Blue, Yellow |
+| **Shape** | Triangle, Square, Circle, Cross |
 
-### Core Rules
-1. **Line Formation**: Cards form lines horizontally and vertically
-2. **Attribute Rule**: In any line, each attribute must be either:
-   - **All the SAME** across all cards, OR
-   - **All DIFFERENT** across all cards
-3. **Turn Rules**:
-   - Play 1-4 cards per turn
-   - All cards in a turn must be placed in the same row or column
-   - Cards must be placed adjacent to existing cards
-4. **Scoring**: Sum of all numbers in each line formed/extended by your placed cards
-5. **Line Limit**: Maximum 4 cards per line
+Plus 2 wild cards that match anything.
 
-### Example Valid Lines
-- Red Triangle 1, Red Triangle 2, Red Triangle 3 (same color & shape, different numbers)
-- Blue Circle 2, Red Square 2, Yellow Triangle 2 (same number, all different colors & shapes)
+Place cards on the board to form lines. In every line, each attribute must be either **all the same** or **all different**. Score points equal to the sum of card numbers in your lines.
+
+### Quick Examples
+
+- `Red Triangle 1` + `Red Triangle 2` + `Red Triangle 3` — same color, same shape, different numbers
+- `Blue Circle 2` + `Red Square 2` + `Yellow Triangle 2` — same number, all different colors and shapes
+
+## Game Modes
+
+| Mode | Description |
+|------|-------------|
+| **Classic** | Play against 1-3 AI opponents (Easy / Medium / Hard difficulty) |
+| **Practice** | Hints enabled — see score previews on every valid position |
+| **Timed** | Turn timer (15s / 30s / 60s) — auto-skips if you run out |
+| **Multiplayer** | Online play with friends via 6-character room codes |
+| **Tutorial** | Interactive 7-step walkthrough teaching all the rules |
+| **Pattern Trainer** | Quick-fire drills — given a partial line, pick the card that completes it |
+
+## Features
+
+- **AI Engine** — Easy (random), Medium (best of 1-2 cards), Hard (exhaustive search of all combos)
+- **Game Replay** — Scrub through any completed game turn by turn
+- **Board Heatmap** — Toggle overlay showing score potential at every position
+- **Stats & Achievements** — 16 achievements, win rate tracking, game history
+- **Dark Mode** — Follows system preference or toggle manually
+- **PWA** — Installable on any device
+- **Accessible** — Keyboard navigation, screen reader support, focus indicators
 
 ## Getting Started
 
-### Prerequisites
-- Node.js 18+
-- npm
-
-### Installation
 ```bash
 npm install
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) to play the game.
+Open [http://localhost:3000](http://localhost:3000) to play.
 
-## Features
+For multiplayer (requires WebSocket server):
 
-- **Multiple Game Modes**: Classic, Practice (with hints), Timed
-- **AI Opponents**: Three difficulty levels (Easy, Medium, Hard)
-- **Multiplayer**: Online play via Socket.io rooms
-- **Interactive Tutorial**: Step-by-step guide to learn the rules
-- **Pattern Trainer**: Practice pattern recognition skills
-- **Game Replay**: Watch turn-by-turn replays of completed games
-- **Board Heatmap**: Visualize score potential across the board
-- **Dark Mode**: System preference detection + manual toggle
-- **Stats & Achievements**: Track your progress with 16 achievements
-- **PWA**: Installable on any device
-- **Accessible**: Keyboard navigation, screen reader support
-
-## Built With
-
-- **React** - UI framework
-- **TypeScript** - Type safety
-- **Next.js** - React framework
-- **CSS Modules** - Scoped styling with design tokens
-- **Socket.io** - Real-time multiplayer
-- **Vitest** - Testing
+```bash
+npm run dev:mp
+```
 
 ## Development
 
 ```bash
-npm run dev          # Development server
-npm run dev:mp       # Development with multiplayer server
+npm run dev          # Next.js dev server
+npm run dev:mp       # Dev server with Socket.io multiplayer
 npm run build        # Production build
 npm run lint         # ESLint
-npm run typecheck    # TypeScript checking
-npm run test         # Run tests (watch mode)
+npm run typecheck    # TypeScript type checking
+npm run test         # Vitest in watch mode
 npm run test:run     # Run tests once
 ```
 
+## Project Structure
+
+```
+src/
+├── ai/                    # AI opponent engine
+│   └── engine.ts          # Easy/Medium/Hard move computation
+├── components/            # React components
+│   ├── Game.tsx           # Main game orchestrator
+│   ├── BoardComponent.tsx # Pan/zoom game board
+│   ├── GameCard.tsx       # Card rendering (shapes by count)
+│   ├── PlayerHand.tsx     # Player hand + turn actions
+│   ├── GameSetup.tsx      # Opponent selection screen
+│   ├── ModeSelect.tsx     # Mode selection landing page
+│   ├── Sidebar.tsx        # Menu drawer with theme toggle
+│   ├── ScoreBoard.tsx     # Multi-player score display
+│   ├── GameOver.tsx       # End game results screen
+│   ├── Replay.tsx         # Turn-by-turn game replay
+│   ├── PatternTrainer.tsx # Pattern recognition drills
+│   ├── TurnTimer.tsx      # Countdown timer for timed mode
+│   ├── StatsPage.tsx      # Stats & achievements dashboard
+│   ├── Lobby.tsx          # Multiplayer room creation/joining
+│   ├── MultiplayerGame.tsx# Online game view
+│   ├── ErrorBoundary.tsx  # Global error recovery
+│   └── Tutorial/          # Interactive tutorial steps
+├── context/
+│   └── GameContext.tsx     # Central state (useReducer + Context)
+├── constants/
+│   └── game.ts            # Game constants (hand size, zoom, etc.)
+├── hooks/
+│   └── useTheme.ts        # Dark mode toggle
+├── multiplayer/
+│   ├── protocol.ts        # Shared client/server event types
+│   ├── RoomManager.ts     # Server-side room + game state
+│   ├── server.ts          # Socket.io server setup
+│   └── useSocket.ts       # Client-side socket hook
+├── stats/
+│   ├── achievements.ts    # 16 achievement definitions + logic
+│   ├── statsService.ts    # Game result recording + aggregation
+│   └── types.ts           # Stats/achievement types
+├── styles/
+│   └── tokens.css         # Design tokens (colors, spacing, dark mode)
+├── types/
+│   └── game.ts            # Core game types (Card, Player, GameState)
+└── utils/
+    ├── gameLogic.ts       # Deck, placement, scoring, validation
+    ├── turnValidation.ts  # Turn-level rules
+    ├── impossibleSquares.ts # Unplayable position detection
+    ├── validationMessages.ts # Human-readable error messages
+    └── heatmap.ts         # Board score potential analysis
+```
+
+## Tech Stack
+
+- **Next.js 14** — React framework
+- **TypeScript** — Strict mode
+- **CSS Modules** — Scoped styles with CSS custom properties
+- **Socket.io** — Real-time multiplayer
+- **Vitest** — 120+ tests
+- **Vercel** — Deployment
+
 ## License
 
-This project is licensed under the MIT License.
+MIT

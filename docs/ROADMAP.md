@@ -2,69 +2,66 @@
 
 ## Vision
 
-A polished, commercial-grade digital version of NodusNexus — playable solo against AI, or online with friends. Fast, beautiful, and accessible on any device.
+A polished, commercial-grade digital card game — playable solo against AI, or online with friends. Fast, beautiful, and accessible on any device.
 
-## Current State
+**Live at [nodusnexus.com](https://nodusnexus.com)**
 
-- Single-player mode with functional game logic (deck, placement validation, scoring)
-- Basic React UI with MUI components and inline styles
-- No tests, no state management library, no multiplayer
-- Legacy unused components scattered in codebase
-- No AI opponent — just open solitaire
+## Current State (v1.0.0)
 
-## Architecture Principles
+All 8 foundation milestones have been completed:
+
+- Clean TypeScript codebase with 120+ tests
+- Context + useReducer state management
+- CSS Modules with design tokens (no runtime CSS-in-JS)
+- AI opponents at 3 difficulty levels
+- 4 game modes (Classic, Practice, Timed, Multiplayer)
+- Interactive tutorial and pattern trainer
+- Game replay with turn-by-turn scrubbing
+- Board heatmap overlay
+- Stats tracking with 16 achievements
+- Dark mode with system preference detection
+- PWA manifest for installability
+- Keyboard accessible with screen reader support
+- Global error boundary
+
+## Architecture
 
 1. **Game logic is pure** — all rules, validation, and scoring live in testable utility functions with zero UI coupling
 2. **State is centralized** — React Context + useReducer for predictable game state
-3. **Components are dumb** — they receive props and dispatch actions, nothing more
-4. **Multiplayer-ready from early** — state shape designed so network sync is additive, not a rewrite
-5. **Mobile-first** — touch interactions are primary, mouse is the enhancement
+3. **Components are presentational** — they receive props and dispatch actions
+4. **Multiplayer is server-authoritative** — Socket.io validates all moves, clients render state
 
-## Phase Overview
+## Completed Milestones
 
-| Phase | Name | Goal |
-|-------|------|------|
-| 1 | Foundation | Clean codebase, tests, proper state management |
-| 2 | Core Game Polish | Beautiful cards, smooth interactions, responsive layout |
-| 3 | Solo Play | AI opponents with difficulty levels |
-| 4 | Game Modes | Timed mode, challenge mode, tutorial |
-| 5 | Multiplayer | Real-time online play with friends |
-| 6 | Social & Engagement | Profiles, stats, leaderboards, achievements |
-| 7 | Commercial Polish | PWA, onboarding, analytics, monetization hooks |
+| # | Milestone | Status |
+|---|-----------|--------|
+| 1 | [Foundation](milestones/01-foundation.md) — Cleanup, testing, state management | Done |
+| 2 | [Core UI](milestones/02-core-ui.md) — Card design, board UX, CSS Modules | Done |
+| 3 | [Solo Play](milestones/03-solo-play.md) — AI opponents, difficulty levels | Done |
+| 4 | [Game Modes](milestones/04-game-modes.md) — Tutorial, timed, practice modes | Done |
+| 5 | [Multiplayer](milestones/05-multiplayer.md) — Online play, lobbies, matchmaking | Done |
+| 6 | [Social](milestones/06-social.md) — Stats, achievements, dashboard | Done |
+| 7 | [Commercial](milestones/07-commercial.md) — PWA, dark mode, a11y, error boundary | Done |
+| 8 | [Digital Features](milestones/08-wild-cards.md) — Replay, heatmap, pattern trainer | Done |
 
-## Milestone Documents
+## What's Next
 
-Each phase is broken into a detailed milestone document in `docs/milestones/`:
+Potential future work (not yet planned):
 
-- [01-foundation.md](milestones/01-foundation.md) — Cleanup, testing, state management
-- [02-core-ui.md](milestones/02-core-ui.md) — Card design, board UX, animations
-- [03-solo-play.md](milestones/03-solo-play.md) — AI opponents, difficulty levels
-- [04-game-modes.md](milestones/04-game-modes.md) — Tutorial, timed, challenge modes
-- [05-multiplayer.md](milestones/05-multiplayer.md) — Online play, lobbies, matchmaking
-- [06-social.md](milestones/06-social.md) — Profiles, stats, leaderboards
-- [07-commercial.md](milestones/07-commercial.md) — PWA, polish, monetization
-- [08-wild-cards.md](milestones/08-wild-cards.md) — Digital-only features that make this special
+- **Authentication** — Anonymous-first with optional social login
+- **Database** — Migrate localStorage stats to Supabase/Postgres
+- **Daily Challenge** — Seeded deck, same game for everyone, leaderboard
+- **Elo Rating** — Competitive ranking for multiplayer
+- **Tournaments** — Automated brackets and leagues
+- **Cosmetics** — Card themes, board skins, card backs
+- **Move Analysis** — AI-powered "you could have scored X here"
+- **Collaborative Mode** — 2v2 team play
 
-## Key Technical Decisions
+## Tech Stack
 
-### State Management: Context + useReducer
-Redux is overkill for this. A single `GameContext` with a reducer handles all game state. Actions are serializable (important for multiplayer replay later).
-
-### Styling: CSS Modules + CSS Custom Properties
-Move away from MUI `sx` prop soup. CSS Modules give scoped styles with zero runtime cost. Custom properties enable theming. MUI stays only for utility components (drawer, tooltips).
-
-### Testing: Vitest + React Testing Library
-Vitest is fast, works natively with TypeScript, and shares Vite's transform pipeline. Game logic gets unit tests. Components get integration tests.
-
-### Multiplayer: WebSocket via Socket.io (or Liveblocks/PartyKit)
-The game state is small — the entire board fits in a few KB. Real-time sync is simple. Start with Socket.io for control, evaluate managed services later.
-
-### Deployment: Vercel
-Next.js on Vercel is zero-config. Edge functions for API routes. Preview deployments for every PR.
-
-## Success Metrics
-
-- **Phase 1-2**: App builds clean, 80%+ test coverage on game logic, Lighthouse 90+
-- **Phase 3**: Average session length > 10 minutes (engaging AI)
-- **Phase 5**: < 200ms latency for multiplayer moves
-- **Phase 7**: PWA installable, < 3s first load, accessible (WCAG 2.1 AA)
+- **Next.js 14** — App Router
+- **TypeScript** — Strict mode
+- **CSS Modules** — Design tokens, dark mode, zero runtime cost
+- **Socket.io** — Real-time multiplayer
+- **Vitest** — 120+ tests
+- **Vercel** — Deployment
