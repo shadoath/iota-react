@@ -1,9 +1,10 @@
 import { Card, CardColor, CardNumber, CardShape, PlacedCard, GridPosition } from '../types/game';
+import { CARD_NUMBERS, CARD_COLORS, CARD_SHAPES } from '../constants/game';
 
 export function createDeck(): Card[] {
-  const numbers: CardNumber[] = [1, 2, 3, 4];
-  const colors: CardColor[] = ['red', 'green', 'blue', 'yellow'];
-  const shapes: CardShape[] = ['triangle', 'square', 'circle', 'cross'];
+  const numbers: CardNumber[] = [...CARD_NUMBERS];
+  const colors: CardColor[] = [...CARD_COLORS];
+  const shapes: CardShape[] = [...CARD_SHAPES];
   
   const deck: Card[] = [];
   let id = 0;

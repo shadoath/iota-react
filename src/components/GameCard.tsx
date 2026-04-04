@@ -1,6 +1,7 @@
 import type React from 'react'
 import type { Card } from '../types/game'
 import { Box } from '@mui/material'
+import { COLOR_MAP } from '../constants/game'
 
 interface GameCardProps {
   card: Card
@@ -61,12 +62,7 @@ const shapeComponents: Record<string, React.FC<{ color: string }>> = {
   ),
 }
 
-const colorMap: Record<string, string> = {
-  red: '#ef4444',
-  green: '#22c55e',
-  blue: '#3b82f6',
-  yellow: '#eab308',
-}
+const colorMap = COLOR_MAP
 
 export const GameCard: React.FC<GameCardProps> = ({
   card,

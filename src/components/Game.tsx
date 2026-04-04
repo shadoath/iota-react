@@ -17,6 +17,7 @@ import {
   isValidPlacement,
   calculateScore,
 } from '../utils/gameLogic'
+import { HAND_SIZE, MAX_LINE_LENGTH, MIN_ZOOM, MAX_ZOOM, ZOOM_STEP, INITIAL_ZOOM } from '../constants/game'
 import { isPlacementInSameLineAsPending } from '../utils/turnValidation'
 import { getDetailedValidationError } from '../utils/validationMessages'
 import { BoardComponent } from './BoardComponent'
@@ -36,7 +37,7 @@ export const Game: React.FC = () => {
   })
 
   const [selectedCard, setSelectedCard] = useState<Card | null>(null)
-  const [zoomLevel, setZoomLevel] = useState(1.0)
+  const [zoomLevel, setZoomLevel] = useState(INITIAL_ZOOM)
 
   // Initialize game
   useEffect(() => {
@@ -45,8 +46,8 @@ export const Game: React.FC = () => {
 
   const startNewGame = () => {
     const deck = createDeck()
-    const playerHand = deck.slice(0, 4)
-    const remainingDeck = deck.slice(4)
+    const playerHand = deck.slice(0, HAND_SIZE)
+    const remainingDeck = deck.slice(HAND_SIZE)
 
     // Place initial card in center
     const initialCard = remainingDeck[0]
@@ -123,7 +124,7 @@ export const Game: React.FC = () => {
 
     setSelectedCard(null)
 
-    if (gameState.pendingPlacements.length + 1 >= 4) {
+    if (gameState.pendingPlacements.length + 1 >= MAX_LINE_LENGTH) {
       toast('Maximum 4 cards per turn!', { icon: '⚠️' })
     }
   }
@@ -141,7 +142,7 @@ export const Game: React.FC = () => {
     const newBoard = [...gameState.board, ...gameState.pendingPlacements]
 
     // Draw new cards
-    const cardsNeeded = 4 - gameState.playerHand.length
+    const cardsNeeded = HAND_SIZE - gameState.playerHand.length
     const newCards = gameState.deck.slice(0, cardsNeeded)
     const newDeck = gameState.deck.slice(cardsNeeded)
     const newHand = [...gameState.playerHand, ...newCards]
@@ -251,7 +252,7 @@ export const Game: React.FC = () => {
         }}
       >
         <IconButton
-          onClick={() => setZoomLevel(Math.min(zoomLevel + 0.1, 3.0))}
+          onClick={() => setZoomLevel(Math.min(zoomLevel + ZOOM_STEP, MAX_ZOOM))}
           sx={{
             backgroundColor: 'white',
             boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
@@ -263,7 +264,7 @@ export const Game: React.FC = () => {
           <ZoomInIcon />
         </IconButton>
         <IconButton
-          onClick={() => setZoomLevel(Math.max(zoomLevel - 0.1, 0.25))}
+          onClick={() => setZoomLevel(Math.max(zoomLevel - ZOOM_STEP, MIN_ZOOM))}
           sx={{
             backgroundColor: 'white',
             boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
@@ -291,7 +292,7 @@ export const Game: React.FC = () => {
           pendingPlacements={gameState.pendingPlacements}
           onPlaceCard={handlePlaceCard}
           selectedCard={
-            gameState.pendingPlacements.length < 4 ? selectedCard : null
+            gameState.pendingPlacements.length < MAX_LINE_LENGTH ? selectedCard : null
           }
           zoomLevel={zoomLevel}
         />
