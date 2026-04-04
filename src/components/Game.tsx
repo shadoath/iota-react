@@ -28,6 +28,8 @@ import { getPlayerStats } from '../stats/statsService'
 import type { GameResult } from '../stats/types'
 import { Replay } from './Replay'
 import { PatternTrainer } from './PatternTrainer'
+import { useOnlineStatus } from '../hooks/useOnlineStatus'
+import { useInstallPrompt } from '../hooks/useInstallPrompt'
 import styles from './Game.module.css'
 
 function GameInner() {
@@ -45,6 +47,8 @@ function GameInner() {
   const initialBoardRef = useRef<PlacedCard[]>([])
   const gameRecordedRef = useRef(false)
   const socket = useSocket()
+  const { isOnline } = useOnlineStatus()
+  const { canInstall, promptInstall } = useInstallPrompt()
 
   const currentPlayer = game.players[game.currentPlayerIndex]
   const isHumanTurn = currentPlayer?.type === 'human'
@@ -317,6 +321,9 @@ function GameInner() {
         onMultiplayer={() => setShowMultiplayer(true)}
         onTrainer={() => setShowTrainer(true)}
         onStats={() => setShowStats(true)}
+        isOnline={isOnline}
+        canInstall={canInstall}
+        onInstall={promptInstall}
       />
     )
   }

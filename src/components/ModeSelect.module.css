@@ -112,3 +112,26 @@
   border-color: var(--color-info);
   color: var(--color-info);
 }
+
+.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.installBtn {
+  padding: var(--space-sm) var(--space-md);
+  background: var(--color-info, #3b82f6);
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  color: #fff;
+  transition: all var(--transition-fast);
+  text-align: center;
+}
+
+.installBtn:hover {
+  opacity: 0.9;
+}

@@ -8,6 +8,9 @@ interface ModeSelectProps {
   onMultiplayer: () => void
   onStats: () => void
   onTrainer: () => void
+  isOnline?: boolean
+  canInstall?: boolean
+  onInstall?: () => void
 }
 
 const modes: Array<{ id: GameMode; name: string; icon: string; desc: string }> = [
@@ -37,6 +40,9 @@ export const ModeSelect: React.FC<ModeSelectProps> = ({
   onMultiplayer,
   onStats,
   onTrainer,
+  isOnline = true,
+  canInstall = false,
+  onInstall,
 }) => {
   return (
     <div className={styles.container}>
@@ -62,13 +68,19 @@ export const ModeSelect: React.FC<ModeSelectProps> = ({
         </div>
 
         <button
-          className={styles.modeBtn}
-          onClick={onMultiplayer}
+          className={`${styles.modeBtn} ${!isOnline ? styles.disabled : ""}`}
+          onClick={isOnline ? onMultiplayer : undefined}
+          disabled={!isOnline}
+          aria-disabled={!isOnline}
         >
           <span className={styles.modeIcon}>{'\uD83C\uDF10'}</span>
           <div className={styles.modeInfo}>
             <div className={styles.modeName}>Multiplayer</div>
-            <div className={styles.modeDesc}>Play online with friends via room code</div>
+            <div className={styles.modeDesc}>
+              {isOnline
+                ? "Play online with friends via room code"
+                : "Requires internet connection"}
+            </div>
           </div>
           <span className={styles.modeArrow}>&rarr;</span>
         </button>
@@ -86,6 +98,15 @@ export const ModeSelect: React.FC<ModeSelectProps> = ({
         <button className={styles.tutorialBtn} onClick={onStats}>
           Stats & Achievements
         </button>
+
+        {canInstall && (
+          <>
+            <div className={styles.divider} />
+            <button className={styles.installBtn} onClick={onInstall}>
+              Install App
+            </button>
+          </>
+        )}
       </div>
     </div>
   )
