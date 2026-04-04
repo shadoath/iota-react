@@ -1,6 +1,7 @@
 import type React from 'react'
 import { useState, useCallback } from 'react'
 import { useTheme } from '../hooks/useTheme'
+import { useCardTheme, CARD_THEMES, BOARD_THEMES } from '../hooks/useCardTheme'
 import styles from './Sidebar.module.css'
 
 interface SidebarProps {
@@ -24,6 +25,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const [open, setOpen] = useState(false)
 
   const { theme, toggle: toggleTheme } = useTheme()
+  const { cardTheme, boardTheme, setCardTheme, setBoardTheme } = useCardTheme()
 
   const handleNewGame = useCallback(() => {
     onNewGame()
@@ -87,6 +89,38 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <button className={styles.themeBtn} onClick={toggleTheme}>
           {themeIcon} Theme: {themeLabel}
         </button>
+
+        <div className={styles.themeSection}>
+          <div className={styles.statLabel}>Card Colors</div>
+          <div className={styles.themeRow}>
+            {CARD_THEMES.map(t => (
+              <button
+                key={t.id}
+                className={`${styles.themeChip} ${cardTheme === t.id ? styles.themeChipActive : ''}`}
+                onClick={() => setCardTheme(t.id)}
+              >
+                {t.name}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className={styles.themeSection}>
+          <div className={styles.statLabel}>Board</div>
+          <div className={styles.themeRow}>
+            {BOARD_THEMES.map(t => (
+              <button
+                key={t.id}
+                className={`${styles.themeChip} ${boardTheme === t.id ? styles.themeChipActive : ''}`}
+                onClick={() => setBoardTheme(t.id)}
+              >
+                {t.name}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className={styles.divider} />
 
         <button className={styles.newGameBtn} onClick={handleNewGame}>
           New Game

@@ -6,6 +6,7 @@ interface ModeSelectProps {
   onSelectMode: (mode: GameMode) => void
   onTutorial: () => void
   onMultiplayer: () => void
+  onDailyChallenge: () => void
   onStats: () => void
   onTrainer: () => void
   isOnline?: boolean
@@ -38,6 +39,7 @@ export const ModeSelect: React.FC<ModeSelectProps> = ({
   onSelectMode,
   onTutorial,
   onMultiplayer,
+  onDailyChallenge,
   onStats,
   onTrainer,
   isOnline = true,
@@ -66,6 +68,18 @@ export const ModeSelect: React.FC<ModeSelectProps> = ({
             </button>
           ))}
         </div>
+
+        <button
+          className={styles.modeBtn}
+          onClick={onDailyChallenge}
+        >
+          <span className={styles.modeIcon}>{'\uD83D\uDCC5'}</span>
+          <div className={styles.modeInfo}>
+            <div className={styles.modeName}>Daily Challenge</div>
+            <div className={styles.modeDesc}>Same puzzle for everyone today — track your streak</div>
+          </div>
+          <span className={styles.modeArrow}>&rarr;</span>
+        </button>
 
         <button
           className={`${styles.modeBtn} ${!isOnline ? styles.disabled : ""}`}

@@ -30,6 +30,8 @@ import { Replay } from './Replay'
 import { PatternTrainer } from './PatternTrainer'
 import { useOnlineStatus } from '../hooks/useOnlineStatus'
 import { useInstallPrompt } from '../hooks/useInstallPrompt'
+import { DailyChallenge } from './DailyChallenge'
+import { recordDailyResult } from '../stats/dailyChallenge'
 import styles from './Game.module.css'
 
 function GameInner() {
@@ -43,6 +45,7 @@ function GameInner() {
   const [showStats, setShowStats] = useState(false)
   const [showReplay, setShowReplay] = useState(false)
   const [showTrainer, setShowTrainer] = useState(false)
+  const [showDaily, setShowDaily] = useState(false)
   const [gameStartTime] = useState(() => Date.now())
   const initialBoardRef = useRef<PlacedCard[]>([])
   const gameRecordedRef = useRef(false)
@@ -100,6 +103,15 @@ function GameInner() {
     }
 
     recordGame(result)
+
+    // Record daily challenge result
+    if (game.gameMode === 'daily') {
+      const humanPlayer = game.players.find(p => p.type === 'human')
+      if (humanPlayer) {
+        recordDailyResult(humanPlayer.score)
+      }
+    }
+
     const stats = getPlayerStats()
     const newAchievements = checkAchievements(result, stats)
 
@@ -261,6 +273,20 @@ function GameInner() {
   }, [game.hintsEnabled, selectedCard, isHumanTurn, game.board, game.pendingPlacements])
 
   // --- Pattern Trainer ---
+  // --- Daily Challenge ---
+  if (showDaily) {
+    return (
+      <DailyChallenge
+        onStart={(settings) => {
+          setShowDaily(false)
+          setLastSettings(settings)
+          dispatch({ type: 'START_GAME', settings })
+        }}
+        onBack={() => setShowDaily(false)}
+      />
+    )
+  }
+
   if (showTrainer) {
     return <PatternTrainer onBack={() => setShowTrainer(false)} />
   }
@@ -319,6 +345,7 @@ function GameInner() {
         onSelectMode={handleSelectMode}
         onTutorial={() => setShowTutorial(true)}
         onMultiplayer={() => setShowMultiplayer(true)}
+        onDailyChallenge={() => setShowDaily(true)}
         onTrainer={() => setShowTrainer(true)}
         onStats={() => setShowStats(true)}
         isOnline={isOnline}
