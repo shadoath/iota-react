@@ -83,7 +83,7 @@ function GameInner() {
         pendingPoints={pendingPoints}
         pendingCount={game.pendingPlacements.length}
         turnInProgress={game.turnInProgress}
-        onNewGame={() => dispatch({ type: 'NEW_GAME' })}
+        onNewGame={() => dispatch({ type: 'RETURN_TO_SETUP' })}
         onCompleteTurn={() => dispatch({ type: 'COMPLETE_TURN' })}
         onUndoLast={() => dispatch({ type: 'UNDO_PLACEMENT' })}
       />

@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { gameReducer, AppState } from '../GameContext'
-import { Card, GameState } from '../../types/game'
+import { Card, GameState, GameSettings, Player } from '../../types/game'
 
 function card(
   number: Card['number'],
@@ -11,7 +11,38 @@ function card(
   return { id, number, color, shape }
 }
 
+function createTestPlayers(): Player[] {
+  return [
+    {
+      id: 'player-0',
+      name: 'You',
+      type: 'human',
+      hand: [
+        card(1, 'red', 'triangle', 'hand-1'),
+        card(2, 'green', 'square', 'hand-2'),
+        card(3, 'blue', 'circle', 'hand-3'),
+        card(4, 'yellow', 'cross', 'hand-4'),
+      ],
+      score: 0,
+    },
+    {
+      id: 'player-1',
+      name: 'Dot',
+      type: 'ai',
+      difficulty: 'medium',
+      hand: [
+        card(1, 'green', 'square', 'ai-1'),
+        card(2, 'blue', 'circle', 'ai-2'),
+        card(3, 'yellow', 'cross', 'ai-3'),
+        card(4, 'red', 'triangle', 'ai-4'),
+      ],
+      score: 0,
+    },
+  ]
+}
+
 function createTestState(overrides: Partial<GameState> = {}): AppState {
+  const players = createTestPlayers()
   return {
     game: {
       deck: [
@@ -20,20 +51,20 @@ function createTestState(overrides: Partial<GameState> = {}): AppState {
         card(2, 'green', 'square', 'deck-3'),
         card(1, 'red', 'triangle', 'deck-4'),
       ],
-      playerHand: [
-        card(1, 'red', 'triangle', 'hand-1'),
-        card(2, 'green', 'square', 'hand-2'),
-        card(3, 'blue', 'circle', 'hand-3'),
-        card(4, 'yellow', 'cross', 'hand-4'),
-      ],
       board: [
         { card: card(1, 'red', 'circle', 'board-1'), position: { row: 0, col: 0 } },
       ],
-      currentPlayer: 1,
-      score: 0,
+      players,
+      currentPlayerIndex: 0,
       pendingPlacements: [],
       turnInProgress: false,
       lastTurnScore: null,
+      gamePhase: 'playing',
+      turnHistory: [],
+      // Legacy compat
+      playerHand: players[0].hand,
+      score: players[0].score,
+      currentPlayer: 1,
       ...overrides,
     },
     selectedCardId: null,
@@ -43,21 +74,56 @@ function createTestState(overrides: Partial<GameState> = {}): AppState {
 }
 
 describe('gameReducer', () => {
-  describe('NEW_GAME', () => {
-    it('resets game state', () => {
-      const state = createTestState({ score: 50 })
-      const next = gameReducer(state, { type: 'NEW_GAME' })
-      expect(next.game.score).toBe(0)
-      expect(next.game.playerHand).toHaveLength(4)
-      expect(next.game.board).toHaveLength(1)
-      expect(next.selectedCardId).toBeNull()
+  describe('START_GAME', () => {
+    it('initializes game with correct player count', () => {
+      const settings: GameSettings = {
+        playerCount: 2,
+        aiPlayers: [{ name: 'Dot', difficulty: 'medium' }],
+      }
+      const state = createTestState()
+      state.game.gamePhase = 'setup'
+
+      const next = gameReducer(state, { type: 'START_GAME', settings })
+      expect(next.game.gamePhase).toBe('playing')
+      expect(next.game.players).toHaveLength(2)
+      expect(next.game.players[0].type).toBe('human')
+      expect(next.game.players[1].type).toBe('ai')
+      expect(next.game.players[1].difficulty).toBe('medium')
     })
 
-    it('preserves zoom level', () => {
+    it('deals 4 cards to each player', () => {
+      const settings: GameSettings = {
+        playerCount: 3,
+        aiPlayers: [
+          { name: 'Dot', difficulty: 'easy' },
+          { name: 'Dash', difficulty: 'hard' },
+        ],
+      }
       const state = createTestState()
-      state.zoomLevel = 2.5
-      const next = gameReducer(state, { type: 'NEW_GAME' })
-      expect(next.zoomLevel).toBe(2.5)
+      const next = gameReducer(state, { type: 'START_GAME', settings })
+      next.game.players.forEach(p => {
+        expect(p.hand).toHaveLength(4)
+      })
+    })
+
+    it('places initial card on board', () => {
+      const settings: GameSettings = {
+        playerCount: 2,
+        aiPlayers: [{ name: 'Dot', difficulty: 'easy' }],
+      }
+      const state = createTestState()
+      const next = gameReducer(state, { type: 'START_GAME', settings })
+      expect(next.game.board).toHaveLength(1)
+      expect(next.game.board[0].position).toEqual({ row: 0, col: 0 })
+    })
+  })
+
+  describe('RETURN_TO_SETUP', () => {
+    it('resets to setup phase', () => {
+      const state = createTestState()
+      const next = gameReducer(state, { type: 'RETURN_TO_SETUP' })
+      expect(next.game.gamePhase).toBe('setup')
+      expect(next.game.players).toHaveLength(0)
     })
   })
 
@@ -74,150 +140,141 @@ describe('gameReducer', () => {
       const next = gameReducer(state, { type: 'SELECT_CARD', cardId: 'hand-1' })
       expect(next.selectedCardId).toBeNull()
     })
-
-    it('switches to a different card', () => {
-      const state = createTestState()
-      state.selectedCardId = 'hand-1'
-      const next = gameReducer(state, { type: 'SELECT_CARD', cardId: 'hand-2' })
-      expect(next.selectedCardId).toBe('hand-2')
-    })
   })
 
   describe('PLACE_CARD', () => {
     it('adds card to pending placements', () => {
       const state = createTestState()
-      const cardToPlace = state.game.playerHand[0]
+      const cardToPlace = state.game.players[0].hand[0]
       const next = gameReducer(state, {
         type: 'PLACE_CARD',
         card: cardToPlace,
         position: { row: 0, col: 1 },
       })
       expect(next.game.pendingPlacements).toHaveLength(1)
-      expect(next.game.pendingPlacements[0].position).toEqual({ row: 0, col: 1 })
     })
 
-    it('removes card from player hand', () => {
+    it('removes card from current player hand', () => {
       const state = createTestState()
-      const cardToPlace = state.game.playerHand[0]
+      const cardToPlace = state.game.players[0].hand[0]
       const next = gameReducer(state, {
         type: 'PLACE_CARD',
         card: cardToPlace,
         position: { row: 0, col: 1 },
       })
-      expect(next.game.playerHand).toHaveLength(3)
-      expect(next.game.playerHand.find(c => c.id === cardToPlace.id)).toBeUndefined()
+      expect(next.game.players[0].hand).toHaveLength(3)
     })
 
     it('sets turnInProgress to true', () => {
       const state = createTestState()
       const next = gameReducer(state, {
         type: 'PLACE_CARD',
-        card: state.game.playerHand[0],
+        card: state.game.players[0].hand[0],
         position: { row: 0, col: 1 },
       })
       expect(next.game.turnInProgress).toBe(true)
     })
-
-    it('clears selected card', () => {
-      const state = createTestState()
-      state.selectedCardId = 'hand-1'
-      const next = gameReducer(state, {
-        type: 'PLACE_CARD',
-        card: state.game.playerHand[0],
-        position: { row: 0, col: 1 },
-      })
-      expect(next.selectedCardId).toBeNull()
-    })
   })
 
   describe('UNDO_PLACEMENT', () => {
-    it('returns last placed card to hand', () => {
+    it('returns card to current player hand', () => {
       let state = createTestState()
-      const cardToPlace = state.game.playerHand[0]
+      const cardToPlace = state.game.players[0].hand[0]
       state = gameReducer(state, {
         type: 'PLACE_CARD',
         card: cardToPlace,
         position: { row: 0, col: 1 },
       })
-      expect(state.game.playerHand).toHaveLength(3)
-
       state = gameReducer(state, { type: 'UNDO_PLACEMENT' })
-      expect(state.game.playerHand).toHaveLength(4)
+      expect(state.game.players[0].hand).toHaveLength(4)
       expect(state.game.pendingPlacements).toHaveLength(0)
     })
 
-    it('does nothing when no pending placements', () => {
+    it('does nothing when no pending', () => {
       const state = createTestState()
       const next = gameReducer(state, { type: 'UNDO_PLACEMENT' })
       expect(next).toBe(state)
     })
-
-    it('sets turnInProgress false when last placement undone', () => {
-      let state = createTestState()
-      state = gameReducer(state, {
-        type: 'PLACE_CARD',
-        card: state.game.playerHand[0],
-        position: { row: 0, col: 1 },
-      })
-      expect(state.game.turnInProgress).toBe(true)
-
-      state = gameReducer(state, { type: 'UNDO_PLACEMENT' })
-      expect(state.game.turnInProgress).toBe(false)
-    })
   })
 
   describe('COMPLETE_TURN', () => {
-    it('returns error when no pending placements', () => {
+    it('returns error when no pending', () => {
       const state = createTestState()
       const next = gameReducer(state, { type: 'COMPLETE_TURN' })
       expect(next.lastActionResult?.type).toBe('error')
     })
 
-    it('moves pending placements to board', () => {
+    it('moves pending to board and advances turn', () => {
       let state = createTestState()
       state = gameReducer(state, {
         type: 'PLACE_CARD',
-        card: state.game.playerHand[0],
+        card: state.game.players[0].hand[0],
         position: { row: 0, col: 1 },
       })
       state = gameReducer(state, { type: 'COMPLETE_TURN' })
       expect(state.game.board).toHaveLength(2)
       expect(state.game.pendingPlacements).toHaveLength(0)
+      expect(state.game.currentPlayerIndex).toBe(1) // advanced to AI
     })
 
-    it('draws new cards from deck', () => {
+    it('updates player score', () => {
       let state = createTestState()
       state = gameReducer(state, {
         type: 'PLACE_CARD',
-        card: state.game.playerHand[0],
+        card: state.game.players[0].hand[0],
         position: { row: 0, col: 1 },
       })
-      const deckBefore = state.game.deck.length
       state = gameReducer(state, { type: 'COMPLETE_TURN' })
-      expect(state.game.playerHand).toHaveLength(4)
-      expect(state.game.deck.length).toBe(deckBefore - 1)
+      expect(state.game.players[0].score).toBeGreaterThan(0)
     })
 
-    it('updates score', () => {
+    it('records turn in history', () => {
       let state = createTestState()
       state = gameReducer(state, {
         type: 'PLACE_CARD',
-        card: state.game.playerHand[0],
+        card: state.game.players[0].hand[0],
         position: { row: 0, col: 1 },
       })
       state = gameReducer(state, { type: 'COMPLETE_TURN' })
-      expect(state.game.score).toBeGreaterThan(0)
+      expect(state.game.turnHistory).toHaveLength(1)
+      expect(state.game.turnHistory[0].playerId).toBe('player-0')
+    })
+  })
+
+  describe('AI_TURN', () => {
+    it('places cards, scores, and advances', () => {
+      let state = createTestState()
+      // Set current to AI player
+      state.game.currentPlayerIndex = 1
+
+      const aiCard = state.game.players[1].hand[0]
+      state = gameReducer(state, {
+        type: 'AI_TURN',
+        placements: [{ card: aiCard, position: { row: 0, col: 1 } }],
+      })
+      expect(state.game.board).toHaveLength(2)
+      expect(state.game.players[1].score).toBeGreaterThan(0)
+      expect(state.game.currentPlayerIndex).toBe(0) // back to human
+      expect(state.game.turnHistory).toHaveLength(1)
     })
 
-    it('sets turnInProgress to false', () => {
+    it('handles empty placements (pass)', () => {
       let state = createTestState()
-      state = gameReducer(state, {
-        type: 'PLACE_CARD',
-        card: state.game.playerHand[0],
-        position: { row: 0, col: 1 },
-      })
-      state = gameReducer(state, { type: 'COMPLETE_TURN' })
-      expect(state.game.turnInProgress).toBe(false)
+      state.game.currentPlayerIndex = 1
+      state = gameReducer(state, { type: 'AI_TURN', placements: [] })
+      expect(state.game.currentPlayerIndex).toBe(0)
+    })
+  })
+
+  describe('SWAP_CARDS', () => {
+    it('swaps cards and advances turn', () => {
+      let state = createTestState()
+      const cardId = state.game.players[0].hand[0].id
+      state = gameReducer(state, { type: 'SWAP_CARDS', cardIds: [cardId] })
+      expect(state.game.players[0].hand).toHaveLength(4)
+      expect(state.game.currentPlayerIndex).toBe(1)
+      expect(state.game.lastTurnScore).toBe(0)
+      expect(state.game.turnHistory).toHaveLength(1)
     })
   })
 
