@@ -52,7 +52,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {/* Drawer */}
       <div className={`${styles.drawer} ${open ? styles.drawerOpen : ''}`}>
         <div className={styles.drawerHeader}>
-          <span className={styles.drawerTitle}>Iota</span>
+          <span className={styles.drawerTitle}>NodusNexus</span>
           <button
             className={styles.closeBtn}
             onClick={() => setOpen(false)}

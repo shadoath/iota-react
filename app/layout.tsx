@@ -5,20 +5,20 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Iota - Card Game of Matching Patterns",
+  title: "NodusNexus - Card Game of Matching Patterns",
   description:
-    "Play Iota, the strategic card game where every card has a color, shape, and number. Match patterns, score points, and challenge AI opponents or friends online.",
+    "Play NodusNexus, the strategic card game where every card has a color, shape, and number. Match patterns, score points, and challenge AI opponents or friends online.",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "Iota",
+    title: "NodusNexus",
   },
   openGraph: {
-    title: "Iota - Card Game",
+    title: "NodusNexus - Card Game",
     description: "The strategic card game of matching patterns. Play solo or with friends.",
     type: "website",
-    siteName: "Iota",
+    siteName: "NodusNexus",
   },
   icons: {
     icon: "/icons/icon.svg",

@@ -1,8 +1,8 @@
-# Iota Digital - Product Roadmap
+# NodusNexus - Product Roadmap
 
 ## Vision
 
-A polished, commercial-grade digital version of Iota — playable solo against AI, or online with friends. Fast, beautiful, and accessible on any device.
+A polished, commercial-grade digital version of NodusNexus — playable solo against AI, or online with friends. Fast, beautiful, and accessible on any device.
 
 ## Current State
 

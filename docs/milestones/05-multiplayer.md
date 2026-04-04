@@ -62,8 +62,8 @@ Client A                    Server                    Client B
 ### 5.3 Room System
 
 **Creating a game:**
-1. Host selects "Create Room" → gets a 6-character room code (e.g., `IOTAX7`)
-2. Share code or link (`iota.game/room/IOTAX7`)
+1. Host selects "Create Room" → gets a 6-character room code (e.g., `NDX4X7`)
+2. Share code or link via room code
 3. Lobby shows connected players
 4. Host starts game when ready (2-4 players)
 
