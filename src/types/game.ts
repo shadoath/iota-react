@@ -2,12 +2,23 @@ export type CardNumber = 1 | 2 | 3 | 4;
 export type CardColor = 'red' | 'green' | 'blue' | 'yellow';
 export type CardShape = 'triangle' | 'square' | 'circle' | 'cross';
 
-export interface Card {
+export interface RegularCard {
   id: string;
   number: CardNumber;
   color: CardColor;
   shape: CardShape;
+  isWild?: false;
 }
+
+export interface WildCard {
+  id: string;
+  number: CardNumber;
+  color: CardColor;
+  shape: CardShape;
+  isWild: true;
+}
+
+export type Card = RegularCard | WildCard;
 
 export interface GridPosition {
   row: number;

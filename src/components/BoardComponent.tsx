@@ -5,6 +5,7 @@ import { GameCard } from './GameCard'
 import { getValidPlacements } from '../utils/gameLogic'
 import { isImpossibleSquare } from '../utils/impossibleSquares'
 import { useState, useEffect } from 'react'
+import { MOBILE_BREAKPOINT } from '../constants/game'
 
 interface BoardComponentProps {
   board: PlacedCard[]
@@ -26,7 +27,7 @@ export const BoardComponent: React.FC<BoardComponentProps> = ({
   
   useEffect(() => {
     const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768)
+      setIsMobile(window.innerWidth < MOBILE_BREAKPOINT)
     }
     checkMobile()
     window.addEventListener('resize', checkMobile)

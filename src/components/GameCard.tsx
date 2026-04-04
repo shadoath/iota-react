@@ -1,6 +1,7 @@
 import type React from 'react'
 import type { Card } from '../types/game'
 import { Box } from '@mui/material'
+import { COLOR_MAP } from '../constants/game'
 
 interface GameCardProps {
   card: Card
@@ -61,12 +62,36 @@ const shapeComponents: Record<string, React.FC<{ color: string }>> = {
   ),
 }
 
-const colorMap: Record<string, string> = {
-  red: '#ef4444',
-  green: '#22c55e',
-  blue: '#3b82f6',
-  yellow: '#eab308',
-}
+const colorMap = COLOR_MAP
+
+const WildCardIcon: React.FC = () => (
+  <svg
+    width='28'
+    height='28'
+    viewBox='0 0 40 40'
+    aria-label='Wild'
+    role='img'
+  >
+    <defs>
+      <linearGradient id='wild-gradient' x1='0%' y1='0%' x2='100%' y2='100%'>
+        <stop offset='0%' stopColor='#ef4444' />
+        <stop offset='33%' stopColor='#22c55e' />
+        <stop offset='66%' stopColor='#3b82f6' />
+        <stop offset='100%' stopColor='#eab308' />
+      </linearGradient>
+    </defs>
+    <text
+      x='20'
+      y='28'
+      textAnchor='middle'
+      fontSize='28'
+      fontWeight='bold'
+      fill='url(#wild-gradient)'
+    >
+      W
+    </text>
+  </svg>
+)
 
 export const GameCard: React.FC<GameCardProps> = ({
   card,
@@ -74,8 +99,9 @@ export const GameCard: React.FC<GameCardProps> = ({
   selected,
   disabled,
 }) => {
-  const ShapeComponent = shapeComponents[card.shape]
-  const color = colorMap[card.color]
+  const isWild = card.isWild
+  const ShapeComponent = isWild ? null : shapeComponents[card.shape]
+  const color = isWild ? '#a855f7' : colorMap[card.color]
 
   return (
     <Box
@@ -85,7 +111,7 @@ export const GameCard: React.FC<GameCardProps> = ({
         position: 'relative',
         width: '56px',
         height: '56px',
-        backgroundColor: 'black',
+        backgroundColor: isWild ? '#1a1a2e' : 'black',
         borderRadius: '4px',
         cursor: disabled ? 'not-allowed' : 'pointer',
         transition: 'all 0.2s',
@@ -93,7 +119,7 @@ export const GameCard: React.FC<GameCardProps> = ({
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        border: '1px solid #e0e0e0',
+        border: isWild ? '2px solid #a855f7' : '1px solid #e0e0e0',
         opacity: disabled ? 0.5 : 1,
         transform: selected ? 'scale(1.05)' : 'scale(1)',
         boxShadow: selected
@@ -107,16 +133,16 @@ export const GameCard: React.FC<GameCardProps> = ({
             },
       }}
     >
-      <ShapeComponent color={color} />
+      {isWild ? <WildCardIcon /> : ShapeComponent && <ShapeComponent color={color} />}
       <span
         style={{
-          fontSize: '1rem',
+          fontSize: isWild ? '0.7rem' : '1rem',
           fontWeight: 'bold',
           marginTop: '2px',
           color,
         }}
       >
-        {card.number}
+        {isWild ? 'WILD' : card.number}
       </span>
     </Box>
   )
