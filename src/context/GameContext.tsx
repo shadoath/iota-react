@@ -9,6 +9,7 @@ import type {
   Player,
   GameSettings,
   GamePhase,
+  GameMode,
   TurnRecord,
 } from '../types/game'
 import { createDeck, calculateScore } from '../utils/gameLogic'
@@ -18,6 +19,8 @@ import { HAND_SIZE } from '../constants/game'
 
 export type GameAction =
   | { type: 'START_GAME'; settings: GameSettings }
+  | { type: 'SHOW_MENU' }
+  | { type: 'SHOW_SETUP'; mode: GameMode }
   | { type: 'RETURN_TO_SETUP' }
   | { type: 'SELECT_CARD'; cardId: string }
   | { type: 'DESELECT_CARD' }
@@ -105,7 +108,10 @@ function initializeGame(settings: GameSettings): GameState {
     turnInProgress: false,
     lastTurnScore: null,
     gamePhase: 'playing',
+    gameMode: settings.mode || 'classic',
     turnHistory: [],
+    turnTimeLimit: settings.turnTimeLimit ?? null,
+    hintsEnabled: settings.hintsEnabled ?? false,
     // Legacy compat
     playerHand: players[0].hand,
     score: players[0].score,
@@ -171,8 +177,11 @@ function createInitialAppState(): AppState {
       pendingPlacements: [],
       turnInProgress: false,
       lastTurnScore: null,
-      gamePhase: 'setup',
+      gamePhase: 'menu',
+      gameMode: 'classic',
       turnHistory: [],
+      turnTimeLimit: null,
+      hintsEnabled: false,
       playerHand: [],
       score: 0,
       currentPlayer: 1,
@@ -197,8 +206,24 @@ export function gameReducer(state: AppState, action: GameAction): AppState {
       }
     }
 
-    case 'RETURN_TO_SETUP': {
+    case 'SHOW_MENU': {
       return createInitialAppState()
+    }
+
+    case 'SHOW_SETUP': {
+      const initial = createInitialAppState()
+      return {
+        ...initial,
+        game: { ...initial.game, gamePhase: 'setup', gameMode: action.mode },
+      }
+    }
+
+    case 'RETURN_TO_SETUP': {
+      const initial = createInitialAppState()
+      return {
+        ...initial,
+        game: { ...initial.game, gamePhase: 'setup' },
+      }
     }
 
     case 'SELECT_CARD': {

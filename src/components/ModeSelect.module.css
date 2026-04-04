@@ -1,0 +1,114 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: var(--space-xl);
+  background-color: var(--color-bg);
+}
+
+.card {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  padding: var(--space-2xl);
+  box-shadow: var(--shadow-lg);
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.title {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  text-align: center;
+}
+
+.subtitle {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  text-align: center;
+  margin-top: calc(-1 * var(--space-sm));
+}
+
+.modes {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.modeBtn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-lg);
+  background: var(--color-surface-alt);
+  border: 2px solid transparent;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  text-align: left;
+}
+
+.modeBtn:hover {
+  border-color: var(--color-info);
+  transform: translateX(4px);
+}
+
+.modeIcon {
+  font-size: 1.5rem;
+  width: 40px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.modeInfo {
+  flex: 1;
+}
+
+.modeName {
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text);
+}
+
+.modeDesc {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  margin-top: 2px;
+}
+
+.modeArrow {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-md);
+  transition: transform var(--transition-fast);
+}
+
+.modeBtn:hover .modeArrow {
+  transform: translateX(4px);
+}
+
+.divider {
+  height: 1px;
+  background: #e5e5e5;
+}
+
+.tutorialBtn {
+  padding: var(--space-sm) var(--space-md);
+  background: transparent;
+  border: 1px dashed #ccc;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  transition: all var(--transition-fast);
+  text-align: center;
+}
+
+.tutorialBtn:hover {
+  border-color: var(--color-info);
+  color: var(--color-info);
+}

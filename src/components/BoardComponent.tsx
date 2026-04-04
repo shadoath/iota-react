@@ -13,6 +13,7 @@ interface BoardComponentProps {
   selectedCard: Card | null
   zoomLevel: number
   onZoomChange: (zoom: number) => void
+  scoreHints?: Record<string, number> | null
 }
 
 export const BoardComponent: React.FC<BoardComponentProps> = ({
@@ -22,6 +23,7 @@ export const BoardComponent: React.FC<BoardComponentProps> = ({
   selectedCard,
   zoomLevel,
   onZoomChange,
+  scoreHints,
 }) => {
   const viewportRef = useRef<HTMLDivElement>(null)
   const [isMobile, setIsMobile] = useState(false)
@@ -196,7 +198,13 @@ export const BoardComponent: React.FC<BoardComponentProps> = ({
                 <div
                   className={styles.placeholder}
                   style={{ width: cellSize - 12, height: cellSize - 12 }}
-                />
+                >
+                  {scoreHints && scoreHints[`${row},${col}`] !== undefined && (
+                    <span className={styles.scoreHint}>
+                      +{scoreHints[`${row},${col}`]}
+                    </span>
+                  )}
+                </div>
               )}
               {!placedCard && impossible && (
                 <div className={styles.impossible} />

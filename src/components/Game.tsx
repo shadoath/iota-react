@@ -2,8 +2,8 @@
 
 import React, { useEffect, useRef, useState, useCallback } from 'react'
 import toast, { Toaster } from 'react-hot-toast'
-import type { Card, GridPosition, GameSettings } from '../types/game'
-import { calculateScore } from '../utils/gameLogic'
+import type { Card, GridPosition, GameSettings, GameMode } from '../types/game'
+import { calculateScore, getValidPlacements, isValidPlacement } from '../utils/gameLogic'
 import { MAX_LINE_LENGTH } from '../constants/game'
 import { isPlacementInSameLineAsPending } from '../utils/turnValidation'
 import { getDetailedValidationError } from '../utils/validationMessages'
@@ -14,6 +14,9 @@ import { Sidebar } from './Sidebar'
 import { GameSetup } from './GameSetup'
 import { GameOver } from './GameOver'
 import { ScoreBoard } from './ScoreBoard'
+import { ModeSelect } from './ModeSelect'
+import { Tutorial } from './Tutorial/Tutorial'
+import { TurnTimer } from './TurnTimer'
 import { GameProvider, useGame } from '../context/GameContext'
 import styles from './Game.module.css'
 
@@ -22,6 +25,8 @@ function GameInner() {
   const { game, selectedCardId, zoomLevel, lastActionResult } = state
   const [isAIThinking, setIsAIThinking] = useState(false)
   const [lastSettings, setLastSettings] = useState<GameSettings | null>(null)
+  const [showTutorial, setShowTutorial] = useState(false)
+  const [selectedMode, setSelectedMode] = useState<GameMode>('classic')
 
   const currentPlayer = game.players[game.currentPlayerIndex]
   const isHumanTurn = currentPlayer?.type === 'human'
@@ -53,7 +58,6 @@ function GameInner() {
 
     setIsAIThinking(true)
 
-    // Delay to make it feel natural
     const thinkTime = currentPlayer.difficulty === 'hard' ? 1500
       : currentPlayer.difficulty === 'medium' ? 1000
       : 600
@@ -66,12 +70,10 @@ function GameInner() {
       )
 
       if (move.length === 0) {
-        // AI can't play — swap a random card
         if (currentPlayer.hand.length > 0 && game.deck.length > 0) {
           const randomCard = currentPlayer.hand[Math.floor(Math.random() * currentPlayer.hand.length)]
           dispatch({ type: 'SWAP_CARDS', cardIds: [randomCard.id] })
         } else {
-          // Pass (no cards to swap, no moves)
           dispatch({ type: 'AI_TURN', placements: [] })
         }
       } else {
@@ -88,6 +90,11 @@ function GameInner() {
   }, [game.currentPlayerIndex, game.gamePhase, currentPlayer, isAIThinking, dispatch, game.board, game.deck.length])
 
   // --- Handlers ---
+
+  const handleSelectMode = useCallback((mode: GameMode) => {
+    setSelectedMode(mode)
+    dispatch({ type: 'SHOW_SETUP', mode })
+  }, [dispatch])
 
   const handleStartGame = useCallback((settings: GameSettings) => {
     setLastSettings(settings)
@@ -128,13 +135,84 @@ function GameInner() {
     }
   }
 
+  const handleTimeout = useCallback(() => {
+    toast.error('Time\'s up! Turn skipped.')
+    // Auto-complete if cards placed, otherwise skip
+    if (game.pendingPlacements.length > 0) {
+      dispatch({ type: 'COMPLETE_TURN' })
+    } else {
+      // Swap a random card as penalty
+      const humanPlayer = game.players.find(p => p.type === 'human')
+      if (humanPlayer && humanPlayer.hand.length > 0 && game.deck.length > 0) {
+        dispatch({ type: 'SWAP_CARDS', cardIds: [humanPlayer.hand[0].id] })
+      } else {
+        dispatch({ type: 'COMPLETE_TURN' })
+      }
+    }
+  }, [dispatch, game.pendingPlacements.length, game.players, game.deck.length])
+
   const pendingPoints = game.pendingPlacements.length > 0
     ? calculateScore(game.pendingPlacements, game.board)
     : 0
 
+  // --- Practice mode: compute score previews for valid positions ---
+  const scoreHints = React.useMemo(() => {
+    if (!game.hintsEnabled || !selectedCard || !isHumanTurn) return null
+
+    const allPlacements = [...game.board, ...game.pendingPlacements]
+    const validPositions = getValidPlacements(game.board, game.pendingPlacements)
+    const hints: Record<string, number> = {}
+
+    for (const pos of validPositions) {
+      if (!isPlacementInSameLineAsPending(pos, game.pendingPlacements)) continue
+      if (!isValidPlacement(selectedCard, pos, allPlacements)) continue
+
+      const testPlacement = { card: selectedCard, position: pos }
+      const score = calculateScore(
+        [...game.pendingPlacements, testPlacement],
+        game.board
+      )
+      hints[`${pos.row},${pos.col}`] = score
+    }
+
+    return hints
+  }, [game.hintsEnabled, selectedCard, isHumanTurn, game.board, game.pendingPlacements])
+
+  // --- Tutorial ---
+  if (showTutorial) {
+    return (
+      <Tutorial
+        onComplete={() => {
+          setShowTutorial(false)
+          dispatch({ type: 'SHOW_MENU' })
+        }}
+        onBack={() => {
+          setShowTutorial(false)
+          dispatch({ type: 'SHOW_MENU' })
+        }}
+      />
+    )
+  }
+
+  // --- Menu screen ---
+  if (game.gamePhase === 'menu') {
+    return (
+      <ModeSelect
+        onSelectMode={handleSelectMode}
+        onTutorial={() => setShowTutorial(true)}
+      />
+    )
+  }
+
   // --- Setup screen ---
   if (game.gamePhase === 'setup') {
-    return <GameSetup onStartGame={handleStartGame} />
+    return (
+      <GameSetup
+        mode={game.gameMode}
+        onStartGame={handleStartGame}
+        onBack={() => dispatch({ type: 'SHOW_MENU' })}
+      />
+    )
   }
 
   const humanPlayer = game.players.find(p => p.type === 'human')
@@ -150,7 +228,7 @@ function GameInner() {
         pendingPoints={pendingPoints}
         pendingCount={game.pendingPlacements.length}
         turnInProgress={game.turnInProgress}
-        onNewGame={() => dispatch({ type: 'RETURN_TO_SETUP' })}
+        onNewGame={() => dispatch({ type: 'SHOW_MENU' })}
         onCompleteTurn={() => dispatch({ type: 'COMPLETE_TURN' })}
         onUndoLast={() => dispatch({ type: 'UNDO_PLACEMENT' })}
       />
@@ -162,6 +240,21 @@ function GameInner() {
         pendingPoints={pendingPoints}
         isAIThinking={isAIThinking}
       />
+
+      {/* Turn timer for timed mode */}
+      {game.turnTimeLimit && isHumanTurn && (
+        <TurnTimer
+          timeLimit={game.turnTimeLimit}
+          onTimeout={handleTimeout}
+          isActive={isHumanTurn && !isAIThinking && game.gamePhase === 'playing'}
+          resetKey={game.turnHistory.length}
+        />
+      )}
+
+      {/* Practice mode hint badge */}
+      {game.hintsEnabled && (
+        <div className={styles.hintBadge}>Practice Mode</div>
+      )}
 
       {/* Board area */}
       <div className={styles.boardArea}>
@@ -176,10 +269,11 @@ function GameInner() {
           }
           zoomLevel={zoomLevel}
           onZoomChange={(zoom) => dispatch({ type: 'SET_ZOOM', zoom })}
+          scoreHints={scoreHints}
         />
       </div>
 
-      {/* Player hand (only shown for human) */}
+      {/* Player hand */}
       <PlayerHand
         cards={humanHand}
         selectedCard={selectedCard}
@@ -197,7 +291,7 @@ function GameInner() {
           players={game.players}
           turnHistory={game.turnHistory}
           onPlayAgain={handlePlayAgain}
-          onNewSetup={() => dispatch({ type: 'RETURN_TO_SETUP' })}
+          onNewSetup={() => dispatch({ type: 'SHOW_MENU' })}
         />
       )}
     </div>
