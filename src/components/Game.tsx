@@ -1,26 +1,17 @@
 'use client'
 
-import type React from 'react'
-import { useEffect, useRef } from 'react'
-import { Box, Typography, Paper, IconButton } from '@mui/material'
-import ZoomInIcon from '@mui/icons-material/ZoomIn'
-import ZoomOutIcon from '@mui/icons-material/ZoomOut'
+import React, { useEffect, useRef } from 'react'
 import toast, { Toaster } from 'react-hot-toast'
 import type { Card, GridPosition } from '../types/game'
 import { calculateScore } from '../utils/gameLogic'
-import {
-  HAND_SIZE,
-  MAX_LINE_LENGTH,
-  MIN_ZOOM,
-  MAX_ZOOM,
-  ZOOM_STEP,
-} from '../constants/game'
+import { MAX_LINE_LENGTH } from '../constants/game'
 import { isPlacementInSameLineAsPending } from '../utils/turnValidation'
 import { getDetailedValidationError } from '../utils/validationMessages'
 import { BoardComponent } from './BoardComponent'
 import { PlayerHand } from './PlayerHand'
 import { Sidebar } from './Sidebar'
 import { GameProvider, useGame } from '../context/GameContext'
+import styles from './Game.module.css'
 
 function GameInner() {
   const { state, dispatch } = useGame()
@@ -83,7 +74,7 @@ function GameInner() {
       : 0
 
   return (
-    <>
+    <div className={styles.layout}>
       <Toaster position='top-center' />
 
       <Sidebar
@@ -97,86 +88,16 @@ function GameInner() {
         onUndoLast={() => dispatch({ type: 'UNDO_PLACEMENT' })}
       />
 
-      <Paper
-        sx={{
-          position: 'fixed',
-          top: 16,
-          left: '50%',
-          transform: 'translateX(-50%)',
-          padding: '12px 24px',
-          backgroundColor: 'white',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-          zIndex: 1100,
-          borderRadius: '24px',
-          textAlign: 'center',
-        }}
-      >
-        <Typography variant='h5' sx={{ fontWeight: 'bold' }}>
-          Score: {game.score}
-        </Typography>
+      {/* Score display */}
+      <div className={styles.scoreBar}>
+        <span className={styles.scoreValue}>Score: {game.score}</span>
         {game.pendingPlacements.length > 0 && (
-          <Typography
-            variant='body2'
-            sx={{ color: '#f59e0b', fontWeight: 'medium' }}
-          >
-            +{pendingPoints} pending
-          </Typography>
+          <span className={styles.scorePending}>+{pendingPoints}</span>
         )}
-      </Paper>
+      </div>
 
-      <Box
-        sx={{
-          position: 'fixed',
-          top: 16,
-          right: 16,
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 1,
-          zIndex: 1100,
-        }}
-      >
-        <IconButton
-          onClick={() =>
-            dispatch({
-              type: 'SET_ZOOM',
-              zoom: Math.min(zoomLevel + ZOOM_STEP, MAX_ZOOM),
-            })
-          }
-          sx={{
-            backgroundColor: 'white',
-            boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-            '&:hover': { backgroundColor: '#f5f5f5' },
-          }}
-        >
-          <ZoomInIcon />
-        </IconButton>
-        <IconButton
-          onClick={() =>
-            dispatch({
-              type: 'SET_ZOOM',
-              zoom: Math.max(zoomLevel - ZOOM_STEP, MIN_ZOOM),
-            })
-          }
-          sx={{
-            backgroundColor: 'white',
-            boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-            '&:hover': { backgroundColor: '#f5f5f5' },
-          }}
-        >
-          <ZoomOutIcon />
-        </IconButton>
-      </Box>
-
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          minHeight: 'calc(100vh - 200px)',
-          paddingTop: '80px',
-          paddingBottom: '10px',
-        }}
-      >
+      {/* Board area */}
+      <div className={styles.boardArea}>
         <BoardComponent
           board={game.board}
           pendingPlacements={game.pendingPlacements}
@@ -187,9 +108,11 @@ function GameInner() {
               : null
           }
           zoomLevel={zoomLevel}
+          onZoomChange={(zoom) => dispatch({ type: 'SET_ZOOM', zoom })}
         />
-      </Box>
+      </div>
 
+      {/* Player hand */}
       <PlayerHand
         cards={game.playerHand}
         selectedCard={selectedCard}
@@ -200,7 +123,7 @@ function GameInner() {
         onCompleteTurn={() => dispatch({ type: 'COMPLETE_TURN' })}
         onUndoLast={() => dispatch({ type: 'UNDO_PLACEMENT' })}
       />
-    </>
+    </div>
   )
 }
 

@@ -1,18 +1,18 @@
-import type React from 'react'
-import { Box } from '@mui/material'
+import React, { useState, useEffect, useRef, useCallback } from 'react'
 import type { PlacedCard, GridPosition, Card } from '../types/game'
 import { GameCard } from './GameCard'
 import { getValidPlacements } from '../utils/gameLogic'
 import { isImpossibleSquare } from '../utils/impossibleSquares'
-import { useState, useEffect } from 'react'
-import { MOBILE_BREAKPOINT } from '../constants/game'
+import { MOBILE_BREAKPOINT, MIN_ZOOM, MAX_ZOOM, ZOOM_STEP } from '../constants/game'
+import styles from './Board.module.css'
 
 interface BoardComponentProps {
   board: PlacedCard[]
   pendingPlacements: PlacedCard[]
   onPlaceCard: (position: GridPosition) => void
   selectedCard: Card | null
-  zoomLevel?: number
+  zoomLevel: number
+  onZoomChange: (zoom: number) => void
 }
 
 export const BoardComponent: React.FC<BoardComponentProps> = ({
@@ -20,40 +20,41 @@ export const BoardComponent: React.FC<BoardComponentProps> = ({
   pendingPlacements,
   onPlaceCard,
   selectedCard,
-  zoomLevel = 1,
+  zoomLevel,
+  onZoomChange,
 }) => {
-  // Detect if we're on mobile
+  const viewportRef = useRef<HTMLDivElement>(null)
   const [isMobile, setIsMobile] = useState(false)
-  
+  const [pan, setPan] = useState({ x: 0, y: 0 })
+  const [isPanning, setIsPanning] = useState(false)
+  const panStart = useRef({ x: 0, y: 0, panX: 0, panY: 0 })
+
   useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < MOBILE_BREAKPOINT)
-    }
+    const checkMobile = () => setIsMobile(window.innerWidth < MOBILE_BREAKPOINT)
     checkMobile()
     window.addEventListener('resize', checkMobile)
     return () => window.removeEventListener('resize', checkMobile)
   }, [])
+
+  // Center board when it first renders or on new game
+  useEffect(() => {
+    if (viewportRef.current) {
+      const vw = viewportRef.current.clientWidth
+      const vh = viewportRef.current.clientHeight
+      setPan({ x: vw / 2 - 40, y: vh / 2 - 40 })
+    }
+  }, [board.length === 1]) // re-center on new game (board resets to 1 card)
+
   const validPlacements = selectedCard
     ? getValidPlacements(board, pendingPlacements)
     : []
 
-  // Calculate scaled sizes - larger on desktop
-  const baseCellSize = isMobile ? 60 : 80
-  const baseCardSize = isMobile ? 56 : 76
-  const baseGap = isMobile ? 3 : 4
-  
-  const cellSize = baseCellSize * zoomLevel
-  const cardSize = baseCardSize * zoomLevel
-  const gap = baseGap * zoomLevel
-
-  // Combine board and pending for display
+  const cellSize = isMobile ? 58 : 72
+  const gap = isMobile ? 3 : 4
   const allPlacements = [...board, ...pendingPlacements]
 
-  // Calculate board bounds
-  let minRow = 0
-  let maxRow = 0
-  let minCol = 0
-  let maxCol = 0
+  // Calculate bounds
+  let minRow = 0, maxRow = 0, minCol = 0, maxCol = 0
   if (allPlacements.length > 0) {
     for (const { position } of allPlacements) {
       minRow = Math.min(minRow, position.row)
@@ -62,120 +63,147 @@ export const BoardComponent: React.FC<BoardComponentProps> = ({
       maxCol = Math.max(maxCol, position.col)
     }
   }
-
-  // Add padding for valid placements
-  minRow -= 1
-  maxRow += 1
-  minCol -= 1
-  maxCol += 1
-
+  minRow -= 1; maxRow += 1; minCol -= 1; maxCol += 1
   const rows = maxRow - minRow + 1
   const cols = maxCol - minCol + 1
 
-  const isValidPlacement = (row: number, col: number) => {
-    return validPlacements.some((pos) => pos.row === row && pos.col === col)
-  }
+  const isValid = (row: number, col: number) =>
+    validPlacements.some(pos => pos.row === row && pos.col === col)
 
-  const getPlacedCard = (row: number, col: number) => {
-    return allPlacements.find(
-      (placed) => placed.position.row === row && placed.position.col === col
-    )
-  }
+  const getPlacedCard = (row: number, col: number) =>
+    allPlacements.find(p => p.position.row === row && p.position.col === col)
+
+  // --- Pan handlers ---
+  const handlePointerDown = useCallback((e: React.PointerEvent) => {
+    // Only pan with primary button when no card selected, or with middle button
+    if (e.button === 1 || (!selectedCard && e.button === 0)) {
+      setIsPanning(true)
+      panStart.current = { x: e.clientX, y: e.clientY, panX: pan.x, panY: pan.y }
+      ;(e.target as HTMLElement).setPointerCapture?.(e.pointerId)
+      e.preventDefault()
+    }
+  }, [selectedCard, pan])
+
+  const handlePointerMove = useCallback((e: React.PointerEvent) => {
+    if (!isPanning) return
+    const dx = e.clientX - panStart.current.x
+    const dy = e.clientY - panStart.current.y
+    setPan({ x: panStart.current.panX + dx, y: panStart.current.panY + dy })
+  }, [isPanning])
+
+  const handlePointerUp = useCallback(() => {
+    setIsPanning(false)
+  }, [])
+
+  // --- Wheel zoom ---
+  const handleWheel = useCallback((e: React.WheelEvent) => {
+    e.preventDefault()
+    const delta = e.deltaY > 0 ? -ZOOM_STEP : ZOOM_STEP
+    onZoomChange(Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, zoomLevel + delta)))
+  }, [zoomLevel, onZoomChange])
+
+  // --- Keyboard zoom ---
+  useEffect(() => {
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === '=' || e.key === '+') {
+        onZoomChange(Math.min(MAX_ZOOM, zoomLevel + ZOOM_STEP))
+      } else if (e.key === '-') {
+        onZoomChange(Math.max(MIN_ZOOM, zoomLevel - ZOOM_STEP))
+      } else if (e.key === 'ArrowUp') {
+        setPan(p => ({ ...p, y: p.y + 40 }))
+      } else if (e.key === 'ArrowDown') {
+        setPan(p => ({ ...p, y: p.y - 40 }))
+      } else if (e.key === 'ArrowLeft') {
+        setPan(p => ({ ...p, x: p.x + 40 }))
+      } else if (e.key === 'ArrowRight') {
+        setPan(p => ({ ...p, x: p.x - 40 }))
+      }
+    }
+    window.addEventListener('keydown', handleKey)
+    return () => window.removeEventListener('keydown', handleKey)
+  }, [zoomLevel, onZoomChange])
 
   return (
-    <Box
-      sx={{
-        position: 'relative',
-        overflow: 'auto',
-        maxHeight: '80vh',
-        maxWidth: '100%',
-        padding: { xs: '16px', md: '32px' },
-        backgroundColor: '#f3f4f6',
-        borderRadius: '8px',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'flex-start',
-      }}
+    <div
+      ref={viewportRef}
+      className={styles.viewport}
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerUp}
+      onPointerCancel={handlePointerUp}
+      onWheel={handleWheel}
     >
+      {/* Zoom controls */}
+      <div className={styles.zoomControls}>
+        <button
+          className={styles.zoomBtn}
+          onClick={() => onZoomChange(Math.min(MAX_ZOOM, zoomLevel + ZOOM_STEP))}
+          aria-label='Zoom in'
+        >
+          +
+        </button>
+        <span className={styles.zoomLevel}>{Math.round(zoomLevel * 100)}%</span>
+        <button
+          className={styles.zoomBtn}
+          onClick={() => onZoomChange(Math.max(MIN_ZOOM, zoomLevel - ZOOM_STEP))}
+          aria-label='Zoom out'
+        >
+          -
+        </button>
+      </div>
+
+      {/* Board grid */}
       <div
+        className={styles.board}
         style={{
-          display: 'grid',
-          gap: `${gap}px`,
-          width: 'fit-content',
-          margin: '0 auto',
           gridTemplateColumns: `repeat(${cols}, ${cellSize}px)`,
           gridTemplateRows: `repeat(${rows}, ${cellSize}px)`,
+          gap: `${gap}px`,
+          transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoomLevel})`,
         }}
       >
-        {Array.from({ length: rows * cols }).map((_, index) => {
+        {Array.from({ length: rows * cols }, (_, index) => {
           const row = Math.floor(index / cols) + minRow
           const col = (index % cols) + minCol
           const placedCard = getPlacedCard(row, col)
-          const isValid = isValidPlacement(row, col)
-          const isImpossible =
-            !placedCard && isImpossibleSquare({ row, col }, allPlacements)
+          const valid = isValid(row, col)
+          const impossible = !placedCard && isImpossibleSquare({ row, col }, allPlacements)
+          const isPending = pendingPlacements.some(
+            p => p.position.row === row && p.position.col === col
+          )
+
+          const cellClass = [
+            styles.cell,
+            valid && selectedCard && !impossible && styles.cellValid,
+          ].filter(Boolean).join(' ')
 
           return (
             <div
               key={`${row}-${col}`}
-              style={{
-                width: `${cellSize}px`,
-                height: `${cellSize}px`,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                borderRadius: `${8 * zoomLevel}px`,
-                backgroundColor:
-                  isValid && selectedCard ? '#bbf7d0' : 'transparent',
-                cursor:
-                  isValid && selectedCard && !isImpossible
-                    ? 'pointer'
-                    : 'default',
-                transition: 'background-color 0.2s',
-              }}
-              onMouseEnter={(e) => {
-                if (isValid && selectedCard && !isImpossible) {
-                  e.currentTarget.style.backgroundColor = '#86efac'
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (isValid && selectedCard && !isImpossible) {
-                  e.currentTarget.style.backgroundColor = '#bbf7d0'
-                }
-              }}
+              className={cellClass}
+              style={{ width: cellSize, height: cellSize }}
               onClick={() => {
-                if (isValid && selectedCard && !isImpossible) {
+                if (valid && selectedCard && !impossible) {
                   onPlaceCard({ row, col })
                 }
               }}
             >
               {placedCard && (
-                <GameCard card={placedCard.card} disabled boardCard />
+                <GameCard card={placedCard.card} disabled boardCard placed={isPending} />
               )}
-              {!placedCard && isValid && selectedCard && !isImpossible && (
+              {!placedCard && valid && selectedCard && !impossible && (
                 <div
-                  style={{
-                    width: `${cardSize}px`,
-                    height: `${cardSize}px`,
-                    border: `${2 * zoomLevel}px dashed #22c55e`,
-                    borderRadius: `${8 * zoomLevel}px`,
-                  }}
+                  className={styles.placeholder}
+                  style={{ width: cellSize - 12, height: cellSize - 12 }}
                 />
               )}
-              {!placedCard && isImpossible && (
-                <div
-                  style={{
-                    width: `${cardSize}px`,
-                    height: `${cardSize}px`,
-                    backgroundColor: '#292929',
-                    borderRadius: '50%',
-                  }}
-                />
+              {!placedCard && impossible && (
+                <div className={styles.impossible} />
               )}
             </div>
           )
         })}
       </div>
-    </Box>
+    </div>
   )
 }
