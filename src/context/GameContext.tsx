@@ -6,6 +6,10 @@ import type {
   GameState,
   GridPosition,
   PendingPlacement,
+  Player,
+  GameSettings,
+  GamePhase,
+  TurnRecord,
 } from '../types/game'
 import { createDeck, calculateScore } from '../utils/gameLogic'
 import { HAND_SIZE } from '../constants/game'
@@ -13,12 +17,15 @@ import { HAND_SIZE } from '../constants/game'
 // --- Action types ---
 
 export type GameAction =
-  | { type: 'NEW_GAME' }
+  | { type: 'START_GAME'; settings: GameSettings }
+  | { type: 'RETURN_TO_SETUP' }
   | { type: 'SELECT_CARD'; cardId: string }
   | { type: 'DESELECT_CARD' }
   | { type: 'PLACE_CARD'; card: Card; position: GridPosition }
   | { type: 'UNDO_PLACEMENT' }
   | { type: 'COMPLETE_TURN' }
+  | { type: 'AI_TURN'; placements: PendingPlacement[] }
+  | { type: 'SWAP_CARDS'; cardIds: string[] }
   | { type: 'SET_ZOOM'; zoom: number }
 
 // --- Extended state (includes UI state) ---
@@ -35,29 +42,141 @@ export interface ActionResult {
   message: string
 }
 
-// --- Initial state ---
+// --- AI player names ---
+const AI_NAMES = ['Dot', 'Dash', 'Pixel', 'Byte', 'Chip', 'Nova']
 
-function createInitialGameState(): GameState {
+// --- Helpers ---
+
+function dealHands(deck: Card[], playerCount: number): { hands: Card[][]; remaining: Card[] } {
+  const hands: Card[][] = []
+  let remaining = [...deck]
+  for (let i = 0; i < playerCount; i++) {
+    hands.push(remaining.slice(0, HAND_SIZE))
+    remaining = remaining.slice(HAND_SIZE)
+  }
+  return { hands, remaining }
+}
+
+function createPlayers(settings: GameSettings, hands: Card[][]): Player[] {
+  const players: Player[] = []
+
+  // Human player is always first
+  players.push({
+    id: 'player-0',
+    name: 'You',
+    type: 'human',
+    hand: hands[0],
+    score: 0,
+  })
+
+  // AI players
+  for (let i = 0; i < settings.aiPlayers.length; i++) {
+    const ai = settings.aiPlayers[i]
+    players.push({
+      id: `player-${i + 1}`,
+      name: ai.name || AI_NAMES[i] || `AI ${i + 1}`,
+      type: 'ai',
+      difficulty: ai.difficulty,
+      hand: hands[i + 1],
+      score: 0,
+    })
+  }
+
+  return players
+}
+
+function initializeGame(settings: GameSettings): GameState {
   const deck = createDeck()
-  const playerHand = deck.slice(0, HAND_SIZE)
-  const remainingDeck = deck.slice(HAND_SIZE)
-  const initialCard = remainingDeck[0]
+  const totalPlayers = 1 + settings.aiPlayers.length
+  const { hands, remaining } = dealHands(deck, totalPlayers)
+
+  // Place initial card
+  const initialCard = remaining[0]
+  const board = [{ card: initialCard, position: { row: 0, col: 0 } }]
+
+  const players = createPlayers(settings, hands)
 
   return {
-    deck: remainingDeck.slice(1),
-    playerHand,
-    board: [{ card: initialCard, position: { row: 0, col: 0 } }],
-    currentPlayer: 1,
-    score: 0,
+    deck: remaining.slice(1),
+    board,
+    players,
+    currentPlayerIndex: 0,
     pendingPlacements: [],
     turnInProgress: false,
     lastTurnScore: null,
+    gamePhase: 'playing',
+    turnHistory: [],
+    // Legacy compat
+    playerHand: players[0].hand,
+    score: players[0].score,
+    currentPlayer: 1,
   }
 }
 
+function syncLegacyFields(game: GameState): GameState {
+  const humanPlayer = game.players.find(p => p.type === 'human')
+  return {
+    ...game,
+    playerHand: humanPlayer?.hand ?? [],
+    score: humanPlayer?.score ?? 0,
+    currentPlayer: game.currentPlayerIndex + 1,
+  }
+}
+
+function drawCards(game: GameState, playerIndex: number): GameState {
+  const player = game.players[playerIndex]
+  const cardsNeeded = HAND_SIZE - player.hand.length
+  if (cardsNeeded <= 0 || game.deck.length === 0) return game
+
+  const drawn = game.deck.slice(0, cardsNeeded)
+  const newDeck = game.deck.slice(cardsNeeded)
+  const newPlayers = game.players.map((p, i) =>
+    i === playerIndex ? { ...p, hand: [...p.hand, ...drawn] } : p
+  )
+
+  return { ...game, deck: newDeck, players: newPlayers }
+}
+
+function advanceTurn(game: GameState): GameState {
+  const nextIndex = (game.currentPlayerIndex + 1) % game.players.length
+
+  // Check if game should end (current player has no cards and deck is empty)
+  const allEmpty = game.players.every(p => p.hand.length === 0) && game.deck.length === 0
+  if (allEmpty) {
+    return { ...game, gamePhase: 'ended', currentPlayerIndex: nextIndex }
+  }
+
+  return { ...game, currentPlayerIndex: nextIndex }
+}
+
+function checkGameEnd(game: GameState): GameState {
+  if (game.deck.length === 0) {
+    const allEmpty = game.players.every(p => p.hand.length === 0)
+    if (allEmpty) {
+      return { ...game, gamePhase: 'ended' }
+    }
+  }
+  return game
+}
+
+// --- Initial state ---
+
 function createInitialAppState(): AppState {
   return {
-    game: createInitialGameState(),
+    game: {
+      deck: [],
+      board: [],
+      players: [],
+      currentPlayerIndex: 0,
+      pendingPlacements: [],
+      turnInProgress: false,
+      lastTurnScore: null,
+      gamePhase: 'setup',
+      turnHistory: [],
+      playerHand: [],
+      score: 0,
+      currentPlayer: 1,
+    },
     selectedCardId: null,
     zoomLevel: 1.0,
     lastActionResult: null,
@@ -68,12 +187,18 @@ function createInitialAppState(): AppState {
 
 export function gameReducer(state: AppState, action: GameAction): AppState {
   switch (action.type) {
-    case 'NEW_GAME': {
+    case 'START_GAME': {
+      const game = initializeGame(action.settings)
       return {
-        ...createInitialAppState(),
-        zoomLevel: state.zoomLevel, // preserve zoom
-        lastActionResult: { type: 'success', message: 'New game started!' },
+        ...state,
+        game: syncLegacyFields(game),
+        selectedCardId: null,
+        lastActionResult: { type: 'success', message: 'Game started!' },
       }
+    }
+
+    case 'RETURN_TO_SETUP': {
+      return createInitialAppState()
     }
 
     case 'SELECT_CARD': {
@@ -100,17 +225,23 @@ export function gameReducer(state: AppState, action: GameAction): AppState {
         position,
       }
 
-      const newPendingPlacements = [...state.game.pendingPlacements, newPending]
+      const currentPlayer = state.game.players[state.game.currentPlayerIndex]
+      const newHand = currentPlayer.hand.filter(c => c.id !== card.id)
+      const newPlayers = state.game.players.map((p, i) =>
+        i === state.game.currentPlayerIndex ? { ...p, hand: newHand } : p
+      )
+
+      const newGame = {
+        ...state.game,
+        pendingPlacements: [...state.game.pendingPlacements, newPending],
+        players: newPlayers,
+        turnInProgress: true,
+      }
 
       return {
         ...state,
         selectedCardId: null,
-        game: {
-          ...state.game,
-          pendingPlacements: newPendingPlacements,
-          playerHand: state.game.playerHand.filter(c => c.id !== card.id),
-          turnInProgress: true,
-        },
+        game: syncLegacyFields(newGame),
         lastActionResult: null,
       }
     }
@@ -124,14 +255,22 @@ export function gameReducer(state: AppState, action: GameAction): AppState {
         id: lastPlacement.card.id.replace('pending-', ''),
       }
 
+      const currentPlayer = state.game.players[state.game.currentPlayerIndex]
+      const newHand = [...currentPlayer.hand, originalCard]
+      const newPlayers = state.game.players.map((p, i) =>
+        i === state.game.currentPlayerIndex ? { ...p, hand: newHand } : p
+      )
+
+      const newGame = {
+        ...state.game,
+        pendingPlacements: state.game.pendingPlacements.slice(0, -1),
+        players: newPlayers,
+        turnInProgress: state.game.pendingPlacements.length > 1,
+      }
+
       return {
         ...state,
-        game: {
-          ...state.game,
-          pendingPlacements: state.game.pendingPlacements.slice(0, -1),
-          playerHand: [...state.game.playerHand, originalCard],
-          turnInProgress: state.game.pendingPlacements.length > 1,
-        },
+        game: syncLegacyFields(newGame),
         lastActionResult: { type: 'info', message: 'Placement undone' },
       }
     }
@@ -146,30 +285,164 @@ export function gameReducer(state: AppState, action: GameAction): AppState {
 
       const points = calculateScore(state.game.pendingPlacements, state.game.board)
       const newBoard = [...state.game.board, ...state.game.pendingPlacements]
-      const cardsNeeded = HAND_SIZE - state.game.playerHand.length
-      const newCards = state.game.deck.slice(0, cardsNeeded)
-      const newDeck = state.game.deck.slice(cardsNeeded)
-      const newHand = [...state.game.playerHand, ...newCards]
-      const newScore = state.game.score + points
+      const currentIdx = state.game.currentPlayerIndex
+      const currentPlayer = state.game.players[currentIdx]
 
-      const isGameOver = newHand.length === 0
-      const message = isGameOver
-        ? `Game Over! Final Score: ${newScore}`
-        : `Turn complete! You scored ${points} points!`
+      const turnRecord: TurnRecord = {
+        playerId: currentPlayer.id,
+        placements: state.game.pendingPlacements,
+        score: points,
+      }
+
+      // Update current player score
+      let newPlayers = state.game.players.map((p, i) =>
+        i === currentIdx ? { ...p, score: p.score + points } : p
+      )
+
+      let newGame: GameState = {
+        ...state.game,
+        board: newBoard,
+        players: newPlayers,
+        pendingPlacements: [],
+        turnInProgress: false,
+        lastTurnScore: points,
+        turnHistory: [...state.game.turnHistory, turnRecord],
+      }
+
+      // Draw cards for current player
+      newGame = drawCards(newGame, currentIdx)
+
+      // Advance to next player
+      newGame = advanceTurn(newGame)
+
+      // Check game end
+      newGame = checkGameEnd(newGame)
+
+      const playerName = currentPlayer.type === 'human' ? 'You' : currentPlayer.name
+      const message = newGame.gamePhase === 'ended'
+        ? `Game Over!`
+        : `${playerName} scored ${points} points!`
 
       return {
         ...state,
-        game: {
-          ...state.game,
-          board: newBoard,
-          playerHand: newHand,
-          deck: newDeck,
-          score: newScore,
-          pendingPlacements: [],
-          turnInProgress: false,
-          lastTurnScore: points,
-        },
+        game: syncLegacyFields(newGame),
         lastActionResult: { type: 'success', message },
+      }
+    }
+
+    case 'AI_TURN': {
+      const { placements } = action
+      if (placements.length === 0) {
+        // AI passes (swap handled separately)
+        const newGame = advanceTurn(state.game)
+        return {
+          ...state,
+          game: syncLegacyFields(checkGameEnd(newGame)),
+          lastActionResult: null,
+        }
+      }
+
+      const pendingPlacements = placements.map(p => ({
+        ...p,
+        card: { ...p.card, id: `pending-${p.card.id}` },
+      }))
+
+      const points = calculateScore(pendingPlacements, state.game.board)
+      const newBoard = [...state.game.board, ...pendingPlacements]
+      const currentIdx = state.game.currentPlayerIndex
+      const currentPlayer = state.game.players[currentIdx]
+
+      // Remove placed cards from AI hand
+      const placedCardIds = new Set(placements.map(p => p.card.id))
+      const newHand = currentPlayer.hand.filter(c => !placedCardIds.has(c.id))
+
+      const turnRecord: TurnRecord = {
+        playerId: currentPlayer.id,
+        placements: pendingPlacements,
+        score: points,
+      }
+
+      let newPlayers = state.game.players.map((p, i) =>
+        i === currentIdx ? { ...p, hand: newHand, score: p.score + points } : p
+      )
+
+      let newGame: GameState = {
+        ...state.game,
+        board: newBoard,
+        players: newPlayers,
+        pendingPlacements: [],
+        turnInProgress: false,
+        lastTurnScore: points,
+        turnHistory: [...state.game.turnHistory, turnRecord],
+      }
+
+      newGame = drawCards(newGame, currentIdx)
+      newGame = advanceTurn(newGame)
+      newGame = checkGameEnd(newGame)
+
+      return {
+        ...state,
+        game: syncLegacyFields(newGame),
+        lastActionResult: {
+          type: 'info',
+          message: `${currentPlayer.name} scored ${points} points!`,
+        },
+      }
+    }
+
+    case 'SWAP_CARDS': {
+      const { cardIds } = action
+      const currentIdx = state.game.currentPlayerIndex
+      const currentPlayer = state.game.players[currentIdx]
+
+      // Return selected cards to deck and shuffle
+      const cardsToReturn = currentPlayer.hand.filter(c => cardIds.includes(c.id))
+      const remainingHand = currentPlayer.hand.filter(c => !cardIds.includes(c.id))
+
+      // Add returned cards to deck, draw same number
+      let newDeck = [...state.game.deck, ...cardsToReturn]
+      // Shuffle the deck
+      for (let i = newDeck.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1))
+        ;[newDeck[i], newDeck[j]] = [newDeck[j], newDeck[i]]
+      }
+
+      const drawn = newDeck.slice(0, cardsToReturn.length)
+      newDeck = newDeck.slice(cardsToReturn.length)
+      const newHand = [...remainingHand, ...drawn]
+
+      const turnRecord: TurnRecord = {
+        playerId: currentPlayer.id,
+        placements: [],
+        score: 0,
+      }
+
+      const newPlayers = state.game.players.map((p, i) =>
+        i === currentIdx ? { ...p, hand: newHand } : p
+      )
+
+      let newGame: GameState = {
+        ...state.game,
+        deck: newDeck,
+        players: newPlayers,
+        pendingPlacements: [],
+        turnInProgress: false,
+        lastTurnScore: 0,
+        turnHistory: [...state.game.turnHistory, turnRecord],
+      }
+
+      newGame = advanceTurn(newGame)
+      newGame = checkGameEnd(newGame)
+
+      const playerName = currentPlayer.type === 'human' ? 'You' : currentPlayer.name
+      return {
+        ...state,
+        selectedCardId: null,
+        game: syncLegacyFields(newGame),
+        lastActionResult: {
+          type: 'info',
+          message: `${playerName} swapped ${cardsToReturn.length} card${cardsToReturn.length > 1 ? 's' : ''}`,
+        },
       }
     }
 
