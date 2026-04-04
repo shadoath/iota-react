@@ -56,7 +56,7 @@ export interface TurnRecord {
 
 export type GamePhase = 'menu' | 'setup' | 'playing' | 'ended';
 
-export type GameMode = 'classic' | 'practice' | 'timed';
+export type GameMode = 'classic' | 'practice' | 'timed' | 'daily';
 
 export interface GameSettings {
   playerCount: number;
@@ -64,6 +64,7 @@ export interface GameSettings {
   mode: GameMode;
   turnTimeLimit?: number; // seconds, for timed mode
   hintsEnabled?: boolean; // for practice mode
+  prebuiltDeck?: Card[]; // for daily challenge (seeded deck)
 }
 
 export interface GameState {
