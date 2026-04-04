@@ -1,0 +1,67 @@
+---
+const links = [
+  { href: '#how-it-works', label: 'How It Works' },
+  { href: '#benefits', label: 'Benefits' },
+  { href: '#modes', label: 'Game Modes' },
+  { href: '#features', label: 'Features' },
+];
+---
+
+<nav class="fixed top-0 left-0 right-0 z-50 bg-dark-bg/80 backdrop-blur-xl border-b border-white/5">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between h-16">
+      <!-- Logo -->
+      <a href="#" class="flex items-center gap-2 group">
+        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-blue to-brand-purple flex items-center justify-center text-white font-bold text-sm">
+          N
+        </div>
+        <span class="text-lg font-bold text-white group-hover:text-brand-blue transition-colors">
+          NodusNexus
+        </span>
+      </a>
+
+      <!-- Desktop links -->
+      <div class="hidden md:flex items-center gap-8">
+        {links.map((link) => (
+          <a
+            href={link.href}
+            class="text-sm text-gray-400 hover:text-white transition-colors"
+          >
+            {link.label}
+          </a>
+        ))}
+        <a
+          href="https://game.nodusnexus.com"
+          class="px-5 py-2 bg-brand-blue hover:bg-blue-600 text-white text-sm font-semibold rounded-full transition-all hover:shadow-lg hover:shadow-blue-500/25"
+        >
+          Play Free
+        </a>
+      </div>
+
+      <!-- Mobile toggle -->
+      <button id="nav-toggle" class="md:hidden text-gray-400 hover:text-white" aria-label="Toggle menu">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Mobile menu -->
+    <div id="nav-menu" class="hidden md:hidden pb-4">
+      {links.map((link) => (
+        <a
+          href={link.href}
+          class="block py-2 text-gray-400 hover:text-white transition-colors"
+        >
+          {link.label}
+        </a>
+      ))}
+      <a
+        href="https://game.nodusnexus.com"
+        class="mt-3 block text-center px-5 py-2.5 bg-brand-blue hover:bg-blue-600 text-white font-semibold rounded-full transition-all"
+      >
+        Play Free
+      </a>
+    </div>
+  </div>
+</nav>
