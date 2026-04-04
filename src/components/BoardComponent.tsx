@@ -37,13 +37,14 @@ export const BoardComponent: React.FC<BoardComponentProps> = ({
   }, [])
 
   // Center board when it first renders or on new game
+  const isNewGame = board.length === 1
   useEffect(() => {
     if (viewportRef.current) {
       const vw = viewportRef.current.clientWidth
       const vh = viewportRef.current.clientHeight
       setPan({ x: vw / 2 - 40, y: vh / 2 - 40 })
     }
-  }, [board.length === 1]) // re-center on new game (board resets to 1 card)
+  }, [isNewGame])
 
   const validPlacements = selectedCard
     ? getValidPlacements(board, pendingPlacements)
