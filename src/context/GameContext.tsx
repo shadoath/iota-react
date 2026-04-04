@@ -89,7 +89,7 @@ function createPlayers(settings: GameSettings, hands: Card[][]): Player[] {
 }
 
 function initializeGame(settings: GameSettings): GameState {
-  const deck = createDeck()
+  const deck = settings.prebuiltDeck ?? createDeck()
   const totalPlayers = 1 + settings.aiPlayers.length
   const { hands, remaining } = dealHands(deck, totalPlayers)
 

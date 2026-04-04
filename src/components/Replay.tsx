@@ -3,7 +3,7 @@
 import React, { useState, useMemo, useCallback } from 'react'
 import type { PlacedCard, TurnRecord, Player } from '../types/game'
 import { BoardComponent } from './BoardComponent'
-import { GameCard } from './GameCard'
+import { analyzeGame, analysisSummary, type TurnAnalysis } from '../ai/analysis'
 import styles from './Replay.module.css'
 
 interface ReplayProps {
@@ -24,6 +24,19 @@ export const Replay: React.FC<ReplayProps> = ({
   const [isPlaying, setIsPlaying] = useState(false)
 
   const totalTurns = turnHistory.length
+
+  // Run AI analysis on human turns
+  const analyses = useMemo(() => {
+    const initialHands = players.map(p => [...p.hand])
+    return analyzeGame(initialBoard, turnHistory, players, initialHands)
+  }, [initialBoard, turnHistory, players])
+
+  const summary = useMemo(() => analysisSummary(analyses), [analyses])
+
+  // Get analysis for current turn
+  const currentAnalysis = currentTurn > 0
+    ? analyses.find(a => a.turnIndex === currentTurn - 1)
+    : null
 
   // Build board state at each turn
   const boardAtTurn = useMemo(() => {
@@ -218,8 +231,22 @@ export const Replay: React.FC<ReplayProps> = ({
               {currentTurnRecord && currentTurnRecord.score > 0
                 ? ` — +${currentTurnRecord.score} points (${currentTurnRecord.placements.length} card${currentTurnRecord.placements.length > 1 ? 's' : ''})`
                 : currentTurnRecord ? ' — swap' : ''}
+              {currentAnalysis && currentAnalysis.scoreDiff > 0 && (
+                <span className={styles.analysisHint}>
+                  {' '}(best: +{currentAnalysis.bestPossibleScore}, missed {currentAnalysis.scoreDiff})
+                </span>
+              )}
+              {currentAnalysis && currentAnalysis.rating === 'optimal' && (
+                <span className={styles.analysisOptimal}> (optimal)</span>
+              )}
             </div>
           </div>
+
+          {summary && (
+            <div className={styles.analysisSummary}>
+              Accuracy: {summary.accuracy}% | Missed: {summary.totalMissed} pts
+            </div>
+          )}
         </div>
       </div>
     </div>

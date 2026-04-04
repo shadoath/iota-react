@@ -150,6 +150,41 @@
   background: var(--color-surface);
 }
 
+/* Theme selectors */
+.themeSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.themeRow {
+  display: flex;
+  gap: var(--space-xs);
+  flex-wrap: wrap;
+}
+
+.themeChip {
+  padding: var(--space-xs) var(--space-sm);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background: transparent;
+  font-size: var(--font-size-xs);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  color: var(--color-text-muted);
+}
+
+.themeChip:hover {
+  border-color: var(--color-info);
+  color: var(--color-info);
+}
+
+.themeChipActive {
+  background: var(--color-info);
+  color: white;
+  border-color: var(--color-info);
+}
+
 /* New game button */
 .newGameBtn {
   background: var(--color-info);
