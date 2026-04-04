@@ -1,7 +1,7 @@
 # CLAUDE.md
 
 ## Project Overview
-This is an Iota React game application built with Next.js.
+This is a NodusNexus React game application built with Next.js.
 
 ## Key Technologies
 - Next.js

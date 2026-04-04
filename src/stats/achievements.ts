@@ -4,7 +4,7 @@
 
 import type { Achievement, AchievementId, GameResult, PlayerStats } from './types'
 
-const STORAGE_KEY = 'iota-achievements'
+const STORAGE_KEY = 'nodusnexus-achievements'
 
 // --- Achievement definitions ---
 

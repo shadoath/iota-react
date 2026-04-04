@@ -16,7 +16,7 @@ After any game, replay it turn by turn:
 - AI analysis: "You could have scored 12 here instead of 6" (run hard AI on your hand at each turn)
 - Share replays via link
 
-This is the "chess.com analysis board" equivalent for Iota.
+This is the "chess.com analysis board" equivalent for NodusNexus.
 
 ### 8.2 Board Heatmap
 
@@ -52,8 +52,8 @@ Start with daily tournaments (async-friendly). Brackets are stretch.
 
 Instead of always playing with the standard 66 cards:
 
-- **Mini Iota**: 3 colors × 3 shapes × 3 numbers = 27 cards + 1 wild. Faster games.
-- **Mega Iota**: 5th color (purple) and 5th shape (star) = 100 cards + 2 wild. Epic games.
+- **Mini NodusNexus**: 3 colors × 3 shapes × 3 numbers = 27 cards + 1 wild. Faster games.
+- **Mega NodusNexus**: 5th color (purple) and 5th shape (star) = 100 cards + 2 wild. Epic games.
 - **Draft mode**: Players alternate drafting cards from a shared pool before the game starts.
 - **Asymmetric start**: Players start with different hand sizes based on turn order.
 

@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 
 type Theme = 'light' | 'dark' | 'system'
 
-const STORAGE_KEY = 'iota-theme'
+const STORAGE_KEY = 'nodusnexus-theme'
 
 export function useTheme() {
   const [theme, setThemeState] = useState<Theme>('system')

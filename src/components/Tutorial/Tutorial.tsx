@@ -20,7 +20,7 @@ export const Tutorial: React.FC<TutorialProps> = ({ onComplete, onBack }) => {
 
   const handleNext = useCallback(() => {
     if (isLastStep) {
-      localStorage.setItem('iota-tutorial-completed', 'true')
+      localStorage.setItem('nodusnexus-tutorial-completed', 'true')
       onComplete()
       return
     }

@@ -41,7 +41,7 @@ export const ModeSelect: React.FC<ModeSelectProps> = ({
   return (
     <div className={styles.container}>
       <div className={styles.card}>
-        <h1 className={styles.title}>Iota</h1>
+        <h1 className={styles.title}>NodusNexus</h1>
         <p className={styles.subtitle}>The card game of matching patterns</p>
 
         <div className={styles.modes}>

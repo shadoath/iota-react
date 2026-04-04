@@ -5,7 +5,7 @@
 
 import type { GameResult, PlayerStats, ModeStats, DifficultyStats } from './types'
 
-const STORAGE_KEY = 'iota-game-results'
+const STORAGE_KEY = 'nodusnexus-game-results'
 const MAX_RECENT = 50
 
 function getResults(): GameResult[] {

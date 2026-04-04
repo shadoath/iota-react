@@ -1,6 +1,6 @@
 {
-  "name": "Iota - Card Game",
-  "short_name": "Iota",
+  "name": "NodusNexus - Card Game",
+  "short_name": "NodusNexus",
   "description": "The card game of matching patterns. Play solo against AI or online with friends.",
   "start_url": "/",
   "display": "standalone",

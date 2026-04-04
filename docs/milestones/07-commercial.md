@@ -52,8 +52,8 @@ Actions:
 
 First-time player experience:
 
-1. Landing page: "Iota — The card game of matching patterns" + "Play Now" CTA
-2. Quick choice: "Learn the rules" → Tutorial, or "I know Iota" → Quick game
+1. Landing page: "NodusNexus — The card game of matching patterns" + "Play Now" CTA
+2. Quick choice: "Learn the rules" → Tutorial, or "I know NodusNexus" → Quick game
 3. After first game: prompt to create account (optional)
 4. After 3rd game: prompt to try daily challenge
 
@@ -74,7 +74,7 @@ No tracking without consent. GDPR-compliant from day one.
 ### 7.6 SEO & Meta
 
 - Open Graph tags for sharing (game preview image)
-- Dynamic OG images for daily challenge results ("I scored 87 on today's Iota challenge!")
+- Dynamic OG images for daily challenge results ("I scored 87 on today's NodusNexus challenge!")
 - Structured data for the app
 - Sitemap for public pages (/leaderboard, /about, /tutorial)
 - `robots.txt` allowing indexing
@@ -95,7 +95,7 @@ Options, in order of user-friendliness:
 - Terms of Service
 - Privacy Policy (required for app stores and GDPR)
 - Cookie consent (if any cookies used beyond session)
-- Iota trademark research — ensure you can use the name or choose an alternative
+- NodusNexus trademark research — ensure you can use the name or choose an alternative
 - Age rating considerations
 
 ### 7.9 Error Handling & Monitoring

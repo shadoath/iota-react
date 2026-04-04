@@ -27,9 +27,9 @@ function placed(c: Card, row: number, col: number): PlacedCard {
 
 export const tutorialSteps: TutorialStep[] = [
   {
-    title: 'Welcome to Iota!',
+    title: 'Welcome to NodusNexus!',
     description:
-      'Iota is a card game where every card has three attributes: a color, a shape, and a number (1-4). The goal is to score points by placing cards on the board.',
+      'NodusNexus is a card game where every card has three attributes: a color, a shape, and a number (1-4). The goal is to score points by placing cards on the board.',
     board: [placed(card(2, 'red', 'triangle', 'demo-1'), 0, 0)],
     hand: [
       card(3, 'blue', 'circle', 'hand-1'),
