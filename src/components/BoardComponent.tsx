@@ -150,9 +150,7 @@ export const BoardComponent: React.FC<BoardComponentProps> = ({
               }}
             >
               {placedCard && (
-                <div style={{ transform: `scale(${zoomLevel})` }}>
-                  <GameCard card={placedCard.card} disabled />
-                </div>
+                <GameCard card={placedCard.card} disabled boardCard />
               )}
               {!placedCard && isValid && selectedCard && !isImpossible && (
                 <div
