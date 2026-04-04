@@ -27,6 +27,7 @@ import { checkAchievements, getAchievements, unlockTutorialAchievement, ACHIEVEM
 import { getPlayerStats } from '../stats/statsService'
 import type { GameResult } from '../stats/types'
 import { Replay } from './Replay'
+import { PatternTrainer } from './PatternTrainer'
 import styles from './Game.module.css'
 
 function GameInner() {
@@ -39,6 +40,7 @@ function GameInner() {
   const [showMultiplayer, setShowMultiplayer] = useState(false)
   const [showStats, setShowStats] = useState(false)
   const [showReplay, setShowReplay] = useState(false)
+  const [showTrainer, setShowTrainer] = useState(false)
   const [gameStartTime] = useState(() => Date.now())
   const initialBoardRef = useRef<PlacedCard[]>([])
   const gameRecordedRef = useRef(false)
@@ -254,6 +256,11 @@ function GameInner() {
     return hints
   }, [game.hintsEnabled, selectedCard, isHumanTurn, game.board, game.pendingPlacements])
 
+  // --- Pattern Trainer ---
+  if (showTrainer) {
+    return <PatternTrainer onBack={() => setShowTrainer(false)} />
+  }
+
   // --- Stats page ---
   if (showStats) {
     return <StatsPage onBack={() => setShowStats(false)} />
@@ -308,6 +315,7 @@ function GameInner() {
         onSelectMode={handleSelectMode}
         onTutorial={() => setShowTutorial(true)}
         onMultiplayer={() => setShowMultiplayer(true)}
+        onTrainer={() => setShowTrainer(true)}
         onStats={() => setShowStats(true)}
       />
     )
