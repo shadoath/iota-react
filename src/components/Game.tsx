@@ -51,11 +51,14 @@ function GameInner() {
   }, [lastActionResult])
 
   // --- AI turn execution ---
+  const aiTurnRef = useRef(false)
+
   useEffect(() => {
     if (game.gamePhase !== 'playing') return
     if (!currentPlayer || currentPlayer.type !== 'ai') return
-    if (isAIThinking) return
+    if (aiTurnRef.current) return
 
+    aiTurnRef.current = true
     setIsAIThinking(true)
 
     const thinkTime = currentPlayer.difficulty === 'hard' ? 1500
@@ -81,13 +84,16 @@ function GameInner() {
       }
 
       setIsAIThinking(false)
+      aiTurnRef.current = false
     }, thinkTime)
 
     return () => {
       clearTimeout(timer)
       setIsAIThinking(false)
+      aiTurnRef.current = false
     }
-  }, [game.currentPlayerIndex, game.gamePhase, currentPlayer, isAIThinking, dispatch, game.board, game.deck.length])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [game.currentPlayerIndex, game.gamePhase])
 
   // --- Handlers ---
 
