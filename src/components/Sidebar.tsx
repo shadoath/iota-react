@@ -2,6 +2,7 @@ import type React from 'react'
 import { useState, useCallback } from 'react'
 import { useTheme } from '../hooks/useTheme'
 import { useCardTheme, CARD_THEMES, BOARD_THEMES } from '../hooks/useCardTheme'
+import type { HelpersConfig } from '../hooks/useHelpers'
 import styles from './Sidebar.module.css'
 
 interface SidebarProps {
@@ -13,7 +14,15 @@ interface SidebarProps {
   onNewGame: () => void
   onCompleteTurn: () => void
   onUndoLast: () => void
+  helpers: HelpersConfig
+  onToggleHelper: (key: keyof HelpersConfig) => void
 }
+
+const HELPER_OPTIONS: Array<{ key: keyof HelpersConfig; label: string; desc: string }> = [
+  { key: 'setCompletion', label: 'Lot Indicator', desc: 'Glow on cards that complete a line of 4' },
+  { key: 'bestMove', label: 'Best Move', desc: 'Highlight the highest-scoring position' },
+  { key: 'attributeGuide', label: 'Attribute Guide', desc: 'Show what\'s needed at each position' },
+]
 
 export const Sidebar: React.FC<SidebarProps> = ({
   cardsLeft,
@@ -21,6 +30,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
   pendingPoints,
   pendingCount,
   onNewGame,
+  helpers,
+  onToggleHelper,
 }) => {
   const [open, setOpen] = useState(false)
 
@@ -83,6 +94,27 @@ export const Sidebar: React.FC<SidebarProps> = ({
             Pending: +{pendingPoints} points
           </div>
         )}
+
+        <div className={styles.divider} />
+
+        {/* Helpers */}
+        <div className={styles.themeSection}>
+          <div className={styles.statLabel}>Helpers</div>
+          {HELPER_OPTIONS.map(opt => (
+            <label key={opt.key} className={styles.helperToggle}>
+              <input
+                type='checkbox'
+                checked={helpers[opt.key]}
+                onChange={() => onToggleHelper(opt.key)}
+                className={styles.helperCheckbox}
+              />
+              <div className={styles.helperInfo}>
+                <span className={styles.helperLabel}>{opt.label}</span>
+                <span className={styles.helperDesc}>{opt.desc}</span>
+              </div>
+            </label>
+          ))}
+        </div>
 
         <div className={styles.divider} />
 

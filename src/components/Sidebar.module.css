@@ -150,6 +150,39 @@
   background: var(--color-surface);
 }
 
+/* Helper toggles */
+.helperToggle {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-sm);
+  padding: var(--space-xs) 0;
+  cursor: pointer;
+}
+
+.helperCheckbox {
+  margin-top: 3px;
+  accent-color: var(--color-info);
+  cursor: pointer;
+}
+
+.helperInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.helperLabel {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text);
+}
+
+.helperDesc {
+  font-size: 10px;
+  color: var(--color-text-muted);
+  line-height: 1.3;
+}
+
 /* Theme selectors */
 .themeSection {
   display: flex;

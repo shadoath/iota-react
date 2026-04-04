@@ -490,6 +490,31 @@ describe('calculateScore', () => {
     ]
     expect(calculateScore(placements, [])).toBe(0)
   })
+
+  it('doubles score for a lot (complete line of 4)', () => {
+    const board: PlacedCard[] = [
+      placed(card(1, 'red', 'triangle'), 0, 0),
+      placed(card(2, 'green', 'square'), 0, 1),
+      placed(card(3, 'blue', 'circle'), 0, 2),
+    ]
+    const placements: PlacedCard[] = [
+      placed(card(4, 'yellow', 'cross'), 0, 3),
+    ]
+    // Line of 4: (1+2+3+4) * 2 = 20
+    expect(calculateScore(placements, board)).toBe(20)
+  })
+
+  it('does not double lines shorter than 4', () => {
+    const board: PlacedCard[] = [
+      placed(card(1, 'red', 'triangle'), 0, 0),
+      placed(card(2, 'green', 'square'), 0, 1),
+    ]
+    const placements: PlacedCard[] = [
+      placed(card(3, 'blue', 'circle'), 0, 2),
+    ]
+    // Line of 3: 1+2+3 = 6 (no doubling)
+    expect(calculateScore(placements, board)).toBe(6)
+  })
 })
 
 describe('wild card validation', () => {

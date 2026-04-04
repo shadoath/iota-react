@@ -12,6 +12,7 @@ interface PlayerHandProps {
   pendingPoints: number
   onCompleteTurn: () => void
   onUndoLast: () => void
+  lotCompletingCards?: Set<string>
 }
 
 export const PlayerHand: React.FC<PlayerHandProps> = ({
@@ -23,6 +24,7 @@ export const PlayerHand: React.FC<PlayerHandProps> = ({
   pendingPoints,
   onCompleteTurn,
   onUndoLast,
+  lotCompletingCards,
 }) => {
   return (
     <>
@@ -46,14 +48,20 @@ export const PlayerHand: React.FC<PlayerHandProps> = ({
       )}
 
       <div className={styles.hand}>
-        {cards.map((card) => (
-          <GameCard
-            key={card.id}
-            card={card}
-            selected={selectedCard?.id === card.id}
-            onClick={() => onSelectCard(card)}
-          />
-        ))}
+        {cards.map((card, index) => {
+          const canCompleteLot = lotCompletingCards?.has(card.id) ?? false
+          return (
+            <div key={card.id} className={`${styles.cardSlot} ${canCompleteLot ? styles.lotGlow : ''}`}>
+              <span className={styles.keyHint}>{index + 1}</span>
+              <GameCard
+                card={card}
+                selected={selectedCard?.id === card.id}
+                onClick={() => onSelectCard(card)}
+              />
+              {canCompleteLot && <span className={styles.lotBadge}>4!</span>}
+            </div>
+          )
+        })}
       </div>
     </>
   )

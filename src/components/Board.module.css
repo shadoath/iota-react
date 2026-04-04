@@ -47,6 +47,29 @@
   justify-content: center;
 }
 
+.bestMovePlaceholder {
+  border-color: var(--color-warning) !important;
+  border-width: 3px !important;
+  background: rgba(245, 158, 11, 0.08);
+}
+
+.bestMoveStar {
+  font-size: 14px;
+  color: var(--color-warning);
+  line-height: 1;
+}
+
+.attrHint {
+  font-size: 8px;
+  color: var(--color-text-muted);
+  text-align: center;
+  line-height: 1.1;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .scoreHint {
   font-size: 11px;
   font-weight: 700;

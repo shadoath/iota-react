@@ -88,8 +88,8 @@ export const Tutorial: React.FC<TutorialProps> = ({ onComplete, onBack }) => {
           <div
             className={styles.miniBoard}
             style={{
-              gridTemplateColumns: `repeat(${cols}, 64px)`,
-              gridTemplateRows: `repeat(${rows}, 80px)`,
+              gridTemplateColumns: `repeat(${cols}, 68px)`,
+              gridTemplateRows: `repeat(${rows}, 68px)`,
             }}
           >
             {Array.from({ length: rows * cols }, (_, idx) => {

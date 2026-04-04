@@ -1,7 +1,7 @@
 .card {
   position: relative;
-  width: 56px;
-  height: 72px;
+  width: 60px;
+  height: 60px;
   background-color: var(--color-card-face);
   border-radius: var(--radius-md);
   cursor: pointer;
@@ -53,8 +53,8 @@
 
 /* Card placed on board (no hover effects, slightly smaller) */
 .boardCard {
-  width: 48px;
-  height: 62px;
+  width: 50px;
+  height: 50px;
   cursor: default;
 }
 

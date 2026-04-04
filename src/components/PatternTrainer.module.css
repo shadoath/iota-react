@@ -79,8 +79,8 @@
 }
 
 .questionMark {
-  width: 56px;
-  height: 72px;
+  width: 60px;
+  height: 60px;
   border: 2px dashed var(--color-border);
   border-radius: var(--radius-md);
   display: flex;
