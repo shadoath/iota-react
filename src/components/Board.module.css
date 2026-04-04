@@ -101,6 +101,29 @@
   transform: scale(0.95);
 }
 
+.heatmapActive {
+  background: var(--color-warning) !important;
+  color: white !important;
+  border-color: var(--color-warning) !important;
+}
+
+.heatmapCell {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--color-warning);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.heatmapScore {
+  font-size: 10px;
+  font-weight: 700;
+  color: white;
+}
+
 .zoomLevel {
   text-align: center;
   font-size: var(--font-size-xs);

@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react'
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import type { PlacedCard, GridPosition, Card } from '../types/game'
 import { GameCard } from './GameCard'
 import { getValidPlacements } from '../utils/gameLogic'
 import { isImpossibleSquare } from '../utils/impossibleSquares'
+import { computeHeatmap, heatmapToMap } from '../utils/heatmap'
 import { MOBILE_BREAKPOINT, MIN_ZOOM, MAX_ZOOM, ZOOM_STEP } from '../constants/game'
 import styles from './Board.module.css'
 
@@ -29,7 +30,15 @@ export const BoardComponent: React.FC<BoardComponentProps> = ({
   const [isMobile, setIsMobile] = useState(false)
   const [pan, setPan] = useState({ x: 0, y: 0 })
   const [isPanning, setIsPanning] = useState(false)
+  const [showHeatmap, setShowHeatmap] = useState(false)
   const panStart = useRef({ x: 0, y: 0, panX: 0, panY: 0 })
+
+  // Compute heatmap (memoized, only when toggled on)
+  const heatmapData = useMemo(() => {
+    if (!showHeatmap) return null
+    const allPlacements = [...board, ...pendingPlacements]
+    return heatmapToMap(computeHeatmap(allPlacements))
+  }, [showHeatmap, board, pendingPlacements])
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < MOBILE_BREAKPOINT)
@@ -153,6 +162,14 @@ export const BoardComponent: React.FC<BoardComponentProps> = ({
         >
           -
         </button>
+        <button
+          className={`${styles.zoomBtn} ${showHeatmap ? styles.heatmapActive : ''}`}
+          onClick={() => setShowHeatmap(prev => !prev)}
+          aria-label={showHeatmap ? 'Hide heatmap' : 'Show heatmap'}
+          title='Score heatmap'
+        >
+          H
+        </button>
       </div>
 
       {/* Board grid */}
@@ -222,6 +239,17 @@ export const BoardComponent: React.FC<BoardComponentProps> = ({
               )}
               {!placedCard && impossible && (
                 <div className={styles.impossible} />
+              )}
+              {!placedCard && !impossible && !isClickable && heatmapData && heatmapData[`${row},${col}`] && (
+                <div
+                  className={styles.heatmapCell}
+                  style={{
+                    opacity: Math.min(0.9, 0.2 + (heatmapData[`${row},${col}`].maxScore / 16) * 0.7),
+                  }}
+                  title={`Max: ${heatmapData[`${row},${col}`].maxScore} | Avg: ${heatmapData[`${row},${col}`].avgScore} | ${heatmapData[`${row},${col}`].validCardCount} valid cards`}
+                >
+                  <span className={styles.heatmapScore}>{heatmapData[`${row},${col}`].maxScore}</span>
+                </div>
               )}
             </div>
           )

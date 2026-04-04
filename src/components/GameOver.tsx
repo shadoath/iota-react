@@ -1,19 +1,23 @@
 import React from 'react'
-import type { Player, TurnRecord } from '../types/game'
+import type { Player, TurnRecord, PlacedCard } from '../types/game'
 import styles from './GameOver.module.css'
 
 interface GameOverProps {
   players: Player[]
   turnHistory: TurnRecord[]
+  initialBoard: PlacedCard[]
   onPlayAgain: () => void
   onNewSetup: () => void
+  onReplay: () => void
 }
 
 export const GameOver: React.FC<GameOverProps> = ({
   players,
   turnHistory,
+  initialBoard,
   onPlayAgain,
   onNewSetup,
+  onReplay,
 }) => {
   const sorted = [...players].sort((a, b) => b.score - a.score)
   const winnerScore = sorted[0]?.score ?? 0
@@ -79,8 +83,11 @@ export const GameOver: React.FC<GameOverProps> = ({
           <button className={styles.playAgainBtn} onClick={onPlayAgain}>
             Play Again
           </button>
+          <button className={styles.setupBtn} onClick={onReplay}>
+            Watch Replay
+          </button>
           <button className={styles.setupBtn} onClick={onNewSetup}>
-            New Setup
+            Menu
           </button>
         </div>
       </div>

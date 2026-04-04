@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState, useCallback } from 'react'
 import toast, { Toaster } from 'react-hot-toast'
-import type { Card, GridPosition, GameSettings, GameMode } from '../types/game'
+import type { Card, GridPosition, GameSettings, GameMode, PlacedCard } from '../types/game'
 import { calculateScore, getValidPlacements, isValidPlacement } from '../utils/gameLogic'
 import { MAX_LINE_LENGTH } from '../constants/game'
 import { isPlacementInSameLineAsPending } from '../utils/turnValidation'
@@ -26,6 +26,8 @@ import { recordGame } from '../stats/statsService'
 import { checkAchievements, getAchievements, unlockTutorialAchievement, ACHIEVEMENTS } from '../stats/achievements'
 import { getPlayerStats } from '../stats/statsService'
 import type { GameResult } from '../stats/types'
+import { Replay } from './Replay'
+import { PatternTrainer } from './PatternTrainer'
 import styles from './Game.module.css'
 
 function GameInner() {
@@ -37,7 +39,10 @@ function GameInner() {
   const [selectedMode, setSelectedMode] = useState<GameMode>('classic')
   const [showMultiplayer, setShowMultiplayer] = useState(false)
   const [showStats, setShowStats] = useState(false)
+  const [showReplay, setShowReplay] = useState(false)
+  const [showTrainer, setShowTrainer] = useState(false)
   const [gameStartTime] = useState(() => Date.now())
+  const initialBoardRef = useRef<PlacedCard[]>([])
   const gameRecordedRef = useRef(false)
   const socket = useSocket()
 
@@ -105,11 +110,16 @@ function GameInner() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [game.gamePhase])
 
-  // Reset recorded flag on new game
+  // Reset recorded flag and capture initial board on new game
   useEffect(() => {
     if (game.gamePhase === 'playing') {
       gameRecordedRef.current = false
+      if (game.board.length === 1 && game.turnHistory.length === 0) {
+        initialBoardRef.current = [...game.board]
+      }
+      setShowReplay(false)
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [game.gamePhase])
 
   // --- AI turn execution ---
@@ -246,6 +256,11 @@ function GameInner() {
     return hints
   }, [game.hintsEnabled, selectedCard, isHumanTurn, game.board, game.pendingPlacements])
 
+  // --- Pattern Trainer ---
+  if (showTrainer) {
+    return <PatternTrainer onBack={() => setShowTrainer(false)} />
+  }
+
   // --- Stats page ---
   if (showStats) {
     return <StatsPage onBack={() => setShowStats(false)} />
@@ -300,6 +315,7 @@ function GameInner() {
         onSelectMode={handleSelectMode}
         onTutorial={() => setShowTutorial(true)}
         onMultiplayer={() => setShowMultiplayer(true)}
+        onTrainer={() => setShowTrainer(true)}
         onStats={() => setShowStats(true)}
       />
     )
@@ -397,13 +413,27 @@ function GameInner() {
       />
 
       {/* Game Over overlay */}
-      {game.gamePhase === 'ended' && (
+      {game.gamePhase === 'ended' && !showReplay && (
         <GameOver
           players={game.players}
           turnHistory={game.turnHistory}
+          initialBoard={initialBoardRef.current}
           onPlayAgain={handlePlayAgain}
           onNewSetup={() => dispatch({ type: 'SHOW_MENU' })}
+          onReplay={() => setShowReplay(true)}
         />
+      )}
+
+      {/* Replay view */}
+      {showReplay && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 500 }}>
+          <Replay
+            initialBoard={initialBoardRef.current}
+            turnHistory={game.turnHistory}
+            players={game.players}
+            onBack={() => setShowReplay(false)}
+          />
+        </div>
       )}
     </div>
   )
