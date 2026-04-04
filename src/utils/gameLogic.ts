@@ -29,10 +29,25 @@ export function createDeck(): Card[] {
   return shuffleDeck(deck);
 }
 
+/**
+ * Cryptographically strong random number in [0, max).
+ * Uses crypto.getRandomValues for better randomness than Math.random().
+ */
+function secureRandomInt(max: number): number {
+  if (typeof globalThis.crypto !== 'undefined' && crypto.getRandomValues) {
+    const arr = new Uint32Array(1);
+    crypto.getRandomValues(arr);
+    return arr[0] % max;
+  }
+  // Fallback for environments without crypto (e.g. some test runners)
+  return Math.floor(Math.random() * max);
+}
+
 export function shuffleDeck(deck: Card[]): Card[] {
   const shuffled = [...deck];
+  // Fisher-Yates with crypto-strength randomness
   for (let i = shuffled.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
+    const j = secureRandomInt(i + 1);
     [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
   }
   return shuffled;

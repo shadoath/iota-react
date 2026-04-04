@@ -12,7 +12,7 @@ import type {
   GameMode,
   TurnRecord,
 } from '../types/game'
-import { createDeck, calculateScore } from '../utils/gameLogic'
+import { createDeck, calculateScore, shuffleDeck } from '../utils/gameLogic'
 import { HAND_SIZE } from '../constants/game'
 
 // --- Action types ---
@@ -425,12 +425,7 @@ export function gameReducer(state: AppState, action: GameAction): AppState {
       const remainingHand = currentPlayer.hand.filter(c => !cardIds.includes(c.id))
 
       // Add returned cards to deck, draw same number
-      let newDeck = [...state.game.deck, ...cardsToReturn]
-      // Shuffle the deck
-      for (let i = newDeck.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1))
-        ;[newDeck[i], newDeck[j]] = [newDeck[j], newDeck[i]]
-      }
+      let newDeck = shuffleDeck([...state.game.deck, ...cardsToReturn])
 
       const drawn = newDeck.slice(0, cardsToReturn.length)
       newDeck = newDeck.slice(cardsToReturn.length)
