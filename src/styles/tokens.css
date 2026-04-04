@@ -1,0 +1,84 @@
+:root {
+  /* Card colors */
+  --color-red: #ef4444;
+  --color-green: #22c55e;
+  --color-blue: #3b82f6;
+  --color-yellow: #eab308;
+  --color-wild: #a855f7;
+
+  /* UI colors */
+  --color-bg: #f0ede6;
+  --color-surface: #ffffff;
+  --color-surface-alt: #faf9f7;
+  --color-text: #1a1a1a;
+  --color-text-muted: #6b7280;
+  --color-text-inverse: #ffffff;
+
+  /* Board colors */
+  --color-board-bg: #e8e4dc;
+  --color-valid: #bbf7d0;
+  --color-valid-hover: #86efac;
+  --color-valid-border: #22c55e;
+  --color-impossible: #d4d0c8;
+
+  /* Card surface */
+  --color-card-face: #1a1a1a;
+  --color-card-face-wild: #1a1a2e;
+  --color-card-border: #333;
+  --color-card-selected: #3b82f6;
+
+  /* Score / feedback */
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
+  --color-info: #3b82f6;
+
+  /* Spacing */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 12px;
+  --space-lg: 16px;
+  --space-xl: 24px;
+  --space-2xl: 32px;
+
+  /* Border radius */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-pill: 9999px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.12);
+  --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.15);
+  --shadow-card: 0 2px 6px rgba(0, 0, 0, 0.2);
+  --shadow-card-hover: 0 4px 12px rgba(0, 0, 0, 0.25);
+  --shadow-card-selected: 0 0 0 3px var(--color-card-selected);
+  --shadow-up: 0 -4px 12px rgba(0, 0, 0, 0.08);
+
+  /* Transitions */
+  --transition-fast: 150ms ease;
+  --transition-normal: 200ms ease;
+  --transition-slow: 300ms ease;
+
+  /* Z-index layers */
+  --z-board: 1;
+  --z-hand: 100;
+  --z-controls: 200;
+  --z-overlay: 300;
+  --z-modal: 400;
+
+  /* Typography */
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  --font-mono: 'SF Mono', 'Fira Code', monospace;
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-md: 1rem;
+  --font-size-lg: 1.25rem;
+  --font-size-xl: 1.5rem;
+  --font-size-2xl: 2rem;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-bold: 700;
+}
