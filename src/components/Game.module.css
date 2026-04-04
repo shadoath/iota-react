@@ -1,0 +1,61 @@
+.layout {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+/* Score bar - fixed top center */
+.scoreBar {
+  position: fixed;
+  top: var(--space-lg);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: var(--z-controls);
+  background: var(--color-surface);
+  padding: var(--space-sm) var(--space-xl);
+  border-radius: var(--radius-pill);
+  box-shadow: var(--shadow-md);
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  white-space: nowrap;
+}
+
+.scoreValue {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  font-variant-numeric: tabular-nums;
+}
+
+.scorePending {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-warning);
+  animation: scorePopIn var(--transition-slow) ease-out;
+}
+
+/* Board area - takes remaining space */
+.boardArea {
+  flex: 1;
+  padding-top: 60px; /* room for score bar */
+  padding-bottom: 100px; /* room for hand */
+  display: flex;
+  min-height: 0;
+}
+
+@media (max-width: 768px) {
+  .scoreBar {
+    padding: var(--space-xs) var(--space-lg);
+  }
+
+  .scoreValue {
+    font-size: var(--font-size-md);
+  }
+
+  .boardArea {
+    padding-top: 48px;
+    padding-bottom: 88px;
+  }
+}

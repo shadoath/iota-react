@@ -1,0 +1,109 @@
+.card {
+  position: relative;
+  width: 56px;
+  height: 72px;
+  background-color: var(--color-card-face);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  border: 2px solid var(--color-card-border);
+  box-shadow: var(--shadow-card);
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.card:hover:not(.disabled) {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-card-hover);
+}
+
+.card:active:not(.disabled) {
+  transform: translateY(-1px);
+}
+
+.selected {
+  border-color: var(--color-card-selected);
+  box-shadow: var(--shadow-card-selected), var(--shadow-card-hover);
+  transform: translateY(-4px);
+}
+
+.selected:hover {
+  transform: translateY(-4px);
+}
+
+.disabled {
+  cursor: default;
+  opacity: 0.85;
+}
+
+.wild {
+  background-color: var(--color-card-face-wild);
+  border-color: var(--color-wild);
+  border-style: dashed;
+}
+
+.wild.selected {
+  border-style: solid;
+}
+
+/* Card placed on board (no hover effects, slightly smaller) */
+.boardCard {
+  width: 48px;
+  height: 62px;
+  cursor: default;
+}
+
+.boardCard:hover {
+  transform: none;
+  box-shadow: var(--shadow-card);
+}
+
+/* Shape container - holds 1-4 shape instances */
+.shapes {
+  display: grid;
+  gap: 1px;
+  place-items: center;
+}
+
+.shapes1 {
+  grid-template-columns: 1fr;
+}
+
+.shapes2 {
+  grid-template-columns: 1fr 1fr;
+}
+
+.shapes3 {
+  grid-template-columns: 1fr 1fr;
+}
+
+.shapes4 {
+  grid-template-columns: 1fr 1fr;
+}
+
+/* Card number label */
+.number {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  line-height: 1;
+  margin-top: 1px;
+}
+
+/* Wild card label */
+.wildLabel {
+  font-size: 0.6rem;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-wild);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+/* Placed animation */
+.placed {
+  animation: cardPlace var(--transition-slow) ease-out;
+}

@@ -1,0 +1,96 @@
+.viewport {
+  position: relative;
+  overflow: hidden;
+  flex: 1;
+  background-color: var(--color-board-bg);
+  border-radius: var(--radius-md);
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.viewport:active {
+  cursor: grabbing;
+}
+
+.board {
+  display: grid;
+  width: fit-content;
+  transform-origin: 0 0;
+  will-change: transform;
+}
+
+.cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  transition: background-color var(--transition-fast);
+}
+
+.cellValid {
+  background-color: var(--color-valid);
+  cursor: pointer;
+}
+
+.cellValid:hover {
+  background-color: var(--color-valid-hover);
+}
+
+.placeholder {
+  border: 2px dashed var(--color-valid-border);
+  border-radius: var(--radius-md);
+  opacity: 0.7;
+}
+
+.impossible {
+  width: 16px;
+  height: 16px;
+  background-color: var(--color-impossible);
+  border-radius: 50%;
+  opacity: 0.4;
+}
+
+/* Zoom controls */
+.zoomControls {
+  position: absolute;
+  top: var(--space-md);
+  right: var(--space-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  z-index: var(--z-controls);
+}
+
+.zoomBtn {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-surface);
+  border: 1px solid #ddd;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-size: var(--font-size-lg);
+  color: var(--color-text);
+  box-shadow: var(--shadow-sm);
+  transition: background-color var(--transition-fast);
+  line-height: 1;
+}
+
+.zoomBtn:hover {
+  background-color: var(--color-surface-alt);
+}
+
+.zoomBtn:active {
+  transform: scale(0.95);
+}
+
+.zoomLevel {
+  text-align: center;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+}
