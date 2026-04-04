@@ -21,6 +21,11 @@ import { Lobby } from './Lobby'
 import { MultiplayerGame } from './MultiplayerGame'
 import { useSocket } from '../multiplayer/useSocket'
 import { GameProvider, useGame } from '../context/GameContext'
+import { StatsPage } from './StatsPage'
+import { recordGame } from '../stats/statsService'
+import { checkAchievements, getAchievements, unlockTutorialAchievement, ACHIEVEMENTS } from '../stats/achievements'
+import { getPlayerStats } from '../stats/statsService'
+import type { GameResult } from '../stats/types'
 import styles from './Game.module.css'
 
 function GameInner() {
@@ -31,6 +36,9 @@ function GameInner() {
   const [showTutorial, setShowTutorial] = useState(false)
   const [selectedMode, setSelectedMode] = useState<GameMode>('classic')
   const [showMultiplayer, setShowMultiplayer] = useState(false)
+  const [showStats, setShowStats] = useState(false)
+  const [gameStartTime] = useState(() => Date.now())
+  const gameRecordedRef = useRef(false)
   const socket = useSocket()
 
   const currentPlayer = game.players[game.currentPlayerIndex]
@@ -54,6 +62,55 @@ function GameInner() {
     }
     lastResultRef.current = lastActionResult
   }, [lastActionResult])
+
+  // --- Record game result when game ends ---
+  useEffect(() => {
+    if (game.gamePhase !== 'ended' || gameRecordedRef.current) return
+    if (game.players.length === 0) return
+    gameRecordedRef.current = true
+
+    const human = game.players.find(p => p.type === 'human')
+    const winner = [...game.players].sort((a, b) => b.score - a.score)[0]
+
+    const result: GameResult = {
+      id: `game-${Date.now()}`,
+      date: new Date().toISOString(),
+      mode: game.gameMode,
+      players: game.players.map(p => ({
+        name: p.name,
+        type: p.type,
+        difficulty: p.difficulty,
+        score: p.score,
+        bestTurn: game.turnHistory
+          .filter(t => t.playerId === p.id)
+          .reduce((max, t) => Math.max(max, t.score), 0),
+      })),
+      winner: winner?.name ?? '',
+      totalTurns: game.turnHistory.length,
+      duration: Math.round((Date.now() - gameStartTime) / 1000),
+    }
+
+    recordGame(result)
+    const stats = getPlayerStats()
+    const newAchievements = checkAchievements(result, stats)
+
+    for (const id of newAchievements) {
+      const achievement = ACHIEVEMENTS.find(a => a.id === id)
+      if (achievement) {
+        toast.success(`Achievement unlocked: ${achievement.icon} ${achievement.name}`, {
+          duration: 4000,
+        })
+      }
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [game.gamePhase])
+
+  // Reset recorded flag on new game
+  useEffect(() => {
+    if (game.gamePhase === 'playing') {
+      gameRecordedRef.current = false
+    }
+  }, [game.gamePhase])
 
   // --- AI turn execution ---
   const aiTurnRef = useRef(false)
@@ -189,6 +246,11 @@ function GameInner() {
     return hints
   }, [game.hintsEnabled, selectedCard, isHumanTurn, game.board, game.pendingPlacements])
 
+  // --- Stats page ---
+  if (showStats) {
+    return <StatsPage onBack={() => setShowStats(false)} />
+  }
+
   // --- Multiplayer ---
   if (showMultiplayer) {
     // If in a game, show the multiplayer game view
@@ -218,6 +280,9 @@ function GameInner() {
       <Tutorial
         onComplete={() => {
           setShowTutorial(false)
+          if (unlockTutorialAchievement()) {
+            toast.success('Achievement unlocked: \u{1F393} Student', { duration: 4000 })
+          }
           dispatch({ type: 'SHOW_MENU' })
         }}
         onBack={() => {
@@ -235,6 +300,7 @@ function GameInner() {
         onSelectMode={handleSelectMode}
         onTutorial={() => setShowTutorial(true)}
         onMultiplayer={() => setShowMultiplayer(true)}
+        onStats={() => setShowStats(true)}
       />
     )
   }

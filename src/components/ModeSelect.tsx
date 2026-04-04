@@ -6,6 +6,7 @@ interface ModeSelectProps {
   onSelectMode: (mode: GameMode) => void
   onTutorial: () => void
   onMultiplayer: () => void
+  onStats: () => void
 }
 
 const modes: Array<{ id: GameMode; name: string; icon: string; desc: string }> = [
@@ -33,6 +34,7 @@ export const ModeSelect: React.FC<ModeSelectProps> = ({
   onSelectMode,
   onTutorial,
   onMultiplayer,
+  onStats,
 }) => {
   return (
     <div className={styles.container}>
@@ -73,6 +75,10 @@ export const ModeSelect: React.FC<ModeSelectProps> = ({
 
         <button className={styles.tutorialBtn} onClick={onTutorial}>
           Learn How to Play
+        </button>
+
+        <button className={styles.tutorialBtn} onClick={onStats}>
+          Stats & Achievements
         </button>
       </div>
     </div>
