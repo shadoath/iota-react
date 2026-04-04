@@ -37,6 +37,10 @@ export const GameSetup: React.FC<GameSetupProps> = ({ mode, onStartGame, onBack 
     setAiPlayers(aiPlayers.filter((_, i) => i !== index))
   }
 
+  const updateName = (index: number, name: string) => {
+    setAiPlayers(aiPlayers.map((p, i) => i === index ? { ...p, name } : p))
+  }
+
   const updateDifficulty = (index: number, difficulty: AIDifficulty) => {
     setAiPlayers(aiPlayers.map((p, i) => i === index ? { ...p, difficulty } : p))
   }
@@ -86,7 +90,13 @@ export const GameSetup: React.FC<GameSetupProps> = ({ mode, onStartGame, onBack 
 
           {aiPlayers.map((ai, index) => (
             <div key={index} className={styles.aiRow}>
-              <span className={styles.aiName}>{ai.name}</span>
+              <input
+                className={styles.aiNameInput}
+                value={ai.name}
+                onChange={(e) => updateName(index, e.target.value)}
+                maxLength={12}
+                aria-label={`Name for opponent ${index + 1}`}
+              />
               <span className={`${styles.diffBadge} ${getDiffClass(ai.difficulty)}`}>
                 {ai.difficulty}
               </span>

@@ -63,6 +63,28 @@
   font-weight: var(--font-weight-medium);
 }
 
+.aiNameInput {
+  flex: 1;
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
+  border: none;
+  border-bottom: 1px solid transparent;
+  background: transparent;
+  color: var(--color-text);
+  padding: 2px 0;
+  outline: none;
+  font-family: inherit;
+  min-width: 0;
+}
+
+.aiNameInput:hover {
+  border-bottom-color: #ccc;
+}
+
+.aiNameInput:focus {
+  border-bottom-color: var(--color-info);
+}
+
 .difficultySelect {
   padding: var(--space-xs) var(--space-sm);
   border: 1px solid #ddd;
