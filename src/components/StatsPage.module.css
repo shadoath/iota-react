@@ -21,7 +21,7 @@
 
 .backBtn {
   background: transparent;
-  border: 1px solid #ddd;
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   padding: var(--space-xs) var(--space-md);
   cursor: pointer;
@@ -186,7 +186,7 @@
 /* Win rate bar */
 .winRateBar {
   height: 8px;
-  background: #e5e5e5;
+  background: var(--color-divider);
   border-radius: 4px;
   overflow: hidden;
   margin-top: var(--space-xs);

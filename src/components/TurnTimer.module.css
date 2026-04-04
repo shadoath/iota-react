@@ -22,7 +22,7 @@
 .bar {
   width: 100px;
   height: 6px;
-  background: #e5e5e5;
+  background: var(--color-divider);
   border-radius: 3px;
   overflow: hidden;
 }
