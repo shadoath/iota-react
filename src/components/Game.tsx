@@ -34,6 +34,11 @@ import { useHelpers } from '../hooks/useHelpers'
 import { findLotCompletingCards, findBestMove, getAttributeHint } from '../utils/helpers'
 import { DailyChallenge } from './DailyChallenge'
 import { recordDailyResult } from '../stats/dailyChallenge'
+import {
+  trackGameStart, trackGameEnd, trackTurnComplete,
+  trackModeSelected, trackAchievementUnlocked, trackDailyChallenge,
+  trackHelperToggled, trackError,
+} from '../analytics/posthog'
 import styles from './Game.module.css'
 
 function GameInner() {
@@ -128,11 +133,24 @@ function GameInner() {
 
     recordGame(result)
 
+    // Track game end
+    trackGameEnd(
+      result.mode,
+      result.winner,
+      human?.score ?? 0,
+      result.totalTurns,
+      result.duration,
+      result.winner === human?.name
+    )
+
     // Record daily challenge result
     if (game.gameMode === 'daily') {
       const humanPlayer = game.players.find(p => p.type === 'human')
       if (humanPlayer) {
         recordDailyResult(humanPlayer.score)
+        const { getDailyHistory } = require('../stats/dailyChallenge')
+        const history = getDailyHistory()
+        trackDailyChallenge(humanPlayer.score, history.currentStreak)
       }
     }
 
@@ -140,6 +158,7 @@ function GameInner() {
     const newAchievements = checkAchievements(result, stats)
 
     for (const id of newAchievements) {
+      trackAchievementUnlocked(id)
       const achievement = ACHIEVEMENTS.find(a => a.id === id)
       if (achievement) {
         toast.success(`Achievement unlocked: ${achievement.icon} ${achievement.name}`, {
@@ -211,11 +230,13 @@ function GameInner() {
 
   const handleSelectMode = useCallback((mode: GameMode) => {
     setSelectedMode(mode)
+    trackModeSelected(mode)
     dispatch({ type: 'SHOW_SETUP', mode })
   }, [dispatch])
 
   const handleStartGame = useCallback((settings: GameSettings) => {
     setLastSettings(settings)
+    trackGameStart(settings.mode, settings.playerCount, settings.aiPlayers.map(a => a.difficulty))
     dispatch({ type: 'START_GAME', settings })
   }, [dispatch])
 
