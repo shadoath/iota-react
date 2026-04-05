@@ -1,4 +1,5 @@
 import React from "react"
+import toast from "react-hot-toast"
 import type { GameMode } from "../types/game"
 import styles from "./ModeSelect.module.css"
 
@@ -49,7 +50,16 @@ export const ModeSelect: React.FC<ModeSelectProps> = ({
   return (
     <div className={styles.container}>
       <div className={styles.card}>
-        <h1 className={styles.title}>NodusNexus</h1>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <h1 className={styles.title}>NodusNexus</h1>
+          <button
+            className={styles.tutorialBtn}
+            style={{ padding: '4px 12px', fontSize: 11 }}
+            onClick={() => toast("Sign in coming soon! Your stats are saved locally for now.")}
+          >
+            Sign In
+          </button>
+        </div>
         <p className={styles.subtitle}>The card game of matching patterns</p>
 
         <div className={styles.modes}>

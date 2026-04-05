@@ -77,6 +77,42 @@
   gap: 2px;
 }
 
+.swapSelected {
+  position: relative;
+}
+
+.swapSelected::before {
+  content: 'SWAP';
+  position: absolute;
+  top: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--color-warning);
+  color: white;
+  font-size: 8px;
+  font-weight: 800;
+  padding: 1px 6px;
+  border-radius: var(--radius-pill);
+  z-index: 2;
+}
+
+.swapBtn {
+  padding: var(--space-xs) var(--space-md);
+  background: transparent;
+  color: var(--color-text-muted);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-xs);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.swapBtn:hover {
+  border-color: var(--color-warning);
+  color: var(--color-warning);
+}
+
 .lotGlow {
   position: relative;
 }
