@@ -121,9 +121,15 @@
   .hand {
     padding: var(--space-sm) var(--space-md);
     gap: var(--space-sm);
+    /* Safe area for phones with bottom bars */
+    padding-bottom: max(var(--space-sm), env(safe-area-inset-bottom));
   }
 
   .turnActions {
-    bottom: 84px;
+    bottom: 90px;
+  }
+
+  .keyHint {
+    display: none; /* hide keyboard hints on touch devices */
   }
 }
