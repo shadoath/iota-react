@@ -17,13 +17,13 @@ export const MOBILE_BREAKPOINT = 768
 
 // Card attributes
 export const CARD_NUMBERS = [1, 2, 3, 4] as const
-export const CARD_COLORS = ['red', 'green', 'blue', 'yellow'] as const
-export const CARD_SHAPES = ['triangle', 'square', 'circle', 'cross'] as const
+export const CARD_COLORS = ["red", "green", "blue", "yellow"] as const
+export const CARD_SHAPES = ["triangle", "square", "circle", "cross"] as const
 
 // Display colors for card faces
 export const COLOR_MAP: Record<string, string> = {
-  red: '#ef4444',
-  green: '#22c55e',
-  blue: '#3b82f6',
-  yellow: '#eab308',
+  red: "#ef4444",
+  green: "#22c55e",
+  blue: "#3b82f6",
+  yellow: "#eab308",
 }

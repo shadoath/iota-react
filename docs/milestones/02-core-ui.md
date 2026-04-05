@@ -17,6 +17,7 @@
 The current cards are black rectangles with colored SVG shapes. They work but don't delight.
 
 **New card design:**
+
 - White/cream card face with subtle rounded corners and shadow
 - Shape fills the card center with bold, saturated colors
 - Number shown as repeated shapes (e.g., 3 circles = three circles arranged)
@@ -25,6 +26,7 @@ The current cards are black rectangles with colored SVG shapes. They work but do
 - Wild card has a distinct rainbow/gradient treatment
 
 Create `src/components/Card/Card.tsx` and `Card.module.css`:
+
 - Props: `card`, `size`, `selected`, `disabled`, `faceDown`, `onClick`
 - Sizes: `sm` (hand on mobile), `md` (hand on desktop), `lg` (board)
 - CSS-only — no images needed for shapes (SVG stays, just polished)
@@ -34,6 +36,7 @@ Create `src/components/Card/Card.tsx` and `Card.module.css`:
 Formalize the shape rendering into a dedicated component:
 
 Create `src/components/Card/shapes/`:
+
 - `Triangle.tsx` — equilateral, filled
 - `Square.tsx` — rounded corners, filled
 - `Circle.tsx` — filled
@@ -50,10 +53,12 @@ Replace the current zoom buttons with proper pan/zoom:
 - **Keyboard**: +/- to zoom, arrow keys to pan
 
 Implementation options:
+
 - Use a lightweight library like `use-gesture` + CSS transforms
 - Or build a custom `usePanZoom` hook with pointer events
 
 The board is a CSS Grid positioned inside a transform container:
+
 ```
 <div className={styles.viewport}>  ← clips overflow
   <div className={styles.board} style={{ transform }}>  ← pan/zoom applied here
@@ -76,6 +81,7 @@ Allow cards to be dragged from hand to board (in addition to the current click-t
 ### 2.5 Layout Overhaul
 
 **Desktop (>1024px):**
+
 ```
 ┌──────────────────────────────────┐
 │  Score    │                      │
@@ -88,6 +94,7 @@ Allow cards to be dragged from hand to board (in addition to the current click-t
 ```
 
 **Tablet (768-1024px):**
+
 ```
 ┌──────────────────┐
 │   Score bar       │
@@ -102,6 +109,7 @@ Allow cards to be dragged from hand to board (in addition to the current click-t
 ```
 
 **Mobile (<768px):**
+
 ```
 ┌──────────────┐
 │ Score (compact)│
@@ -126,6 +134,7 @@ For each component, create a co-located `.module.css` file and remove MUI `sx` p
 - `ScoreDisplay.module.css`
 
 Establish design tokens in `src/styles/tokens.css`:
+
 ```css
 :root {
   --color-red: #ef4444;
@@ -141,8 +150,8 @@ Establish design tokens in `src/styles/tokens.css`:
   --radius-card: 8px;
   --radius-button: 6px;
 
-  --shadow-card: 0 2px 8px rgba(0,0,0,0.12);
-  --shadow-card-hover: 0 4px 16px rgba(0,0,0,0.18);
+  --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.12);
+  --shadow-card-hover: 0 4px 16px rgba(0, 0, 0, 0.18);
 
   --z-board: 1;
   --z-hand: 10;
@@ -165,6 +174,7 @@ Use CSS animations/transitions only — no animation libraries needed.
 ### 2.8 Sound Effects (Optional, Toggleable)
 
 Simple, satisfying sounds:
+
 - Card place: soft "thud"
 - Turn complete: subtle "ding"
 - Invalid move: quiet "bonk"

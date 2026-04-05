@@ -35,7 +35,9 @@
   font-size: var(--font-size-md);
   font-weight: var(--font-weight-bold);
   cursor: pointer;
-  transition: background-color var(--transition-fast), transform var(--transition-fast);
+  transition:
+    background-color var(--transition-fast),
+    transform var(--transition-fast);
 }
 
 .btnComplete:hover:not(:disabled) {
@@ -80,7 +82,7 @@
 }
 
 .lotGlow::after {
-  content: '';
+  content: "";
   position: absolute;
   inset: 4px;
   border-radius: var(--radius-md);

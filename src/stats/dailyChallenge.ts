@@ -3,11 +3,11 @@
  * Scores stored in localStorage, keyed by date.
  */
 
-import { createSeededRandom, dateSeed, getTodayString, seededShuffle } from '../utils/seededRandom'
-import type { Card, CardNumber, CardColor, CardShape } from '../types/game'
-import { CARD_NUMBERS, CARD_COLORS, CARD_SHAPES } from '../constants/game'
+import { createSeededRandom, dateSeed, getTodayString, seededShuffle } from "../utils/seededRandom"
+import type { Card, CardNumber, CardColor, CardShape } from "../types/game"
+import { CARD_NUMBERS, CARD_COLORS, CARD_SHAPES } from "../constants/game"
 
-const STORAGE_KEY = 'nodusnexus-daily'
+const STORAGE_KEY = "nodusnexus-daily"
 
 export interface DailyResult {
   date: string
@@ -40,8 +40,20 @@ export function getDailyDeck(dateStr: string = getTodayString()): Card[] {
   }
 
   // Add 2 wild cards
-  deck.push({ id: `daily-wild-1`, number: 0 as CardNumber, color: 'wild' as CardColor, shape: 'wild' as CardShape, isWild: true } as Card)
-  deck.push({ id: `daily-wild-2`, number: 0 as CardNumber, color: 'wild' as CardColor, shape: 'wild' as CardShape, isWild: true } as Card)
+  deck.push({
+    id: `daily-wild-1`,
+    number: 0 as CardNumber,
+    color: "wild" as CardColor,
+    shape: "wild" as CardShape,
+    isWild: true,
+  } as Card)
+  deck.push({
+    id: `daily-wild-2`,
+    number: 0 as CardNumber,
+    color: "wild" as CardColor,
+    shape: "wild" as CardShape,
+    isWild: true,
+  } as Card)
 
   return seededShuffle(deck, random)
 }
@@ -52,20 +64,20 @@ export function getDailyDeck(dateStr: string = getTodayString()): Card[] {
 export function hasTodayBeenPlayed(): boolean {
   const history = getHistory()
   const today = getTodayString()
-  return history.results.some(r => r.date === today && r.completed)
+  return history.results.some((r) => r.date === today && r.completed)
 }
 
 /**
  * Record a daily challenge result.
  */
 export function recordDailyResult(score: number): void {
-  if (typeof window === 'undefined') return
+  if (typeof window === "undefined") return
 
   const history = getHistory()
   const today = getTodayString()
 
   // Don't overwrite a completed result
-  const existing = history.results.find(r => r.date === today)
+  const existing = history.results.find((r) => r.date === today)
   if (existing?.completed) return
 
   if (existing) {
@@ -99,14 +111,14 @@ export function getDailyHistory(): DailyHistory {
 export function getTodayScore(): number | null {
   const history = getHistory()
   const today = getTodayString()
-  const result = history.results.find(r => r.date === today)
+  const result = history.results.find((r) => r.date === today)
   return result?.completed ? result.score : null
 }
 
 // --- Internal ---
 
 function getHistory(): DailyHistory {
-  if (typeof window === 'undefined') {
+  if (typeof window === "undefined") {
     return { results: [], currentStreak: 0, bestStreak: 0 }
   }
   try {
@@ -118,14 +130,14 @@ function getHistory(): DailyHistory {
 }
 
 function saveHistory(history: DailyHistory): void {
-  if (typeof window === 'undefined') return
+  if (typeof window === "undefined") return
   localStorage.setItem(STORAGE_KEY, JSON.stringify(history))
 }
 
 function updateStreaks(history: DailyHistory): void {
   // Sort by date descending
   const sorted = [...history.results]
-    .filter(r => r.completed)
+    .filter((r) => r.completed)
     .sort((a, b) => b.date.localeCompare(a.date))
 
   let streak = 0
@@ -134,7 +146,7 @@ function updateStreaks(history: DailyHistory): void {
   for (let i = 0; i < sorted.length; i++) {
     const expected = new Date(today)
     expected.setDate(expected.getDate() - i)
-    const expectedStr = `${expected.getFullYear()}-${String(expected.getMonth() + 1).padStart(2, '0')}-${String(expected.getDate()).padStart(2, '0')}`
+    const expectedStr = `${expected.getFullYear()}-${String(expected.getMonth() + 1).padStart(2, "0")}-${String(expected.getDate()).padStart(2, "0")}`
 
     if (sorted[i].date === expectedStr) {
       streak++

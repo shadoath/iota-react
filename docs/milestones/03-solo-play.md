@@ -19,8 +19,8 @@ Extend `GameState` to support multiple players:
 interface Player {
   id: string
   name: string
-  type: 'human' | 'ai'
-  difficulty?: 'easy' | 'medium' | 'hard'
+  type: "human" | "ai"
+  difficulty?: "easy" | "medium" | "hard"
   hand: Card[]
   score: number
 }
@@ -32,7 +32,7 @@ interface GameState {
   currentPlayerIndex: number
   pendingPlacements: PendingPlacement[]
   turnHistory: TurnRecord[]
-  gamePhase: 'setup' | 'playing' | 'ended'
+  gamePhase: "setup" | "playing" | "ended"
 }
 
 interface TurnRecord {
@@ -60,28 +60,32 @@ Create `src/ai/engine.ts` — a pure function:
 function computeAIMove(
   hand: Card[],
   board: PlacedCard[],
-  difficulty: 'easy' | 'medium' | 'hard'
+  difficulty: "easy" | "medium" | "hard"
 ): PendingPlacement[]
 ```
 
 **Easy AI:**
+
 - Finds all valid single-card placements
 - Picks one randomly
 - Never plays multiple cards per turn
 
 **Medium AI:**
+
 - Finds all valid single and double-card placements
 - Scores each option
 - Picks the highest-scoring move
 - Occasionally (20%) picks a random move instead (feels human)
 
 **Hard AI:**
+
 - Exhaustive search of all possible placements (1-4 cards)
 - Evaluates each by score
 - Tiebreaker: prefer moves that don't open high-value positions for opponents
 - Considers board state (avoids creating easy 4-card line completions for next player)
 
 **Implementation approach:**
+
 1. Generate all valid single-card placements
 2. For each, generate valid second-card placements (same line)
 3. Continue to 3 and 4 cards

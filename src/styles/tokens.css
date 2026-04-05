@@ -75,8 +75,8 @@
   --z-modal: 400;
 
   /* Typography */
-  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-  --font-mono: 'SF Mono', 'Fira Code', monospace;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", sans-serif;
+  --font-mono: "SF Mono", "Fira Code", monospace;
   --font-size-xs: 0.75rem;
   --font-size-sm: 0.875rem;
   --font-size-md: 1rem;
@@ -89,7 +89,7 @@
 }
 
 /* Dark mode */
-[data-theme='dark'] {
+[data-theme="dark"] {
   --color-bg: #121212;
   --color-surface: #1e1e1e;
   --color-surface-alt: #2a2a2a;
@@ -119,7 +119,7 @@
 }
 
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme='light']) {
+  :root:not([data-theme="light"]) {
     --color-bg: #121212;
     --color-surface: #1e1e1e;
     --color-surface-alt: #2a2a2a;

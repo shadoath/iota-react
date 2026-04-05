@@ -1,6 +1,6 @@
-import React from 'react'
-import type { GameMode } from '../types/game'
-import styles from './ModeSelect.module.css'
+import React from "react"
+import type { GameMode } from "../types/game"
+import styles from "./ModeSelect.module.css"
 
 interface ModeSelectProps {
   onSelectMode: (mode: GameMode) => void
@@ -16,22 +16,22 @@ interface ModeSelectProps {
 
 const modes: Array<{ id: GameMode; name: string; icon: string; desc: string }> = [
   {
-    id: 'classic',
-    name: 'Classic Game',
-    icon: '\u2660',
-    desc: 'Play against AI opponents with standard rules',
+    id: "classic",
+    name: "Classic Game",
+    icon: "\u2660",
+    desc: "Play against AI opponents with standard rules",
   },
   {
-    id: 'practice',
-    name: 'Practice',
-    icon: '\u2728',
-    desc: 'Play with hints — see valid positions and score previews',
+    id: "practice",
+    name: "Practice",
+    icon: "\u2728",
+    desc: "Play with hints — see valid positions and score previews",
   },
   {
-    id: 'timed',
-    name: 'Timed Mode',
-    icon: '\u23F1',
-    desc: 'Race the clock with a turn timer',
+    id: "timed",
+    name: "Timed Mode",
+    icon: "\u23F1",
+    desc: "Race the clock with a turn timer",
   },
 ]
 
@@ -54,11 +54,7 @@ export const ModeSelect: React.FC<ModeSelectProps> = ({
 
         <div className={styles.modes}>
           {modes.map((mode) => (
-            <button
-              key={mode.id}
-              className={styles.modeBtn}
-              onClick={() => onSelectMode(mode.id)}
-            >
+            <button key={mode.id} className={styles.modeBtn} onClick={() => onSelectMode(mode.id)}>
               <span className={styles.modeIcon}>{mode.icon}</span>
               <div className={styles.modeInfo}>
                 <div className={styles.modeName}>{mode.name}</div>
@@ -69,14 +65,13 @@ export const ModeSelect: React.FC<ModeSelectProps> = ({
           ))}
         </div>
 
-        <button
-          className={styles.modeBtn}
-          onClick={onDailyChallenge}
-        >
-          <span className={styles.modeIcon}>{'\uD83D\uDCC5'}</span>
+        <button className={styles.modeBtn} onClick={onDailyChallenge}>
+          <span className={styles.modeIcon}>{"\uD83D\uDCC5"}</span>
           <div className={styles.modeInfo}>
             <div className={styles.modeName}>Daily Challenge</div>
-            <div className={styles.modeDesc}>Same puzzle for everyone today — track your streak</div>
+            <div className={styles.modeDesc}>
+              Same puzzle for everyone today — track your streak
+            </div>
           </div>
           <span className={styles.modeArrow}>&rarr;</span>
         </button>
@@ -87,13 +82,11 @@ export const ModeSelect: React.FC<ModeSelectProps> = ({
           disabled={!isOnline}
           aria-disabled={!isOnline}
         >
-          <span className={styles.modeIcon}>{'\uD83C\uDF10'}</span>
+          <span className={styles.modeIcon}>{"\uD83C\uDF10"}</span>
           <div className={styles.modeInfo}>
             <div className={styles.modeName}>Multiplayer</div>
             <div className={styles.modeDesc}>
-              {isOnline
-                ? "Play online with friends via room code"
-                : "Requires internet connection"}
+              {isOnline ? "Play online with friends via room code" : "Requires internet connection"}
             </div>
           </div>
           <span className={styles.modeArrow}>&rarr;</span>
@@ -123,9 +116,13 @@ export const ModeSelect: React.FC<ModeSelectProps> = ({
         )}
 
         <div className={styles.legal}>
-          <a href='/privacy' className={styles.legalLink}>Privacy Policy</a>
+          <a href="/privacy" className={styles.legalLink}>
+            Privacy Policy
+          </a>
           <span className={styles.legalDot}>&middot;</span>
-          <a href='/terms' className={styles.legalLink}>Terms of Service</a>
+          <a href="/terms" className={styles.legalLink}>
+            Terms of Service
+          </a>
         </div>
       </div>
     </div>

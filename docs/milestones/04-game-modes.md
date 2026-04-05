@@ -26,6 +26,7 @@ An interactive, step-by-step tutorial — not a wall of text.
 7. **"You're ready!"** — Quick 5-turn practice round, then launch into a real game.
 
 Implementation:
+
 - `src/components/Tutorial/Tutorial.tsx` — step-by-step overlay
 - Pre-built board states for each step (no randomness)
 - Forced valid placements (only correct position is clickable)
@@ -40,6 +41,7 @@ Race the clock:
 - **Blitz**: 30 seconds per turn, but bonus points for finishing early (remaining seconds × 2 added to turn score).
 
 Timer component:
+
 - Circular progress indicator
 - Color changes: green → yellow → red as time runs down
 - Pulse animation in last 5 seconds
@@ -55,6 +57,7 @@ Same puzzle for everyone, every day:
 - Compare with friends / global
 
 Implementation:
+
 - `src/utils/seededRandom.ts` — deterministic RNG from date seed
 - Same deck order, same AI seed = same game for everyone
 - Results stored locally + optionally synced (Phase 6)

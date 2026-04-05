@@ -8,11 +8,11 @@ A strategic card game of matching patterns. Play solo against AI, practice your 
 
 66 cards. Each has three attributes:
 
-| Attribute | Values |
-|-----------|--------|
-| **Number** | 1, 2, 3, 4 |
-| **Color** | Red, Green, Blue, Yellow |
-| **Shape** | Triangle, Square, Circle, Cross |
+| Attribute  | Values                          |
+| ---------- | ------------------------------- |
+| **Number** | 1, 2, 3, 4                      |
+| **Color**  | Red, Green, Blue, Yellow        |
+| **Shape**  | Triangle, Square, Circle, Cross |
 
 Plus 2 wild cards that match anything.
 
@@ -25,13 +25,13 @@ Place cards on the board to form lines. In every line, each attribute must be ei
 
 ## Game Modes
 
-| Mode | Description |
-|------|-------------|
-| **Classic** | Play against 1-3 AI opponents (Easy / Medium / Hard difficulty) |
-| **Practice** | Hints enabled — see score previews on every valid position |
-| **Timed** | Turn timer (15s / 30s / 60s) — auto-skips if you run out |
-| **Multiplayer** | Online play with friends via 6-character room codes |
-| **Tutorial** | Interactive 7-step walkthrough teaching all the rules |
+| Mode                | Description                                                               |
+| ------------------- | ------------------------------------------------------------------------- |
+| **Classic**         | Play against 1-3 AI opponents (Easy / Medium / Hard difficulty)           |
+| **Practice**        | Hints enabled — see score previews on every valid position                |
+| **Timed**           | Turn timer (15s / 30s / 60s) — auto-skips if you run out                  |
+| **Multiplayer**     | Online play with friends via 6-character room codes                       |
+| **Tutorial**        | Interactive 7-step walkthrough teaching all the rules                     |
 | **Pattern Trainer** | Quick-fire drills — given a partial line, pick the card that completes it |
 
 ## Features

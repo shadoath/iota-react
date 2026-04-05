@@ -1,10 +1,10 @@
-import type React from 'react'
-import { useState, useCallback } from 'react'
-import { useTheme } from '../hooks/useTheme'
-import { useCardTheme, CARD_THEMES, BOARD_THEMES } from '../hooks/useCardTheme'
-import type { HelpersConfig } from '../hooks/useHelpers'
-import type { SoundConfig } from '../hooks/useSound'
-import styles from './Sidebar.module.css'
+import type React from "react"
+import { useState, useCallback } from "react"
+import { useTheme } from "../hooks/useTheme"
+import { useCardTheme, CARD_THEMES, BOARD_THEMES } from "../hooks/useCardTheme"
+import type { HelpersConfig } from "../hooks/useHelpers"
+import type { SoundConfig } from "../hooks/useSound"
+import styles from "./Sidebar.module.css"
 
 interface SidebarProps {
   cardsLeft: number
@@ -23,9 +23,9 @@ interface SidebarProps {
 }
 
 const HELPER_OPTIONS: Array<{ key: keyof HelpersConfig; label: string; desc: string }> = [
-  { key: 'setCompletion', label: 'Lot Indicator', desc: 'Glow on cards that complete a line of 4' },
-  { key: 'bestMove', label: 'Best Move', desc: 'Highlight the highest-scoring position' },
-  { key: 'attributeGuide', label: 'Attribute Guide', desc: 'Show what\'s needed at each position' },
+  { key: "setCompletion", label: "Lot Indicator", desc: "Glow on cards that complete a line of 4" },
+  { key: "bestMove", label: "Best Move", desc: "Highlight the highest-scoring position" },
+  { key: "attributeGuide", label: "Attribute Guide", desc: "Show what's needed at each position" },
 ]
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -50,33 +50,29 @@ export const Sidebar: React.FC<SidebarProps> = ({
     setOpen(false)
   }, [onNewGame])
 
-  const themeLabel = theme === 'light' ? 'Light' : theme === 'dark' ? 'Dark' : 'System'
-  const themeIcon = theme === 'light' ? '\u2600' : theme === 'dark' ? '\u{1F319}' : '\u{1F4BB}'
+  const themeLabel = theme === "light" ? "Light" : theme === "dark" ? "Dark" : "System"
+  const themeIcon = theme === "light" ? "\u2600" : theme === "dark" ? "\u{1F319}" : "\u{1F4BB}"
 
   return (
     <>
-      <button
-        className={styles.menuBtn}
-        onClick={() => setOpen(true)}
-        aria-label='Open menu'
-      >
+      <button className={styles.menuBtn} onClick={() => setOpen(true)} aria-label="Open menu">
         ☰
       </button>
 
       {/* Overlay */}
       <div
-        className={`${styles.overlay} ${open ? styles.overlayOpen : ''}`}
+        className={`${styles.overlay} ${open ? styles.overlayOpen : ""}`}
         onClick={() => setOpen(false)}
       />
 
       {/* Drawer */}
-      <div className={`${styles.drawer} ${open ? styles.drawerOpen : ''}`}>
+      <div className={`${styles.drawer} ${open ? styles.drawerOpen : ""}`}>
         <div className={styles.drawerHeader}>
           <span className={styles.drawerTitle}>NodusNexus</span>
           <button
             className={styles.closeBtn}
             onClick={() => setOpen(false)}
-            aria-label='Close menu'
+            aria-label="Close menu"
           >
             ✕
           </button>
@@ -97,9 +93,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         )}
 
         {pendingCount > 0 && (
-          <div className={styles.pendingBadge}>
-            Pending: +{pendingPoints} points
-          </div>
+          <div className={styles.pendingBadge}>Pending: +{pendingPoints} points</div>
         )}
 
         <div className={styles.divider} />
@@ -107,10 +101,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {/* Helpers */}
         <div className={styles.themeSection}>
           <div className={styles.statLabel}>Helpers</div>
-          {HELPER_OPTIONS.map(opt => (
+          {HELPER_OPTIONS.map((opt) => (
             <label key={opt.key} className={styles.helperToggle}>
               <input
-                type='checkbox'
+                type="checkbox"
                 checked={helpers[opt.key]}
                 onChange={() => onToggleHelper(opt.key)}
                 className={styles.helperCheckbox}
@@ -134,20 +128,18 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <div className={styles.statLabel}>Sound</div>
           <label className={styles.helperToggle}>
             <input
-              type='checkbox'
+              type="checkbox"
               checked={soundConfig.enabled}
               onChange={() => onSoundToggle(!soundConfig.enabled)}
               className={styles.helperCheckbox}
             />
-            <span className={styles.helperLabel}>
-              {soundConfig.enabled ? 'On' : 'Off'}
-            </span>
+            <span className={styles.helperLabel}>{soundConfig.enabled ? "On" : "Off"}</span>
           </label>
           {soundConfig.enabled && (
             <div className={styles.volumeRow}>
               <span className={styles.volumeLabel}>Vol</span>
               <input
-                type='range'
+                type="range"
                 min={0}
                 max={100}
                 value={Math.round(soundConfig.volume * 100)}
@@ -162,10 +154,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <div className={styles.themeSection}>
           <div className={styles.statLabel}>Card Colors</div>
           <div className={styles.themeRow}>
-            {CARD_THEMES.map(t => (
+            {CARD_THEMES.map((t) => (
               <button
                 key={t.id}
-                className={`${styles.themeChip} ${cardTheme === t.id ? styles.themeChipActive : ''}`}
+                className={`${styles.themeChip} ${cardTheme === t.id ? styles.themeChipActive : ""}`}
                 onClick={() => setCardTheme(t.id)}
               >
                 {t.name}
@@ -177,10 +169,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <div className={styles.themeSection}>
           <div className={styles.statLabel}>Board</div>
           <div className={styles.themeRow}>
-            {BOARD_THEMES.map(t => (
+            {BOARD_THEMES.map((t) => (
               <button
                 key={t.id}
-                className={`${styles.themeChip} ${boardTheme === t.id ? styles.themeChipActive : ''}`}
+                className={`${styles.themeChip} ${boardTheme === t.id ? styles.themeChipActive : ""}`}
                 onClick={() => setBoardTheme(t.id)}
               >
                 {t.name}

@@ -1,10 +1,10 @@
-'use client'
+"use client"
 
-import React, { useState, useMemo, useCallback } from 'react'
-import type { PlacedCard, TurnRecord, Player } from '../types/game'
-import { BoardComponent } from './BoardComponent'
-import { analyzeGame, analysisSummary, type TurnAnalysis } from '../ai/analysis'
-import styles from './Replay.module.css'
+import React, { useState, useMemo, useCallback } from "react"
+import type { PlacedCard, TurnRecord, Player } from "../types/game"
+import { BoardComponent } from "./BoardComponent"
+import { analyzeGame, analysisSummary, type TurnAnalysis } from "../ai/analysis"
+import styles from "./Replay.module.css"
 
 interface ReplayProps {
   initialBoard: PlacedCard[] // the starter card
@@ -13,12 +13,7 @@ interface ReplayProps {
   onBack: () => void
 }
 
-export const Replay: React.FC<ReplayProps> = ({
-  initialBoard,
-  turnHistory,
-  players,
-  onBack,
-}) => {
+export const Replay: React.FC<ReplayProps> = ({ initialBoard, turnHistory, players, onBack }) => {
   const [currentTurn, setCurrentTurn] = useState(0)
   const [zoomLevel, setZoomLevel] = useState(1.0)
   const [isPlaying, setIsPlaying] = useState(false)
@@ -27,16 +22,15 @@ export const Replay: React.FC<ReplayProps> = ({
 
   // Run AI analysis on human turns
   const analyses = useMemo(() => {
-    const initialHands = players.map(p => [...p.hand])
+    const initialHands = players.map((p) => [...p.hand])
     return analyzeGame(initialBoard, turnHistory, players, initialHands)
   }, [initialBoard, turnHistory, players])
 
   const summary = useMemo(() => analysisSummary(analyses), [analyses])
 
   // Get analysis for current turn
-  const currentAnalysis = currentTurn > 0
-    ? analyses.find(a => a.turnIndex === currentTurn - 1)
-    : null
+  const currentAnalysis =
+    currentTurn > 0 ? analyses.find((a) => a.turnIndex === currentTurn - 1) : null
 
   // Build board state at each turn
   const boardAtTurn = useMemo(() => {
@@ -55,15 +49,13 @@ export const Replay: React.FC<ReplayProps> = ({
   const board = boardAtTurn[currentTurn] ?? initialBoard
   const currentTurnRecord = currentTurn > 0 ? turnHistory[currentTurn - 1] : null
   const currentPlayerName = currentTurnRecord
-    ? players.find(p => p.id === currentTurnRecord.playerId)?.name ?? 'Unknown'
-    : 'Start'
+    ? (players.find((p) => p.id === currentTurnRecord.playerId)?.name ?? "Unknown")
+    : "Start"
 
   // Cards placed in the current turn (for highlighting)
   const highlightedPositions = useMemo(() => {
     if (!currentTurnRecord) return new Set<string>()
-    return new Set(
-      currentTurnRecord.placements.map(p => `${p.position.row},${p.position.col}`)
-    )
+    return new Set(currentTurnRecord.placements.map((p) => `${p.position.row},${p.position.col}`))
   }, [currentTurnRecord])
 
   // Cumulative scores at each turn
@@ -89,7 +81,7 @@ export const Replay: React.FC<ReplayProps> = ({
     }
 
     const timer = setTimeout(() => {
-      setCurrentTurn(prev => prev + 1)
+      setCurrentTurn((prev) => prev + 1)
     }, 1500)
 
     return () => clearTimeout(timer)
@@ -97,12 +89,12 @@ export const Replay: React.FC<ReplayProps> = ({
 
   const handlePrev = useCallback(() => {
     setIsPlaying(false)
-    setCurrentTurn(prev => Math.max(0, prev - 1))
+    setCurrentTurn((prev) => Math.max(0, prev - 1))
   }, [])
 
   const handleNext = useCallback(() => {
     setIsPlaying(false)
-    setCurrentTurn(prev => Math.min(totalTurns, prev + 1))
+    setCurrentTurn((prev) => Math.min(totalTurns, prev + 1))
   }, [totalTurns])
 
   const handlePlayPause = useCallback(() => {
@@ -110,7 +102,7 @@ export const Replay: React.FC<ReplayProps> = ({
       setCurrentTurn(0)
       setIsPlaying(true)
     } else {
-      setIsPlaying(prev => !prev)
+      setIsPlaying((prev) => !prev)
     }
   }, [currentTurn, totalTurns])
 
@@ -121,9 +113,9 @@ export const Replay: React.FC<ReplayProps> = ({
           &larr; Back
         </button>
         <h1 className={styles.title}>Game Replay</h1>
-        <div style={{ display: 'flex', gap: 8 }}>
-          {players.map(p => (
-            <span key={p.id} style={{ fontSize: 12, color: 'var(--color-text-muted)' }}>
+        <div style={{ display: "flex", gap: 8 }}>
+          {players.map((p) => (
+            <span key={p.id} style={{ fontSize: 12, color: "var(--color-text-muted)" }}>
               {p.name}: <strong>{currentScores[p.id] ?? 0}</strong>
             </span>
           ))}
@@ -143,23 +135,29 @@ export const Replay: React.FC<ReplayProps> = ({
         {/* Turn list sidebar */}
         <div className={styles.turnList}>
           <button
-            className={`${styles.turnItem} ${currentTurn === 0 ? styles.turnItemActive : ''}`}
-            onClick={() => { setCurrentTurn(0); setIsPlaying(false) }}
+            className={`${styles.turnItem} ${currentTurn === 0 ? styles.turnItemActive : ""}`}
+            onClick={() => {
+              setCurrentTurn(0)
+              setIsPlaying(false)
+            }}
           >
             <span className={styles.turnItemName}>Start</span>
           </button>
           {turnHistory.map((turn, index) => {
-            const player = players.find(p => p.id === turn.playerId)
+            const player = players.find((p) => p.id === turn.playerId)
             return (
               <button
                 key={index}
-                className={`${styles.turnItem} ${currentTurn === index + 1 ? styles.turnItemActive : ''}`}
-                onClick={() => { setCurrentTurn(index + 1); setIsPlaying(false) }}
+                className={`${styles.turnItem} ${currentTurn === index + 1 ? styles.turnItemActive : ""}`}
+                onClick={() => {
+                  setCurrentTurn(index + 1)
+                  setIsPlaying(false)
+                }}
               >
                 <span className={styles.turnItemCards}>{turn.placements.length}c</span>
-                <span className={styles.turnItemName}>{player?.name ?? '?'}</span>
+                <span className={styles.turnItemName}>{player?.name ?? "?"}</span>
                 <span className={styles.turnItemScore}>
-                  {turn.score > 0 ? `+${turn.score}` : '0'}
+                  {turn.score > 0 ? `+${turn.score}` : "0"}
                 </span>
               </button>
             )
@@ -170,7 +168,7 @@ export const Replay: React.FC<ReplayProps> = ({
       {/* Timeline controls */}
       <div className={styles.controls}>
         <input
-          type='range'
+          type="range"
           className={styles.slider}
           min={0}
           max={totalTurns}
@@ -183,9 +181,12 @@ export const Replay: React.FC<ReplayProps> = ({
         <div className={styles.controlRow}>
           <button
             className={styles.controlBtn}
-            onClick={() => { setCurrentTurn(0); setIsPlaying(false) }}
+            onClick={() => {
+              setCurrentTurn(0)
+              setIsPlaying(false)
+            }}
             disabled={currentTurn === 0}
-            aria-label='Go to start'
+            aria-label="Go to start"
           >
             ⏮
           </button>
@@ -193,31 +194,34 @@ export const Replay: React.FC<ReplayProps> = ({
             className={styles.controlBtn}
             onClick={handlePrev}
             disabled={currentTurn === 0}
-            aria-label='Previous turn'
+            aria-label="Previous turn"
           >
             ◀
           </button>
           <button
             className={styles.controlBtn}
             onClick={handlePlayPause}
-            aria-label={isPlaying ? 'Pause' : 'Play'}
+            aria-label={isPlaying ? "Pause" : "Play"}
             style={{ width: 48 }}
           >
-            {isPlaying ? '⏸' : '▶'}
+            {isPlaying ? "⏸" : "▶"}
           </button>
           <button
             className={styles.controlBtn}
             onClick={handleNext}
             disabled={currentTurn >= totalTurns}
-            aria-label='Next turn'
+            aria-label="Next turn"
           >
             ▶
           </button>
           <button
             className={styles.controlBtn}
-            onClick={() => { setCurrentTurn(totalTurns); setIsPlaying(false) }}
+            onClick={() => {
+              setCurrentTurn(totalTurns)
+              setIsPlaying(false)
+            }}
             disabled={currentTurn >= totalTurns}
-            aria-label='Go to end'
+            aria-label="Go to end"
           >
             ⏭
           </button>
@@ -229,14 +233,17 @@ export const Replay: React.FC<ReplayProps> = ({
             <div className={styles.turnDetail}>
               {currentPlayerName}
               {currentTurnRecord && currentTurnRecord.score > 0
-                ? ` — +${currentTurnRecord.score} points (${currentTurnRecord.placements.length} card${currentTurnRecord.placements.length > 1 ? 's' : ''})`
-                : currentTurnRecord ? ' — swap' : ''}
+                ? ` — +${currentTurnRecord.score} points (${currentTurnRecord.placements.length} card${currentTurnRecord.placements.length > 1 ? "s" : ""})`
+                : currentTurnRecord
+                  ? " — swap"
+                  : ""}
               {currentAnalysis && currentAnalysis.scoreDiff > 0 && (
                 <span className={styles.analysisHint}>
-                  {' '}(best: +{currentAnalysis.bestPossibleScore}, missed {currentAnalysis.scoreDiff})
+                  {" "}
+                  (best: +{currentAnalysis.bestPossibleScore}, missed {currentAnalysis.scoreDiff})
                 </span>
               )}
-              {currentAnalysis && currentAnalysis.rating === 'optimal' && (
+              {currentAnalysis && currentAnalysis.rating === "optimal" && (
                 <span className={styles.analysisOptimal}> (optimal)</span>
               )}
             </div>

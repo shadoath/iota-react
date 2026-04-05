@@ -3,7 +3,7 @@
  * Stored in localStorage, designed to migrate to a database later.
  */
 
-import type { GameMode, AIDifficulty } from '../types/game'
+import type { GameMode, AIDifficulty } from "../types/game"
 
 export interface GameResult {
   id: string
@@ -17,7 +17,7 @@ export interface GameResult {
 
 export interface GameResultPlayer {
   name: string
-  type: 'human' | 'ai'
+  type: "human" | "ai"
   difficulty?: AIDifficulty
   score: number
   bestTurn: number
@@ -53,26 +53,26 @@ export interface DifficultyStats {
 
 export type AchievementId =
   // Beginner
-  | 'first_game'
-  | 'first_win'
-  | 'tutorial_complete'
+  | "first_game"
+  | "first_win"
+  | "tutorial_complete"
   // Skill
-  | 'four_of_a_kind'
-  | 'century'
-  | 'perfect_line'
-  | 'high_roller'
+  | "four_of_a_kind"
+  | "century"
+  | "perfect_line"
+  | "high_roller"
   // Dedication
-  | 'ten_games'
-  | 'fifty_games'
-  | 'centurion'
+  | "ten_games"
+  | "fifty_games"
+  | "centurion"
   // Difficulty
-  | 'beat_easy'
-  | 'beat_medium'
-  | 'beat_hard'
+  | "beat_easy"
+  | "beat_medium"
+  | "beat_hard"
   // Modes
-  | 'practice_player'
-  | 'speed_demon'
-  | 'multi_player'
+  | "practice_player"
+  | "speed_demon"
+  | "multi_player"
 
 export interface Achievement {
   id: AchievementId

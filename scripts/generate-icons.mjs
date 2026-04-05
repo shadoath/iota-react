@@ -29,10 +29,7 @@ async function generateMaskable(size) {
   const padding = Math.round(size * 0.1)
   const innerSize = size - padding * 2
 
-  const resizedSvg = await sharp(svgBuffer)
-    .resize(innerSize, innerSize)
-    .png()
-    .toBuffer()
+  const resizedSvg = await sharp(svgBuffer).resize(innerSize, innerSize).png().toBuffer()
 
   await sharp({
     create: {

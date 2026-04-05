@@ -37,9 +37,7 @@ registerRoute(
 
 // Network-only for Socket.io and API routes
 registerRoute(
-  ({ url }) =>
-    url.pathname.startsWith("/api/") ||
-    url.pathname.startsWith("/socket.io/"),
+  ({ url }) => url.pathname.startsWith("/api/") || url.pathname.startsWith("/socket.io/"),
   new NetworkOnly()
 )
 
@@ -47,9 +45,7 @@ registerRoute(
 const navigationHandler = new NetworkFirst({
   cacheName: "navigation",
   networkTimeoutSeconds: 3,
-  plugins: [
-    new CacheableResponsePlugin({ statuses: [0, 200] }),
-  ],
+  plugins: [new CacheableResponsePlugin({ statuses: [0, 200] })],
 })
 
 const navigationRoute = new NavigationRoute(navigationHandler, {

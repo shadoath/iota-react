@@ -3,13 +3,13 @@
  * All reads/writes go through this module for easy migration later.
  */
 
-import type { GameResult, PlayerStats, ModeStats, DifficultyStats } from './types'
+import type { GameResult, PlayerStats, ModeStats, DifficultyStats } from "./types"
 
-const STORAGE_KEY = 'nodusnexus-game-results'
+const STORAGE_KEY = "nodusnexus-game-results"
 const MAX_RECENT = 50
 
 function getResults(): GameResult[] {
-  if (typeof window === 'undefined') return []
+  if (typeof window === "undefined") return []
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
     return raw ? JSON.parse(raw) : []
@@ -19,7 +19,7 @@ function getResults(): GameResult[] {
 }
 
 function saveResults(results: GameResult[]): void {
-  if (typeof window === 'undefined') return
+  if (typeof window === "undefined") return
   localStorage.setItem(STORAGE_KEY, JSON.stringify(results.slice(-MAX_RECENT)))
 }
 
@@ -51,7 +51,7 @@ export function getPlayerStats(): PlayerStats {
   let streak = 0
 
   for (const result of results) {
-    const human = result.players.find(p => p.type === 'human')
+    const human = result.players.find((p) => p.type === "human")
     if (!human) continue
 
     stats.gamesPlayed++
@@ -70,7 +70,7 @@ export function getPlayerStats(): PlayerStats {
     }
 
     // By mode
-    const mode = result.mode || 'classic'
+    const mode = result.mode || "classic"
     if (!stats.byMode[mode]) {
       stats.byMode[mode] = { played: 0, won: 0, totalScore: 0, highScore: 0 }
     }
@@ -82,12 +82,15 @@ export function getPlayerStats(): PlayerStats {
 
     // By difficulty (highest AI difficulty in the game)
     const aiDifficulties = result.players
-      .filter(p => p.type === 'ai' && p.difficulty)
-      .map(p => p.difficulty!)
-    const hardestDiff = aiDifficulties.includes('hard') ? 'hard'
-      : aiDifficulties.includes('medium') ? 'medium'
-      : aiDifficulties.includes('easy') ? 'easy'
-      : null
+      .filter((p) => p.type === "ai" && p.difficulty)
+      .map((p) => p.difficulty!)
+    const hardestDiff = aiDifficulties.includes("hard")
+      ? "hard"
+      : aiDifficulties.includes("medium")
+        ? "medium"
+        : aiDifficulties.includes("easy")
+          ? "easy"
+          : null
 
     if (hardestDiff) {
       if (!stats.byDifficulty[hardestDiff]) {
@@ -99,17 +102,13 @@ export function getPlayerStats(): PlayerStats {
   }
 
   stats.currentStreak = streak
-  stats.averageScore = stats.gamesPlayed > 0
-    ? Math.round(stats.totalScore / stats.gamesPlayed)
-    : 0
-  stats.winRate = stats.gamesPlayed > 0
-    ? Math.round((stats.gamesWon / stats.gamesPlayed) * 100)
-    : 0
+  stats.averageScore = stats.gamesPlayed > 0 ? Math.round(stats.totalScore / stats.gamesPlayed) : 0
+  stats.winRate = stats.gamesPlayed > 0 ? Math.round((stats.gamesWon / stats.gamesPlayed) * 100) : 0
 
   return stats
 }
 
 export function clearStats(): void {
-  if (typeof window === 'undefined') return
+  if (typeof window === "undefined") return
   localStorage.removeItem(STORAGE_KEY)
 }

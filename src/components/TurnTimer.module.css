@@ -30,12 +30,20 @@
 .barFill {
   height: 100%;
   border-radius: 3px;
-  transition: width 1s linear, background-color 0.3s;
+  transition:
+    width 1s linear,
+    background-color 0.3s;
 }
 
-.green { background-color: var(--color-success); }
-.yellow { background-color: var(--color-warning); }
-.red { background-color: var(--color-error); }
+.green {
+  background-color: var(--color-success);
+}
+.yellow {
+  background-color: var(--color-warning);
+}
+.red {
+  background-color: var(--color-error);
+}
 
 .urgent {
   animation: pulse 0.5s ease-in-out infinite;

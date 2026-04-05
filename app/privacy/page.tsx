@@ -1,11 +1,11 @@
-import Link from 'next/link'
-import styles from '../../src/components/LegalPage.module.css'
+import Link from "next/link"
+import styles from "../../src/components/LegalPage.module.css"
 
 export default function PrivacyPolicy() {
   return (
     <div className={styles.container}>
       <div className={styles.inner}>
-        <Link href='/' className={styles.backLink}>
+        <Link href="/" className={styles.backLink}>
           &larr; Back to game
         </Link>
         <div className={styles.content}>
@@ -14,8 +14,9 @@ export default function PrivacyPolicy() {
 
           <h2>Overview</h2>
           <p>
-            NodusNexus (&quot;we&quot;, &quot;our&quot;, &quot;the game&quot;) is committed to protecting your privacy.
-            This policy explains what data we collect, how we use it, and your rights.
+            NodusNexus (&quot;we&quot;, &quot;our&quot;, &quot;the game&quot;) is committed to
+            protecting your privacy. This policy explains what data we collect, how we use it, and
+            your rights.
           </p>
 
           <h2>Data We Collect</h2>
@@ -34,8 +35,8 @@ export default function PrivacyPolicy() {
 
           <h2>Analytics Data (Optional)</h2>
           <p>
-            We use PostHog for anonymous analytics to understand how the game is used and
-            improve the experience. Analytics data includes:
+            We use PostHog for anonymous analytics to understand how the game is used and improve
+            the experience. Analytics data includes:
           </p>
           <ul>
             <li>Game events (start, end, mode selected) — no personal information</li>
@@ -43,14 +44,14 @@ export default function PrivacyPolicy() {
             <li>Error reports for debugging</li>
           </ul>
           <p>
-            Analytics are anonymous by default. We do not use cookies for tracking.
-            No personal information is collected unless you create an account.
+            Analytics are anonymous by default. We do not use cookies for tracking. No personal
+            information is collected unless you create an account.
           </p>
 
           <h2>Multiplayer Data</h2>
           <p>
-            When using multiplayer features, the following data is temporarily processed
-            on our servers during the game session:
+            When using multiplayer features, the following data is temporarily processed on our
+            servers during the game session:
           </p>
           <ul>
             <li>Display name you choose when creating or joining a room</li>
@@ -58,8 +59,8 @@ export default function PrivacyPolicy() {
             <li>Connection status for reconnection handling</li>
           </ul>
           <p>
-            Multiplayer session data is held in memory only and is not persisted to disk.
-            It is automatically deleted when the room closes or after 30 minutes of inactivity.
+            Multiplayer session data is held in memory only and is not persisted to disk. It is
+            automatically deleted when the room closes or after 30 minutes of inactivity.
           </p>
 
           <h2>Data We Do NOT Collect</h2>
@@ -73,14 +74,28 @@ export default function PrivacyPolicy() {
 
           <h2>Third-Party Services</h2>
           <ul>
-            <li><strong>PostHog</strong> — Anonymous analytics. <a href="https://posthog.com/privacy" target="_blank" rel="noopener noreferrer">PostHog Privacy Policy</a></li>
-            <li><strong>Vercel</strong> — Hosting. <a href="https://vercel.com/legal/privacy-policy" target="_blank" rel="noopener noreferrer">Vercel Privacy Policy</a></li>
+            <li>
+              <strong>PostHog</strong> — Anonymous analytics.{" "}
+              <a href="https://posthog.com/privacy" target="_blank" rel="noopener noreferrer">
+                PostHog Privacy Policy
+              </a>
+            </li>
+            <li>
+              <strong>Vercel</strong> — Hosting.{" "}
+              <a
+                href="https://vercel.com/legal/privacy-policy"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Vercel Privacy Policy
+              </a>
+            </li>
           </ul>
 
           <h2>Children&apos;s Privacy</h2>
           <p>
-            NodusNexus does not knowingly collect personal information from children under 13.
-            The game can be played without providing any personal information.
+            NodusNexus does not knowingly collect personal information from children under 13. The
+            game can be played without providing any personal information.
           </p>
 
           <h2>Your Rights</h2>
@@ -93,14 +108,17 @@ export default function PrivacyPolicy() {
 
           <h2>Changes to This Policy</h2>
           <p>
-            We may update this policy from time to time. Changes will be posted on this page
-            with an updated date.
+            We may update this policy from time to time. Changes will be posted on this page with an
+            updated date.
           </p>
 
           <h2>Contact</h2>
           <p>
-            For privacy-related questions, please reach out via the contact information on{' '}
-            <a href="https://nodusnexus.com" target="_blank" rel="noopener noreferrer">nodusnexus.com</a>.
+            For privacy-related questions, please reach out via the contact information on{" "}
+            <a href="https://nodusnexus.com" target="_blank" rel="noopener noreferrer">
+              nodusnexus.com
+            </a>
+            .
           </p>
         </div>
       </div>
