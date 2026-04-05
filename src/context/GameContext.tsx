@@ -11,7 +11,12 @@ import type {
   GamePhase,
   GameMode,
   TurnRecord,
+  CustomGameConfig,
+  CardNumber,
+  CardColor,
+  CardShape,
 } from "../types/game"
+import { DEFAULT_CUSTOM_CONFIG } from "../types/game"
 import { createDeck, calculateScore, shuffleDeck } from "../utils/gameLogic"
 import { arePlacementsContiguous } from "../utils/turnValidation"
 import { HAND_SIZE } from "../constants/game"
@@ -30,6 +35,7 @@ export type GameAction =
   | { type: "COMPLETE_TURN" }
   | { type: "AI_TURN"; placements: PendingPlacement[] }
   | { type: "SWAP_CARDS"; cardIds: string[] }
+  | { type: "USE_SPECIAL"; cardId: string; targetPosition?: GridPosition; swapCardId?: string }
   | { type: "SET_ZOOM"; zoom: number }
 
 // --- Extended state (includes UI state) ---
@@ -90,7 +96,8 @@ function createPlayers(settings: GameSettings, hands: Card[][]): Player[] {
 }
 
 function initializeGame(settings: GameSettings): GameState {
-  const deck = settings.prebuiltDeck ?? createDeck()
+  const customConfig = settings.customConfig ?? DEFAULT_CUSTOM_CONFIG
+  const deck = settings.prebuiltDeck ?? createDeck(customConfig)
   const totalPlayers = 1 + settings.aiPlayers.length
   const { hands, remaining } = dealHands(deck, totalPlayers)
 
@@ -113,6 +120,7 @@ function initializeGame(settings: GameSettings): GameState {
     turnHistory: [],
     turnTimeLimit: settings.turnTimeLimit ?? null,
     hintsEnabled: settings.hintsEnabled ?? false,
+    customConfig,
     // Legacy compat
     playerHand: players[0].hand,
     score: players[0].score,
@@ -183,6 +191,7 @@ function createInitialAppState(): AppState {
       turnHistory: [],
       turnTimeLimit: null,
       hintsEnabled: false,
+      customConfig: DEFAULT_CUSTOM_CONFIG,
       playerHand: [],
       score: 0,
       currentPlayer: 1,
@@ -474,6 +483,132 @@ export function gameReducer(state: AppState, action: GameAction): AppState {
           type: "info",
           message: `${playerName} swapped ${cardsToReturn.length} card${cardsToReturn.length > 1 ? "s" : ""}`,
         },
+      }
+    }
+
+    case "USE_SPECIAL": {
+      const currentIdx = state.game.currentPlayerIndex
+      const currentPlayer = state.game.players[currentIdx]
+      const specialCard = currentPlayer.hand.find((c) => c.id === action.cardId)
+      if (!specialCard || !("isSpecial" in specialCard) || !specialCard.isSpecial) {
+        return { ...state, lastActionResult: { type: "error", message: "Not a special card" } }
+      }
+
+      const newHand = currentPlayer.hand.filter((c) => c.id !== action.cardId)
+      let newBoard = [...state.game.board]
+      let newPlayers = state.game.players.map((p, i) =>
+        i === currentIdx ? { ...p, hand: newHand } : p
+      )
+      let message = ""
+
+      switch (specialCard.specialType) {
+        case "remove": {
+          // Remove a card from the board at target position
+          if (!action.targetPosition) {
+            return { ...state, lastActionResult: { type: "error", message: "Select a board card to remove" } }
+          }
+          const { row, col } = action.targetPosition
+          const targetIdx = newBoard.findIndex((p) => p.position.row === row && p.position.col === col)
+          if (targetIdx === -1) {
+            return { ...state, lastActionResult: { type: "error", message: "No card at that position" } }
+          }
+          newBoard = newBoard.filter((_, i) => i !== targetIdx)
+          message = "Card removed from the board!"
+          break
+        }
+        case "steal": {
+          // Take a board card into your hand
+          if (!action.targetPosition) {
+            return { ...state, lastActionResult: { type: "error", message: "Select a board card to steal" } }
+          }
+          const { row, col } = action.targetPosition
+          const targetCard = newBoard.find((p) => p.position.row === row && p.position.col === col)
+          if (!targetCard) {
+            return { ...state, lastActionResult: { type: "error", message: "No card at that position" } }
+          }
+          newBoard = newBoard.filter((p) => !(p.position.row === row && p.position.col === col))
+          const stolenCard = { ...targetCard.card, id: targetCard.card.id.replace("pending-", "") }
+          newPlayers = newPlayers.map((p, i) =>
+            i === currentIdx ? { ...p, hand: [...p.hand, stolenCard] } : p
+          )
+          message = `Stole a card from the board!`
+          break
+        }
+        case "swap": {
+          // Swap a board card with one in your hand
+          if (!action.targetPosition || !action.swapCardId) {
+            return { ...state, lastActionResult: { type: "error", message: "Select a board card and hand card to swap" } }
+          }
+          const { row, col } = action.targetPosition
+          const boardIdx = newBoard.findIndex((p) => p.position.row === row && p.position.col === col)
+          if (boardIdx === -1) {
+            return { ...state, lastActionResult: { type: "error", message: "No card at that position" } }
+          }
+          const player = newPlayers[currentIdx]
+          const handCard = player.hand.find((c) => c.id === action.swapCardId)
+          if (!handCard) {
+            return { ...state, lastActionResult: { type: "error", message: "Card not in hand" } }
+          }
+          const removedBoardCard = newBoard[boardIdx].card
+          newBoard[boardIdx] = { card: handCard, position: { row, col } }
+          newPlayers = newPlayers.map((p, i) =>
+            i === currentIdx
+              ? { ...p, hand: p.hand.filter((c) => c.id !== action.swapCardId).concat(removedBoardCard) }
+              : p
+          )
+          message = "Swapped a card!"
+          break
+        }
+        case "mirror": {
+          // Placed as a wild — it copies whatever is needed
+          if (!action.targetPosition) {
+            return { ...state, lastActionResult: { type: "error", message: "Select where to place the mirror" } }
+          }
+          // Place it as a wild card at the target position
+          const mirrorCard: Card = {
+            id: specialCard.id,
+            number: 0 as CardNumber,
+            color: "wild" as CardColor,
+            shape: "wild" as CardShape,
+            isWild: true,
+          } as Card
+          newBoard = [...newBoard, { card: mirrorCard, position: action.targetPosition }]
+          message = "Mirror card placed — adapts to any pattern!"
+          break
+        }
+        case "double": {
+          // Placed on the board — the line it joins gets double score on next turn
+          if (!action.targetPosition) {
+            return { ...state, lastActionResult: { type: "error", message: "Select where to place the double card" } }
+          }
+          // Place as a wild with double marker
+          const doubleCard: Card = {
+            id: specialCard.id,
+            number: 0 as CardNumber,
+            color: "wild" as CardColor,
+            shape: "wild" as CardShape,
+            isWild: true,
+          } as Card
+          newBoard = [...newBoard, { card: doubleCard, position: action.targetPosition }]
+          message = "Double card placed — line score doubled!"
+          break
+        }
+        default:
+          return { ...state, lastActionResult: { type: "error", message: "Unknown special card type" } }
+      }
+
+      const newGame = {
+        ...state.game,
+        board: newBoard,
+        players: newPlayers,
+        turnInProgress: true,
+      }
+
+      return {
+        ...state,
+        selectedCardId: null,
+        game: syncLegacyFields(newGame),
+        lastActionResult: { type: "success" as const, message },
       }
     }
 
