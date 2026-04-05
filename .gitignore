@@ -46,3 +46,7 @@ marketing/node_modules/
 
 # Sentry Config File
 .env.sentry-build-plugin
+
+# MCP config
+.mcp.json
+.cursor/
