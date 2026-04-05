@@ -13,6 +13,7 @@ import type {
   TurnRecord,
 } from "../types/game"
 import { createDeck, calculateScore, shuffleDeck } from "../utils/gameLogic"
+import { arePlacementsContiguous } from "../utils/turnValidation"
 import { HAND_SIZE } from "../constants/game"
 
 // --- Action types ---
@@ -305,6 +306,17 @@ export function gameReducer(state: AppState, action: GameAction): AppState {
         return {
           ...state,
           lastActionResult: { type: "error", message: "You must place at least one card!" },
+        }
+      }
+
+      // Validate contiguity — all placed cards must form a continuous line
+      if (!arePlacementsContiguous(state.game.pendingPlacements, state.game.board)) {
+        return {
+          ...state,
+          lastActionResult: {
+            type: "error",
+            message: "Cards must form a continuous line with no gaps!",
+          },
         }
       }
 

@@ -13,6 +13,8 @@ interface PlayerHandProps {
   onCompleteTurn: () => void
   onUndoLast: () => void
   lotCompletingCards?: Set<string>
+  swapSelected?: Set<string>
+  onSwapMode?: () => void
 }
 
 export const PlayerHand: React.FC<PlayerHandProps> = ({
@@ -25,6 +27,8 @@ export const PlayerHand: React.FC<PlayerHandProps> = ({
   onCompleteTurn,
   onUndoLast,
   lotCompletingCards,
+  swapSelected,
+  onSwapMode,
 }) => {
   return (
     <>
@@ -46,21 +50,27 @@ export const PlayerHand: React.FC<PlayerHandProps> = ({
       <div className={styles.hand}>
         {cards.map((card, index) => {
           const canCompleteLot = lotCompletingCards?.has(card.id) ?? false
+          const isSwapSelected = swapSelected?.has(card.id) ?? false
           return (
             <div
               key={card.id}
-              className={`${styles.cardSlot} ${canCompleteLot ? styles.lotGlow : ""}`}
+              className={`${styles.cardSlot} ${canCompleteLot ? styles.lotGlow : ""} ${isSwapSelected ? styles.swapSelected : ""}`}
             >
               <span className={styles.keyHint}>{index + 1}</span>
               <GameCard
                 card={card}
-                selected={selectedCard?.id === card.id}
+                selected={selectedCard?.id === card.id || isSwapSelected}
                 onClick={() => onSelectCard(card)}
               />
-              {canCompleteLot && <span className={styles.lotBadge}>4!</span>}
+              {canCompleteLot && !swapSelected && <span className={styles.lotBadge}>4!</span>}
             </div>
           )
         })}
+        {onSwapMode && !turnInProgress && (
+          <button className={styles.swapBtn} onClick={onSwapMode} title="Swap cards (S)">
+            Swap
+          </button>
+        )}
       </div>
     </>
   )

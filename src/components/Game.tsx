@@ -1,7 +1,8 @@
 "use client"
 
 import React, { useEffect, useRef, useState, useCallback } from "react"
-import toast, { Toaster } from "react-hot-toast"
+import toast from "react-hot-toast"
+import { GameLog, LotCelebration, KeyboardHints, type LogEntry } from "./GameLog"
 import type { Card, GridPosition, GameSettings, GameMode, PlacedCard } from "../types/game"
 import { calculateScore, getValidPlacements, isValidPlacement } from "../utils/gameLogic"
 import { MAX_LINE_LENGTH } from "../constants/game"
@@ -66,6 +67,12 @@ function GameInner() {
   const [showTrainer, setShowTrainer] = useState(false)
   const [showDaily, setShowDaily] = useState(false)
   const [gameStartTime] = useState(() => Date.now())
+  const [logEntries, setLogEntries] = useState<LogEntry[]>([])
+  const [swapMode, setSwapMode] = useState(false)
+  const [swapSelected, setSwapSelected] = useState<Set<string>>(new Set())
+  const [showCelebration, setShowCelebration] = useState(false)
+  const [celebrationKey, setCelebrationKey] = useState(0)
+  const logIdRef = useRef(0)
   const initialBoardRef = useRef<PlacedCard[]>([])
   const gameRecordedRef = useRef(false)
   const socket = useSocket()
@@ -74,6 +81,22 @@ function GameInner() {
   const { helpers, toggleHelper } = useHelpers()
   const sound = useSound()
 
+  const addLogEntry = useCallback(
+    (message: string, type: LogEntry["type"]) => {
+      logIdRef.current++
+      setLogEntries((prev) => [
+        ...prev.slice(-20),
+        {
+          id: `log-${logIdRef.current}`,
+          message,
+          type,
+          turn: game.turnHistory.length + 1,
+        },
+      ])
+    },
+    [game.turnHistory.length]
+  )
+
   const currentPlayer = game.players[game.currentPlayerIndex]
   const isHumanTurn = currentPlayer?.type === "human"
 
@@ -81,7 +104,7 @@ function GameInner() {
     ? (game.players[game.currentPlayerIndex]?.hand.find((c) => c.id === selectedCardId) ?? null)
     : null
 
-  // --- Keyboard card selection (1-4) and Escape to deselect ---
+  // --- Keyboard shortcuts ---
   useEffect(() => {
     if (game.gamePhase !== "playing" || !isHumanTurn) return
 
@@ -89,41 +112,78 @@ function GameInner() {
     if (!humanPlayer) return
 
     const handleKeyDown = (e: KeyboardEvent) => {
+      // Don't capture when typing in an input
+      if ((e.target as HTMLElement).tagName === "INPUT") return
+
       const num = parseInt(e.key, 10)
       if (num >= 1 && num <= 4 && num <= humanPlayer.hand.length) {
-        const card = humanPlayer.hand[num - 1]
-        dispatch({ type: "SELECT_CARD", cardId: card.id })
+        // 1-4: select card
+        if (swapMode) {
+          const card = humanPlayer.hand[num - 1]
+          setSwapSelected((prev) => {
+            const next = new Set(prev)
+            if (next.has(card.id)) next.delete(card.id)
+            else next.add(card.id)
+            return next
+          })
+        } else {
+          const card = humanPlayer.hand[num - 1]
+          dispatch({ type: "SELECT_CARD", cardId: card.id })
+        }
+      } else if (e.key === "Enter" || e.key === " ") {
+        // Enter/Space: complete turn (or confirm swap)
+        e.preventDefault()
+        if (swapMode && swapSelected.size > 0) {
+          dispatch({ type: "SWAP_CARDS", cardIds: Array.from(swapSelected) })
+          setSwapMode(false)
+          setSwapSelected(new Set())
+        } else if (game.pendingPlacements.length > 0) {
+          dispatch({ type: "COMPLETE_TURN" })
+        }
+      } else if (e.key === "u" || e.key === "U") {
+        // U: undo
+        dispatch({ type: "UNDO_PLACEMENT" })
+      } else if (e.key === "s" || e.key === "S") {
+        // S: toggle swap mode
+        if (!game.turnInProgress) {
+          setSwapMode((prev) => !prev)
+          setSwapSelected(new Set())
+          dispatch({ type: "DESELECT_CARD" })
+        }
       } else if (e.key === "Escape") {
-        dispatch({ type: "DESELECT_CARD" })
+        // Escape: cancel
+        if (swapMode) {
+          setSwapMode(false)
+          setSwapSelected(new Set())
+        } else {
+          dispatch({ type: "DESELECT_CARD" })
+        }
       }
     }
 
     window.addEventListener("keydown", handleKeyDown)
     return () => window.removeEventListener("keydown", handleKeyDown)
-  }, [game.gamePhase, isHumanTurn, game.players, dispatch])
+  }, [game.gamePhase, isHumanTurn, game.players, dispatch, swapMode, swapSelected, game.pendingPlacements.length, game.turnInProgress])
 
-  // Show toast for action results
+  // Route action results to game log (not toast)
   const lastResultRef = useRef(lastActionResult)
   useEffect(() => {
     if (lastActionResult && lastActionResult !== lastResultRef.current) {
-      if (lastActionResult.type === "success") {
-        toast.success(lastActionResult.message)
-        // Sound for turn complete
-        if (lastActionResult.message.includes("points")) {
-          sound.playTurnComplete()
-        }
+      addLogEntry(lastActionResult.message, lastActionResult.type)
+
+      // Sound effects
+      if (lastActionResult.type === "success" && lastActionResult.message.includes("points")) {
+        sound.playTurnComplete()
       } else if (lastActionResult.type === "error") {
-        toast.error(lastActionResult.message)
         sound.playInvalidMove()
+        // Errors still show as toast for immediate visibility
+        toast.error(lastActionResult.message)
       } else if (lastActionResult.message === "Placement undone") {
-        toast(lastActionResult.message)
         sound.playUndo()
-      } else {
-        toast(lastActionResult.message)
       }
     }
     lastResultRef.current = lastActionResult
-  }, [lastActionResult, sound])
+  }, [lastActionResult, sound, addLogEntry])
 
   // --- Record game result when game ends ---
   useEffect(() => {
@@ -305,7 +365,9 @@ function GameInner() {
 
     if (game.pendingPlacements.length + 1 >= MAX_LINE_LENGTH) {
       sound.playLotBonus()
-      toast("Maximum 4 cards per turn!", { icon: "⚠️" })
+      setShowCelebration(true)
+      setCelebrationKey((k) => k + 1)
+      addLogEntry("LOT! Line of 4 — score doubled!", "success")
     }
   }
 
@@ -484,7 +546,10 @@ function GameInner() {
 
   return (
     <div className={styles.layout} role="main">
-      <Toaster position="top-center" />
+      {/* Game log (replaces toasts) */}
+      <GameLog entries={logEntries} />
+      <KeyboardHints />
+      <LotCelebration show={showCelebration} triggerKey={celebrationKey} />
 
       {/* Screen reader announcements */}
       <div
@@ -556,17 +621,65 @@ function GameInner() {
         />
       </div>
 
+      {/* Swap mode indicator */}
+      {swapMode && isHumanTurn && (
+        <div style={{
+          position: 'fixed', bottom: 110, left: '50%', transform: 'translateX(-50%)',
+          zIndex: 200, background: 'var(--color-warning)', color: 'white',
+          padding: '6px 16px', borderRadius: 20, fontSize: 13, fontWeight: 700,
+          display: 'flex', gap: 8, alignItems: 'center',
+        }}>
+          Select cards to swap ({swapSelected.size})
+          <button
+            style={{ background: 'white', color: 'var(--color-warning)', border: 'none', borderRadius: 4, padding: '2px 8px', fontWeight: 700, cursor: 'pointer', fontSize: 11 }}
+            onClick={() => {
+              if (swapSelected.size > 0) {
+                dispatch({ type: 'SWAP_CARDS', cardIds: Array.from(swapSelected) })
+                setSwapMode(false)
+                setSwapSelected(new Set())
+              }
+            }}
+            disabled={swapSelected.size === 0}
+          >
+            Swap
+          </button>
+          <button
+            style={{ background: 'transparent', color: 'white', border: '1px solid white', borderRadius: 4, padding: '2px 8px', cursor: 'pointer', fontSize: 11 }}
+            onClick={() => { setSwapMode(false); setSwapSelected(new Set()) }}
+          >
+            Cancel
+          </button>
+        </div>
+      )}
+
       {/* Player hand */}
       <PlayerHand
         cards={humanHand}
-        selectedCard={selectedCard}
-        onSelectCard={handleSelectCard}
+        selectedCard={swapMode ? null : selectedCard}
+        onSelectCard={(card) => {
+          if (swapMode) {
+            setSwapSelected((prev) => {
+              const next = new Set(prev)
+              if (next.has(card.id)) next.delete(card.id)
+              else next.add(card.id)
+              return next
+            })
+          } else {
+            handleSelectCard(card)
+          }
+        }}
         turnInProgress={game.turnInProgress && isHumanTurn}
         pendingCount={game.pendingPlacements.length}
         pendingPoints={pendingPoints}
         onCompleteTurn={() => dispatch({ type: "COMPLETE_TURN" })}
         onUndoLast={() => dispatch({ type: "UNDO_PLACEMENT" })}
         lotCompletingCards={lotCompletingCards}
+        swapSelected={swapMode ? swapSelected : undefined}
+        onSwapMode={!game.turnInProgress && isHumanTurn ? () => {
+          setSwapMode(true)
+          setSwapSelected(new Set())
+          dispatch({ type: "DESELECT_CARD" })
+        } : undefined}
       />
 
       {/* Game Over overlay */}
