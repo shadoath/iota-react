@@ -1,0 +1,86 @@
+---
+const benefits = [
+  {
+    icon: `<svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" /></svg>`,
+    title: 'Pattern Recognition',
+    description: 'Every turn trains your brain to spot relationships across multiple dimensions simultaneously. A skill that transfers to math, science, and everyday problem-solving.',
+    color: 'brand-yellow',
+  },
+  {
+    icon: `<svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" /></svg>`,
+    title: 'Strategic Thinking',
+    description: 'Plan multiple moves ahead. Consider not just your best play, but what positions you leave open for future turns. Think like a chess player, score like a champion.',
+    color: 'brand-blue',
+  },
+  {
+    icon: `<svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`,
+    title: 'Working Memory',
+    description: 'Hold card attributes, board state, and scoring possibilities in mind all at once. Research shows this kind of mental exercise strengthens cognitive flexibility.',
+    color: 'brand-green',
+  },
+  {
+    icon: `<svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M15.59 14.37a6 6 0 01-5.84 7.38v-4.8m5.84-2.58a14.98 14.98 0 006.16-12.12A14.98 14.98 0 009.631 8.41m5.96 5.96a14.926 14.926 0 01-5.841 2.58m-.119-8.54a6 6 0 00-7.381 5.84h4.8m2.581-5.84a14.927 14.927 0 00-2.58 5.84m2.699 2.7c-.103.021-.207.041-.311.06a15.09 15.09 0 01-2.448-2.448 14.9 14.9 0 01.06-.312m-2.24 2.39a4.493 4.493 0 00-1.757 4.306 4.493 4.493 0 004.306-1.758M16.5 9a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z" /></svg>`,
+    title: 'Focus & Flow',
+    description: 'Enter a state of deep concentration as you analyze the board. Timed mode adds healthy pressure, training sustained attention in an age of distraction.',
+    color: 'brand-red',
+  },
+  {
+    icon: `<svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M4.26 10.147a60.438 60.438 0 00-.491 6.347A48.62 48.62 0 0112 20.904a48.62 48.62 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.636 50.636 0 00-2.658-.813A59.906 59.906 0 0112 3.493a59.903 59.903 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.717 50.717 0 0112 13.489a50.702 50.702 0 017.74-3.342M6.75 15a.75.75 0 100-1.5.75.75 0 000 1.5zm0 0v-3.675A55.378 55.378 0 0112 8.443m-7.007 11.55A5.981 5.981 0 006.75 15.75v-1.5" /></svg>`,
+    title: 'Learning at Every Age',
+    description: 'Children develop logical reasoning and categorization skills. Adults keep their minds sharp. Research-backed cognitive benefits for ages 8 to 80+.',
+    color: 'brand-purple',
+  },
+  {
+    icon: `<svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" /></svg>`,
+    title: 'Social Connection',
+    description: 'Challenge friends online with room codes, compete on daily leaderboards, or bond with family around the screen. Great games bring people together.',
+    color: 'brand-green',
+  },
+];
+---
+
+<section id="benefits" class="py-24 lg:py-32 relative">
+  <!-- Subtle background accent -->
+  <div class="absolute inset-0 bg-gradient-to-b from-transparent via-brand-blue/[0.02] to-transparent"></div>
+
+  <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Section header -->
+    <div class="text-center mb-16 reveal">
+      <span class="inline-block px-4 py-1 rounded-full bg-brand-green/10 text-brand-green text-sm font-medium mb-4">
+        Good For Your Brain
+      </span>
+      <h2 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white mb-4">
+        Fun That Makes You <span class="gradient-text">Smarter</span>
+      </h2>
+      <p class="text-gray-400 text-lg max-w-2xl mx-auto">
+        NodusNexus isn't just entertainment. Every game is a workout for your brain,
+        building skills that matter in school, work, and life.
+      </p>
+    </div>
+
+    <!-- Benefits grid -->
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {benefits.map((benefit, i) => (
+        <div class={`reveal reveal-delay-${(i % 4) + 1} group p-6 rounded-2xl bg-white/[0.03] border border-white/5 hover:border-${benefit.color}/20 transition-all duration-300 hover:bg-white/[0.05]`}>
+          <div class={`w-12 h-12 rounded-xl bg-${benefit.color}/10 flex items-center justify-center text-${benefit.color} mb-4 group-hover:scale-110 transition-transform`}>
+            <Fragment set:html={benefit.icon} />
+          </div>
+          <h3 class="text-lg font-bold text-white mb-2">{benefit.title}</h3>
+          <p class="text-gray-400 text-sm leading-relaxed">{benefit.description}</p>
+        </div>
+      ))}
+    </div>
+
+    <!-- Quote callout -->
+    <div class="mt-16 reveal">
+      <div class="max-w-3xl mx-auto text-center p-8 rounded-2xl bg-gradient-to-r from-brand-blue/5 via-brand-purple/5 to-brand-red/5 border border-white/5">
+        <blockquote class="text-xl lg:text-2xl font-medium text-white italic leading-relaxed mb-4">
+          "The best brain training doesn't feel like training at all. It feels like play."
+        </blockquote>
+        <p class="text-gray-400 text-sm">
+          Pattern-matching games are used by educators worldwide to develop logical reasoning and spatial awareness
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
