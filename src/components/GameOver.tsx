@@ -1,6 +1,6 @@
-import React from 'react'
-import type { Player, TurnRecord, PlacedCard } from '../types/game'
-import styles from './GameOver.module.css'
+import React from "react"
+import type { Player, TurnRecord, PlacedCard } from "../types/game"
+import styles from "./GameOver.module.css"
 
 interface GameOverProps {
   players: Player[]
@@ -25,17 +25,15 @@ export const GameOver: React.FC<GameOverProps> = ({
   // Stats
   const totalTurns = turnHistory.length
   const bestTurn = turnHistory.reduce((max, t) => Math.max(max, t.score), 0)
-  const humanPlayer = players.find(p => p.type === 'human')
-  const humanTurns = turnHistory.filter(t => t.playerId === humanPlayer?.id)
+  const humanPlayer = players.find((p) => p.type === "human")
+  const humanTurns = turnHistory.filter((t) => t.playerId === humanPlayer?.id)
   const humanBestTurn = humanTurns.reduce((max, t) => Math.max(max, t.score), 0)
   const humanWon = humanPlayer?.score === winnerScore
 
   return (
     <div className={styles.overlay}>
       <div className={styles.card}>
-        <h2 className={styles.title}>
-          {humanWon ? 'You Win!' : `${sorted[0]?.name} Wins!`}
-        </h2>
+        <h2 className={styles.title}>{humanWon ? "You Win!" : `${sorted[0]?.name} Wins!`}</h2>
 
         <div className={styles.scoreboard}>
           {sorted.map((player, index) => {
@@ -43,14 +41,14 @@ export const GameOver: React.FC<GameOverProps> = ({
             return (
               <div
                 key={player.id}
-                className={`${styles.playerRow} ${isWinner ? styles.winner : ''}`}
+                className={`${styles.playerRow} ${isWinner ? styles.winner : ""}`}
               >
                 <span className={styles.rank}>
-                  {index === 0 ? '1st' : index === 1 ? '2nd' : index === 2 ? '3rd' : '4th'}
+                  {index === 0 ? "1st" : index === 1 ? "2nd" : index === 2 ? "3rd" : "4th"}
                 </span>
                 <span className={styles.playerName}>
                   {player.name}
-                  {player.type === 'ai' && (
+                  {player.type === "ai" && (
                     <span className={styles.playerType}>({player.difficulty})</span>
                   )}
                 </span>

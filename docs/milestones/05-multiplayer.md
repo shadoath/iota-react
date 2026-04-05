@@ -14,17 +14,20 @@
 ### 5.1 Choose Infrastructure
 
 **Option A: Socket.io + Express server**
+
 - Full control, self-hosted
 - Deploy on Railway/Render/Fly.io alongside Next.js
 - More work but more flexibility
 
 **Option B: PartyKit**
+
 - Edge-deployed WebSocket rooms
 - Minimal server code — just define room behavior
 - Built for exactly this kind of real-time game
 - Free tier is generous
 
 **Option C: Liveblocks**
+
 - Managed real-time sync with conflict resolution
 - Presence, storage, and rooms built in
 - Higher-level API, less boilerplate
@@ -47,6 +50,7 @@ Client A                    Server                    Client B
 ```
 
 **Server responsibilities:**
+
 - Hold authoritative game state
 - Validate all moves (reuse `gameLogic.ts` — it's pure, runs anywhere)
 - Broadcast state updates to all clients
@@ -54,6 +58,7 @@ Client A                    Server                    Client B
 - Manage player disconnection/reconnection
 
 **Client responsibilities:**
+
 - Send actions (place card, complete turn, swap cards)
 - Render state received from server
 - Optimistic updates for own moves (revert on rejection)
@@ -62,25 +67,28 @@ Client A                    Server                    Client B
 ### 5.3 Room System
 
 **Creating a game:**
+
 1. Host selects "Create Room" → gets a 6-character room code (e.g., `NDX4X7`)
 2. Share code or link via room code
 3. Lobby shows connected players
 4. Host starts game when ready (2-4 players)
 
 **Joining a game:**
+
 1. Enter room code or click shared link
 2. Choose display name
 3. Wait in lobby until host starts
 
 **Room state:**
+
 ```typescript
 interface Room {
   code: string
   host: string
   players: RoomPlayer[]
-  status: 'lobby' | 'playing' | 'ended'
+  status: "lobby" | "playing" | "ended"
   settings: {
-    turnTimer: number | null  // seconds, or null for untimed
+    turnTimer: number | null // seconds, or null for untimed
     maxPlayers: 2 | 3 | 4
   }
   gameState: GameState | null
@@ -128,6 +136,7 @@ Players disconnect. Handle it gracefully:
 ### 5.8 Anti-Cheat Basics
 
 Since game logic runs on server:
+
 - Clients can't manipulate scores or card positions
 - Server validates every move
 - Hand contents never sent to other clients

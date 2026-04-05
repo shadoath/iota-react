@@ -166,8 +166,12 @@
   font-weight: var(--font-weight-medium);
 }
 
-.gameWin { color: var(--color-success); }
-.gameLoss { color: var(--color-error); }
+.gameWin {
+  color: var(--color-success);
+}
+.gameLoss {
+  color: var(--color-error);
+}
 
 .gameScore {
   font-weight: var(--font-weight-bold);

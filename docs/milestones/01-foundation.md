@@ -41,24 +41,26 @@ npm install -D vitest @testing-library/react @testing-library/jest-dom jsdom
 ```
 
 Add `vitest.config.ts`:
+
 ```typescript
-import { defineConfig } from 'vitest/config'
-import react from '@vitejs/plugin-react'
+import { defineConfig } from "vitest/config"
+import react from "@vitejs/plugin-react"
 
 export default defineConfig({
   plugins: [react()],
   test: {
-    environment: 'jsdom',
+    environment: "jsdom",
     globals: true,
-    setupFiles: './src/test/setup.ts',
+    setupFiles: "./src/test/setup.ts",
   },
   resolve: {
-    alias: { '@': '.' },
+    alias: { "@": "." },
   },
 })
 ```
 
 Add to `package.json`:
+
 ```json
 "scripts": {
   "test": "vitest",
@@ -72,6 +74,7 @@ Add to `package.json`:
 Write unit tests for every function in the utils layer. These are pure functions — easy to test, critical to get right.
 
 **`src/utils/__tests__/gameLogic.test.ts`**:
+
 - `createDeck()` — returns 66 cards, correct distribution (4×4×4 + 2 wild)
 - `shuffleDeck()` — returns same cards in different order
 - `isValidLine()` — all-same, all-different, mixed invalid, wild card handling
@@ -81,10 +84,12 @@ Write unit tests for every function in the utils layer. These are pure functions
 - `isValidPlacement()` — valid placement, invalid (breaks line), non-adjacent
 
 **`src/utils/__tests__/turnValidation.test.ts`**:
+
 - `areAllPlacementsInSameLine()` — same row, same column, diagonal (invalid), single card
 - `isPlacementInSameLineAsPending()` — aligns, doesn't align
 
 **`src/utils/__tests__/impossibleSquares.test.ts`**:
+
 - `isImpossibleSquare()` — open position, impossible due to line limit, impossible due to conflicting constraints
 
 ### 1.5 Centralize State with Context + Reducer
@@ -123,6 +128,7 @@ Refactor `Game.tsx` to use the context instead of local `useState` calls. The co
 ### 1.6 Extract Constants
 
 Create `src/constants/game.ts`:
+
 ```typescript
 export const HAND_SIZE = 4
 export const MAX_LINE_LENGTH = 4

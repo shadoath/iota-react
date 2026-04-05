@@ -1,7 +1,7 @@
-import type React from 'react'
-import type { Card } from '../types/game'
-import { GameCard } from './GameCard'
-import styles from './PlayerHand.module.css'
+import type React from "react"
+import type { Card } from "../types/game"
+import { GameCard } from "./GameCard"
+import styles from "./PlayerHand.module.css"
 
 interface PlayerHandProps {
   cards: Card[]
@@ -37,11 +37,7 @@ export const PlayerHand: React.FC<PlayerHandProps> = ({
           >
             Complete Turn {pendingPoints > 0 && `(+${pendingPoints})`}
           </button>
-          <button
-            className={styles.btnUndo}
-            onClick={onUndoLast}
-            disabled={pendingCount === 0}
-          >
+          <button className={styles.btnUndo} onClick={onUndoLast} disabled={pendingCount === 0}>
             Undo
           </button>
         </div>
@@ -51,7 +47,10 @@ export const PlayerHand: React.FC<PlayerHandProps> = ({
         {cards.map((card, index) => {
           const canCompleteLot = lotCompletingCards?.has(card.id) ?? false
           return (
-            <div key={card.id} className={`${styles.cardSlot} ${canCompleteLot ? styles.lotGlow : ''}`}>
+            <div
+              key={card.id}
+              className={`${styles.cardSlot} ${canCompleteLot ? styles.lotGlow : ""}`}
+            >
               <span className={styles.keyHint}>{index + 1}</span>
               <GameCard
                 card={card}

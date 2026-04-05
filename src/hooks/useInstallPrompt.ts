@@ -12,8 +12,7 @@ export function useInstallPrompt(): {
   canInstall: boolean
   promptInstall: () => void
 } {
-  const [deferredPrompt, setDeferredPrompt] =
-    useState<BeforeInstallPromptEvent | null>(null)
+  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null)
 
   useEffect(() => {
     const handler = (e: Event) => {

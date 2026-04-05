@@ -4,7 +4,7 @@
  * Env var NEXT_PUBLIC_POSTHOG_KEY must be set for tracking to activate.
  */
 
-import posthog from 'posthog-js'
+import posthog from "posthog-js"
 
 // --- Event tracking ---
 
@@ -13,7 +13,7 @@ export function trackEvent(event: string, properties?: Record<string, unknown>):
 }
 
 export function trackGameStart(mode: string, playerCount: number, aiDifficulties: string[]): void {
-  trackEvent('game_start', { mode, playerCount, aiDifficulties })
+  trackEvent("game_start", { mode, playerCount, aiDifficulties })
 }
 
 export function trackGameEnd(
@@ -24,63 +24,63 @@ export function trackGameEnd(
   duration: number,
   won: boolean
 ): void {
-  trackEvent('game_end', { mode, winner, humanScore, totalTurns, duration, won })
+  trackEvent("game_end", { mode, winner, humanScore, totalTurns, duration, won })
 }
 
 export function trackTurnComplete(score: number, cardsPlaced: number, isLot: boolean): void {
-  trackEvent('turn_complete', { score, cardsPlaced, isLot })
+  trackEvent("turn_complete", { score, cardsPlaced, isLot })
 }
 
 export function trackCardPlaced(cardNumber: number, cardColor: string, cardShape: string): void {
-  trackEvent('card_placed', { cardNumber, cardColor, cardShape })
+  trackEvent("card_placed", { cardNumber, cardColor, cardShape })
 }
 
 export function trackModeSelected(mode: string): void {
-  trackEvent('mode_selected', { mode })
+  trackEvent("mode_selected", { mode })
 }
 
 export function trackTutorialStep(step: number, total: number): void {
-  trackEvent('tutorial_step', { step, total })
+  trackEvent("tutorial_step", { step, total })
 }
 
 export function trackTutorialComplete(): void {
-  trackEvent('tutorial_complete')
+  trackEvent("tutorial_complete")
 }
 
 export function trackAchievementUnlocked(achievementId: string): void {
-  trackEvent('achievement_unlocked', { achievementId })
+  trackEvent("achievement_unlocked", { achievementId })
 }
 
 export function trackDailyChallenge(score: number, streak: number): void {
-  trackEvent('daily_challenge', { score, streak })
+  trackEvent("daily_challenge", { score, streak })
 }
 
-export function trackMultiplayerRoom(action: 'create' | 'join' | 'leave'): void {
-  trackEvent('multiplayer_room', { action })
+export function trackMultiplayerRoom(action: "create" | "join" | "leave"): void {
+  trackEvent("multiplayer_room", { action })
 }
 
 export function trackHelperToggled(helper: string, enabled: boolean): void {
-  trackEvent('helper_toggled', { helper, enabled })
+  trackEvent("helper_toggled", { helper, enabled })
 }
 
 export function trackThemeChanged(theme: string): void {
-  trackEvent('theme_changed', { theme })
+  trackEvent("theme_changed", { theme })
 }
 
 export function trackPatternTrainer(correct: boolean, responseTimeMs: number): void {
-  trackEvent('pattern_trainer', { correct, responseTimeMs })
+  trackEvent("pattern_trainer", { correct, responseTimeMs })
 }
 
 export function trackError(error: string, context?: Record<string, unknown>): void {
-  trackEvent('client_error', { error, ...context })
+  trackEvent("client_error", { error, ...context })
 }
 
 export function trackPwaInstallPrompted(): void {
-  trackEvent('pwa_install_prompted')
+  trackEvent("pwa_install_prompted")
 }
 
 export function trackReplayStarted(): void {
-  trackEvent('replay_started')
+  trackEvent("replay_started")
 }
 
 // --- User identification ---

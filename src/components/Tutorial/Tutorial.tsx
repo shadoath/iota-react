@@ -1,7 +1,7 @@
-import React, { useState, useCallback } from 'react'
-import { tutorialSteps } from './tutorialSteps'
-import { GameCard } from '../GameCard'
-import styles from './Tutorial.module.css'
+import React, { useState, useCallback } from "react"
+import { tutorialSteps } from "./tutorialSteps"
+import { GameCard } from "../GameCard"
+import styles from "./Tutorial.module.css"
 
 interface TutorialProps {
   onComplete: () => void
@@ -20,50 +20,60 @@ export const Tutorial: React.FC<TutorialProps> = ({ onComplete, onBack }) => {
 
   const handleNext = useCallback(() => {
     if (isLastStep) {
-      localStorage.setItem('nodusnexus-tutorial-completed', 'true')
+      localStorage.setItem("nodusnexus-tutorial-completed", "true")
       onComplete()
       return
     }
-    setStepIndex(prev => prev + 1)
+    setStepIndex((prev) => prev + 1)
     setStepCompleted(false)
     setSelectedCardIndex(null)
   }, [isLastStep, onComplete])
 
   const handlePrev = useCallback(() => {
     if (stepIndex > 0) {
-      setStepIndex(prev => prev - 1)
+      setStepIndex((prev) => prev - 1)
       setStepCompleted(false)
       setSelectedCardIndex(null)
     }
   }, [stepIndex])
 
-  const handleCellClick = useCallback((row: number, col: number) => {
-    if (!hasPlacementTask || stepCompleted) return
-    if (selectedCardIndex === null && step.targetCardIndex !== null) {
-      // Auto-select the target card
-      setSelectedCardIndex(step.targetCardIndex)
-      return
-    }
-    if (step.targetPosition && row === step.targetPosition.row && col === step.targetPosition.col) {
-      setStepCompleted(true)
-    }
-  }, [hasPlacementTask, stepCompleted, selectedCardIndex, step])
+  const handleCellClick = useCallback(
+    (row: number, col: number) => {
+      if (!hasPlacementTask || stepCompleted) return
+      if (selectedCardIndex === null && step.targetCardIndex !== null) {
+        // Auto-select the target card
+        setSelectedCardIndex(step.targetCardIndex)
+        return
+      }
+      if (
+        step.targetPosition &&
+        row === step.targetPosition.row &&
+        col === step.targetPosition.col
+      ) {
+        setStepCompleted(true)
+      }
+    },
+    [hasPlacementTask, stepCompleted, selectedCardIndex, step]
+  )
 
-  const handleCardClick = useCallback((index: number) => {
-    if (stepCompleted) return
-    if (step.targetCardIndex !== null && index !== step.targetCardIndex) return
-    setSelectedCardIndex(prev => prev === index ? null : index)
-  }, [stepCompleted, step.targetCardIndex])
+  const handleCardClick = useCallback(
+    (index: number) => {
+      if (stepCompleted) return
+      if (step.targetCardIndex !== null && index !== step.targetCardIndex) return
+      setSelectedCardIndex((prev) => (prev === index ? null : index))
+    },
+    [stepCompleted, step.targetCardIndex]
+  )
 
   // Calculate board grid bounds
   const allPositions = [
-    ...step.board.map(p => p.position),
+    ...step.board.map((p) => p.position),
     ...(step.targetPosition ? [step.targetPosition] : []),
   ]
-  const minRow = Math.min(...allPositions.map(p => p.row)) - 1
-  const maxRow = Math.max(...allPositions.map(p => p.row)) + 1
-  const minCol = Math.min(...allPositions.map(p => p.col)) - 1
-  const maxCol = Math.max(...allPositions.map(p => p.col)) + 1
+  const minRow = Math.min(...allPositions.map((p) => p.row)) - 1
+  const maxRow = Math.max(...allPositions.map((p) => p.row)) + 1
+  const minCol = Math.min(...allPositions.map((p) => p.col)) - 1
+  const maxCol = Math.max(...allPositions.map((p) => p.col)) + 1
   const rows = maxRow - minRow + 1
   const cols = maxCol - minCol + 1
 
@@ -96,7 +106,7 @@ export const Tutorial: React.FC<TutorialProps> = ({ onComplete, onBack }) => {
               const row = Math.floor(idx / cols) + minRow
               const col = (idx % cols) + minCol
               const boardCard = step.board.find(
-                p => p.position.row === row && p.position.col === col
+                (p) => p.position.row === row && p.position.col === col
               )
               const isTarget =
                 step.targetPosition?.row === row &&
@@ -110,12 +120,17 @@ export const Tutorial: React.FC<TutorialProps> = ({ onComplete, onBack }) => {
               return (
                 <div
                   key={`${row}-${col}`}
-                  className={`${styles.miniCell} ${isTarget && selectedCardIndex !== null ? styles.miniCellTarget : ''}`}
+                  className={`${styles.miniCell} ${isTarget && selectedCardIndex !== null ? styles.miniCellTarget : ""}`}
                   onClick={() => handleCellClick(row, col)}
                 >
                   {boardCard && <GameCard card={boardCard.card} disabled boardCard />}
                   {isPlaced && step.hand[step.targetCardIndex ?? 0] && (
-                    <GameCard card={step.hand[step.targetCardIndex ?? 0]} disabled boardCard placed />
+                    <GameCard
+                      card={step.hand[step.targetCardIndex ?? 0]}
+                      disabled
+                      boardCard
+                      placed
+                    />
                   )}
                 </div>
               )
@@ -135,17 +150,12 @@ export const Tutorial: React.FC<TutorialProps> = ({ onComplete, onBack }) => {
             </div>
           )}
 
-          {stepCompleted && (
-            <span className={styles.completedMsg}>Correct!</span>
-          )}
+          {stepCompleted && <span className={styles.completedMsg}>Correct!</span>}
         </div>
 
         <div className={styles.nav}>
           {stepIndex > 0 && (
-            <button
-              className={`${styles.navBtn} ${styles.navBtnSecondary}`}
-              onClick={handlePrev}
-            >
+            <button className={`${styles.navBtn} ${styles.navBtnSecondary}`} onClick={handlePrev}>
               Previous
             </button>
           )}
@@ -155,7 +165,11 @@ export const Tutorial: React.FC<TutorialProps> = ({ onComplete, onBack }) => {
             disabled={!canAdvance}
             style={{ opacity: canAdvance ? 1 : 0.5 }}
           >
-            {isLastStep ? 'Start Playing' : hasPlacementTask && !stepCompleted ? 'Place the card' : 'Next'}
+            {isLastStep
+              ? "Start Playing"
+              : hasPlacementTask && !stepCompleted
+                ? "Place the card"
+                : "Next"}
           </button>
         </div>
       </div>

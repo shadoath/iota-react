@@ -1,9 +1,9 @@
-import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
-import "./globals.css";
-import { PWAProvider } from "../src/components/PWAProvider";
+import type { Metadata, Viewport } from "next"
+import { Inter } from "next/font/google"
+import "./globals.css"
+import { PWAProvider } from "../src/components/PWAProvider"
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
   title: "NodusNexus - Card Game of Matching Patterns",
@@ -29,7 +29,7 @@ export const metadata: Metadata = {
     ],
     apple: "/icons/apple-touch-icon.png",
   },
-};
+}
 
 export const viewport: Viewport = {
   themeColor: "#1a1a1a",
@@ -37,12 +37,12 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
-};
+}
 
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: React.ReactNode
 }>) {
   return (
     <html lang="en">
@@ -51,5 +51,5 @@ export default function RootLayout({
         {children}
       </body>
     </html>
-  );
+  )
 }

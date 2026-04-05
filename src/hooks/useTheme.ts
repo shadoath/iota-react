@@ -1,14 +1,14 @@
-'use client'
+"use client"
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback } from "react"
 
-type Theme = 'light' | 'dark' | 'system'
+type Theme = "light" | "dark" | "system"
 
-const STORAGE_KEY = 'nodusnexus-theme'
+const STORAGE_KEY = "nodusnexus-theme"
 
 function getStoredTheme(): Theme {
-  if (typeof window === 'undefined') return 'system'
-  return (localStorage.getItem(STORAGE_KEY) as Theme) || 'system'
+  if (typeof window === "undefined") return "system"
+  return (localStorage.getItem(STORAGE_KEY) as Theme) || "system"
 }
 
 export function useTheme() {
@@ -25,8 +25,8 @@ export function useTheme() {
   }, [])
 
   const toggle = useCallback(() => {
-    setThemeState(prev => {
-      const next = prev === 'light' ? 'dark' : prev === 'dark' ? 'system' : 'light'
+    setThemeState((prev) => {
+      const next = prev === "light" ? "dark" : prev === "dark" ? "system" : "light"
       localStorage.setItem(STORAGE_KEY, next)
       return next
     })
@@ -37,9 +37,9 @@ export function useTheme() {
 
 function applyTheme(theme: Theme) {
   const root = document.documentElement
-  if (theme === 'system') {
-    root.removeAttribute('data-theme')
+  if (theme === "system") {
+    root.removeAttribute("data-theme")
   } else {
-    root.setAttribute('data-theme', theme)
+    root.setAttribute("data-theme", theme)
   }
 }

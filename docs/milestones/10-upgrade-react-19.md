@@ -12,32 +12,39 @@
 ## Breaking Changes to Address
 
 ### 1. Ref changes
+
 - `ref` is now a regular prop (no more `forwardRef` needed)
 - We don't use `forwardRef` anywhere — **no action needed**
 
 ### 2. Context as provider
+
 - `<Context>` can be used directly instead of `<Context.Provider>`
 - Our `GameContext.tsx` uses `<GameContext.Provider>` — **optional cleanup, not breaking**
 
 ### 3. Cleanup functions in refs
+
 - Ref callbacks can return cleanup functions
 - **No action needed** — we don't use ref callbacks
 
 ### 4. `useDeferredValue` initial value
+
 - New optional second argument
 - **No action needed** — we don't use this hook
 
 ### 5. Stricter hydration error reporting
+
 - Better error messages for SSR mismatches
 - May surface hidden issues with our `useEffect`-based client state (localStorage reads, etc.)
 - **Test thoroughly** — our theme hook, stats, and tutorial completion check all read localStorage in effects
 
 ### 6. Removed deprecated APIs
+
 - `react-dom/test-utils` — removed. `act()` now exported from `react`
 - Check if `@testing-library/react` handles this (it should in v16+)
 - `ReactDOM.render` / `ReactDOM.unmountComponentAtNode` — removed. We use Next.js entry, so **no action**
 
 ### 7. TypeScript changes
+
 - `@types/react@19` has stricter types
 - `React.FC` children are no longer implicit — must be explicit in props
 - Audit all components that receive `children`
@@ -54,6 +61,7 @@ npm install -D @types/react@19 @types/react-dom@19
 ### 2. Fix TypeScript errors
 
 Run `npm run typecheck` and fix:
+
 - Any components relying on implicit `children` prop
 - Any usage of removed types
 
@@ -74,6 +82,7 @@ Ensure `act()` imports work correctly. Update test setup if needed.
 ### 5. Optional: Adopt new APIs
 
 These are nice-to-haves, not required for the upgrade:
+
 - Replace `<GameContext.Provider>` with `<GameContext>` (cleaner)
 - Explore `useOptimistic` for card placement (optimistic UI)
 - Explore `use()` for async data loading

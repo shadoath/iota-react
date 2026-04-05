@@ -11,10 +11,7 @@ export function registerServiceWorker(onUpdateAvailable: () => void): void {
         if (!newWorker) return
 
         newWorker.addEventListener("statechange", () => {
-          if (
-            newWorker.state === "installed" &&
-            navigator.serviceWorker.controller
-          ) {
+          if (newWorker.state === "installed" && navigator.serviceWorker.controller) {
             onUpdateAvailable()
           }
         })

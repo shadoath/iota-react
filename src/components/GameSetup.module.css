@@ -144,9 +144,18 @@
   font-weight: var(--font-weight-medium);
 }
 
-.diffEasy { background: #dcfce7; color: #166534; }
-.diffMedium { background: #fef3c7; color: #92400e; }
-.diffHard { background: #fee2e2; color: #991b1b; }
+.diffEasy {
+  background: #dcfce7;
+  color: #166534;
+}
+.diffMedium {
+  background: #fef3c7;
+  color: #92400e;
+}
+.diffHard {
+  background: #fee2e2;
+  color: #991b1b;
+}
 
 /* Start button */
 .startBtn {
@@ -158,7 +167,9 @@
   font-size: var(--font-size-lg);
   font-weight: var(--font-weight-bold);
   cursor: pointer;
-  transition: background-color var(--transition-fast), transform var(--transition-fast);
+  transition:
+    background-color var(--transition-fast),
+    transform var(--transition-fast);
 }
 
 .startBtn:hover {

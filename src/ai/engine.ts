@@ -1,6 +1,11 @@
-import type { Card, PlacedCard, PendingPlacement, AIDifficulty, GridPosition } from '../types/game'
-import { getValidPlacements, isValidPlacement, calculateScore, getCardsInLine } from '../utils/gameLogic'
-import { isPlacementInSameLineAsPending } from '../utils/turnValidation'
+import type { Card, PlacedCard, PendingPlacement, AIDifficulty, GridPosition } from "../types/game"
+import {
+  getValidPlacements,
+  isValidPlacement,
+  calculateScore,
+  getCardsInLine,
+} from "../utils/gameLogic"
+import { isPlacementInSameLineAsPending } from "../utils/turnValidation"
 
 interface ScoredMove {
   placements: PendingPlacement[]
@@ -17,11 +22,11 @@ export function computeAIMove(
   difficulty: AIDifficulty
 ): PendingPlacement[] {
   switch (difficulty) {
-    case 'easy':
+    case "easy":
       return computeEasyMove(hand, board)
-    case 'medium':
+    case "medium":
       return computeMediumMove(hand, board)
-    case 'hard':
+    case "hard":
       return computeHardMove(hand, board)
     default:
       return computeEasyMove(hand, board)
@@ -44,10 +49,7 @@ function computeEasyMove(hand: Card[], board: PlacedCard[]): PendingPlacement[] 
  * 20% chance of picking a random move instead (feels more human).
  */
 function computeMediumMove(hand: Card[], board: PlacedCard[]): PendingPlacement[] {
-  const allMoves = [
-    ...findAllSingleMoves(hand, board),
-    ...findAllDoubleMoves(hand, board),
-  ]
+  const allMoves = [...findAllSingleMoves(hand, board), ...findAllDoubleMoves(hand, board)]
 
   if (allMoves.length === 0) return []
 
@@ -136,11 +138,7 @@ function findAllDoubleMoves(hand: Card[], board: PlacedCard[]): ScoredMove[] {
  * Find all valid move combinations up to N cards.
  * Uses recursive depth-first search.
  */
-function findAllMovesUpToN(
-  hand: Card[],
-  board: PlacedCard[],
-  maxCards: number
-): ScoredMove[] {
+function findAllMovesUpToN(hand: Card[], board: PlacedCard[], maxCards: number): ScoredMove[] {
   const allMoves: ScoredMove[] = []
 
   function search(
@@ -161,15 +159,19 @@ function findAllMovesUpToN(
     if (depth >= maxCards) return
 
     // Get valid positions for next card
-    const validPositions = currentPlacements.length === 0
-      ? getValidPlacements(currentBoard)
-      : getValidPlacements(currentBoard, currentPlacements)
+    const validPositions =
+      currentPlacements.length === 0
+        ? getValidPlacements(currentBoard)
+        : getValidPlacements(currentBoard, currentPlacements)
 
     for (let i = 0; i < remainingHand.length; i++) {
       const card = remainingHand[i]
 
       for (const pos of validPositions) {
-        if (currentPlacements.length > 0 && !isPlacementInSameLineAsPending(pos, currentPlacements)) {
+        if (
+          currentPlacements.length > 0 &&
+          !isPlacementInSameLineAsPending(pos, currentPlacements)
+        ) {
           continue
         }
         if (!isValidPlacement(card, pos, currentBoard)) continue

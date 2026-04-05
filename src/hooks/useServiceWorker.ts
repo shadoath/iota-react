@@ -1,10 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
-import {
-  registerServiceWorker,
-  applyUpdate as swApplyUpdate,
-} from "../sw/sw-registration"
+import { registerServiceWorker, applyUpdate as swApplyUpdate } from "../sw/sw-registration"
 
 export function useServiceWorker(): {
   updateAvailable: boolean

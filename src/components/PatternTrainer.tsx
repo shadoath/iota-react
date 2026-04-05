@@ -1,10 +1,10 @@
-'use client'
+"use client"
 
-import React, { useState, useCallback, useMemo, useEffect } from 'react'
-import type { Card, CardNumber, CardColor, CardShape } from '../types/game'
-import { CARD_NUMBERS, CARD_COLORS, CARD_SHAPES } from '../constants/game'
-import { GameCard } from './GameCard'
-import styles from './PatternTrainer.module.css'
+import React, { useState, useCallback, useMemo, useEffect } from "react"
+import type { Card, CardNumber, CardColor, CardShape } from "../types/game"
+import { CARD_NUMBERS, CARD_COLORS, CARD_SHAPES } from "../constants/game"
+import { GameCard } from "./GameCard"
+import styles from "./PatternTrainer.module.css"
 
 interface PatternTrainerProps {
   onBack: () => void
@@ -23,22 +23,25 @@ function randomItem<T>(arr: readonly T[]): T {
 function generatePuzzle(): Puzzle {
   // Randomly decide if each attribute is "all same" or "all different"
   const lineLength = Math.random() < 0.5 ? 2 : 3 // show 2 or 3 cards, find the next
-  const numberMode = Math.random() < 0.5 ? 'same' : 'different'
-  const colorMode = Math.random() < 0.5 ? 'same' : 'different'
-  const shapeMode = Math.random() < 0.5 ? 'same' : 'different'
+  const numberMode = Math.random() < 0.5 ? "same" : "different"
+  const colorMode = Math.random() < 0.5 ? "same" : "different"
+  const shapeMode = Math.random() < 0.5 ? "same" : "different"
 
   // Generate the line
-  const numbers: CardNumber[] = numberMode === 'same'
-    ? Array(lineLength + 1).fill(randomItem(CARD_NUMBERS))
-    : shuffleArray([...CARD_NUMBERS]).slice(0, lineLength + 1)
+  const numbers: CardNumber[] =
+    numberMode === "same"
+      ? Array(lineLength + 1).fill(randomItem(CARD_NUMBERS))
+      : shuffleArray([...CARD_NUMBERS]).slice(0, lineLength + 1)
 
-  const colors: CardColor[] = colorMode === 'same'
-    ? Array(lineLength + 1).fill(randomItem(CARD_COLORS))
-    : shuffleArray([...CARD_COLORS]).slice(0, lineLength + 1)
+  const colors: CardColor[] =
+    colorMode === "same"
+      ? Array(lineLength + 1).fill(randomItem(CARD_COLORS))
+      : shuffleArray([...CARD_COLORS]).slice(0, lineLength + 1)
 
-  const shapes: CardShape[] = shapeMode === 'same'
-    ? Array(lineLength + 1).fill(randomItem(CARD_SHAPES))
-    : shuffleArray([...CARD_SHAPES]).slice(0, lineLength + 1)
+  const shapes: CardShape[] =
+    shapeMode === "same"
+      ? Array(lineLength + 1).fill(randomItem(CARD_SHAPES))
+      : shuffleArray([...CARD_SHAPES]).slice(0, lineLength + 1)
 
   const allCards: Card[] = []
   for (let i = 0; i <= lineLength; i++) {
@@ -69,16 +72,20 @@ function generatePuzzle(): Puzzle {
       wrong.number === correctAnswer.number &&
       wrong.color === correctAnswer.color &&
       wrong.shape === correctAnswer.shape
-    ) continue
+    )
+      continue
 
     // Check it would actually be invalid in the line
     const testLine = [...lineCards.map((c, i) => ({ ...c })), wrong]
     if (isValidLine(testLine, numberMode, colorMode, shapeMode)) continue
 
     // Not a duplicate wrong answer
-    if (wrongAnswers.some(w =>
-      w.number === wrong.number && w.color === wrong.color && w.shape === wrong.shape
-    )) continue
+    if (
+      wrongAnswers.some(
+        (w) => w.number === wrong.number && w.color === wrong.color && w.shape === wrong.shape
+      )
+    )
+      continue
 
     wrongAnswers.push(wrong)
   }
@@ -97,13 +104,13 @@ function generatePuzzle(): Puzzle {
 }
 
 function isValidLine(cards: Card[], numMode: string, colMode: string, shpMode: string): boolean {
-  const nums = new Set(cards.map(c => c.number))
-  const cols = new Set(cards.map(c => c.color))
-  const shps = new Set(cards.map(c => c.shape))
+  const nums = new Set(cards.map((c) => c.number))
+  const cols = new Set(cards.map((c) => c.color))
+  const shps = new Set(cards.map((c) => c.shape))
 
-  const numOk = numMode === 'same' ? nums.size === 1 : nums.size === cards.length
-  const colOk = colMode === 'same' ? cols.size === 1 : cols.size === cards.length
-  const shpOk = shpMode === 'same' ? shps.size === 1 : shps.size === cards.length
+  const numOk = numMode === "same" ? nums.size === 1 : nums.size === cards.length
+  const colOk = colMode === "same" ? cols.size === 1 : cols.size === cards.length
+  const shpOk = shpMode === "same" ? shps.size === 1 : shps.size === cards.length
 
   return numOk && colOk && shpOk
 }
@@ -140,15 +147,18 @@ export const PatternTrainer: React.FC<PatternTrainerProps> = ({ onBack }) => {
   const isAnswered = selected !== null
   const isCorrect = selected !== null && choices[selected].id === puzzle.correctAnswer.id
 
-  const handleSelect = useCallback((index: number) => {
-    if (isAnswered) return
-    setSelected(index)
-    const correct = choices[index].id === puzzle.correctAnswer.id
-    setScore(prev => ({
-      correct: prev.correct + (correct ? 1 : 0),
-      total: prev.total + 1,
-    }))
-  }, [isAnswered, choices, puzzle.correctAnswer.id])
+  const handleSelect = useCallback(
+    (index: number) => {
+      if (isAnswered) return
+      setSelected(index)
+      const correct = choices[index].id === puzzle.correctAnswer.id
+      setScore((prev) => ({
+        correct: prev.correct + (correct ? 1 : 0),
+        total: prev.total + 1,
+      }))
+    },
+    [isAnswered, choices, puzzle.correctAnswer.id]
+  )
 
   const handleNext = useCallback(() => {
     setPuzzle(generatePuzzle())
@@ -168,11 +178,19 @@ export const PatternTrainer: React.FC<PatternTrainerProps> = ({ onBack }) => {
 
         <div className={styles.stats}>
           <span>
-            Score: <span className={styles.statBold}>{score.correct}/{score.total}</span>
+            Score:{" "}
+            <span className={styles.statBold}>
+              {score.correct}/{score.total}
+            </span>
           </span>
           <span>
             {score.total > 0 && (
-              <>Accuracy: <span className={styles.statBold}>{Math.round((score.correct / score.total) * 100)}%</span></>
+              <>
+                Accuracy:{" "}
+                <span className={styles.statBold}>
+                  {Math.round((score.correct / score.total) * 100)}%
+                </span>
+              </>
             )}
           </span>
         </div>
@@ -195,7 +213,7 @@ export const PatternTrainer: React.FC<PatternTrainerProps> = ({ onBack }) => {
             const isThis = selected === index
             const isTheCorrect = card.id === puzzle.correctAnswer.id
 
-            let stateClass = ''
+            let stateClass = ""
             if (isAnswered) {
               if (isTheCorrect) stateClass = styles.correct
               else if (isThis) stateClass = styles.incorrect
@@ -204,7 +222,7 @@ export const PatternTrainer: React.FC<PatternTrainerProps> = ({ onBack }) => {
             return (
               <button
                 key={index}
-                className={`${styles.choiceBtn} ${stateClass} ${isAnswered ? styles.disabled : ''}`}
+                className={`${styles.choiceBtn} ${stateClass} ${isAnswered ? styles.disabled : ""}`}
                 onClick={() => handleSelect(index)}
               >
                 <GameCard card={card} disabled />
@@ -215,8 +233,10 @@ export const PatternTrainer: React.FC<PatternTrainerProps> = ({ onBack }) => {
 
         {isAnswered && (
           <>
-            <div className={`${styles.feedback} ${isCorrect ? styles.feedbackCorrect : styles.feedbackIncorrect}`}>
-              {isCorrect ? 'Correct!' : 'Wrong — the highlighted card completes the line'}
+            <div
+              className={`${styles.feedback} ${isCorrect ? styles.feedbackCorrect : styles.feedbackIncorrect}`}
+            >
+              {isCorrect ? "Correct!" : "Wrong — the highlighted card completes the line"}
             </div>
             <button className={styles.nextBtn} onClick={handleNext}>
               Next Puzzle

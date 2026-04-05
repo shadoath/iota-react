@@ -74,4 +74,5 @@ Medium — mostly mechanical changes. The async API migration and React 19 compa
 ## Dependencies
 
 Must complete first:
+
 1. [React 18 → 19 upgrade](10-upgrade-react-19.md)

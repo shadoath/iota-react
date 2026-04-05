@@ -1,10 +1,15 @@
-'use client'
+"use client"
 
-import React, { useMemo } from 'react'
-import { getTodayString } from '../utils/seededRandom'
-import { getDailyDeck, hasTodayBeenPlayed, getDailyHistory, getTodayScore } from '../stats/dailyChallenge'
-import type { GameSettings } from '../types/game'
-import styles from './DailyChallenge.module.css'
+import React, { useMemo } from "react"
+import { getTodayString } from "../utils/seededRandom"
+import {
+  getDailyDeck,
+  hasTodayBeenPlayed,
+  getDailyHistory,
+  getTodayScore,
+} from "../stats/dailyChallenge"
+import type { GameSettings } from "../types/game"
+import styles from "./DailyChallenge.module.css"
 
 interface DailyChallengeProps {
   onStart: (settings: GameSettings) => void
@@ -21,14 +26,14 @@ export const DailyChallenge: React.FC<DailyChallengeProps> = ({ onStart, onBack 
     const deck = getDailyDeck(today)
     onStart({
       playerCount: 2,
-      aiPlayers: [{ name: 'Daily Bot', difficulty: 'hard' }],
-      mode: 'daily',
+      aiPlayers: [{ name: "Daily Bot", difficulty: "hard" }],
+      mode: "daily",
       prebuiltDeck: deck,
     })
   }
 
   const recentResults = [...history.results]
-    .filter(r => r.completed)
+    .filter((r) => r.completed)
     .sort((a, b) => b.date.localeCompare(a.date))
     .slice(0, 7)
 
@@ -50,7 +55,9 @@ export const DailyChallenge: React.FC<DailyChallengeProps> = ({ onStart, onBack 
             <span className={styles.streakLabel}>Best</span>
           </div>
           <div className={styles.streakItem}>
-            <span className={styles.streakValue}>{history.results.filter(r => r.completed).length}</span>
+            <span className={styles.streakValue}>
+              {history.results.filter((r) => r.completed).length}
+            </span>
             <span className={styles.streakLabel}>Played</span>
           </div>
         </div>
@@ -70,7 +77,7 @@ export const DailyChallenge: React.FC<DailyChallengeProps> = ({ onStart, onBack 
           <>
             <div className={styles.divider} />
             <div className={styles.recentList}>
-              {recentResults.map(r => (
+              {recentResults.map((r) => (
                 <div key={r.date} className={styles.recentItem}>
                   <span>{r.date}</span>
                   <span className={styles.recentScore}>{r.score}</span>

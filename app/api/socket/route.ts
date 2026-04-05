@@ -5,8 +5,8 @@
  * server is attached via the custom server (server.ts at project root).
  */
 
-import { NextResponse } from 'next/server'
+import { NextResponse } from "next/server"
 
 export async function GET() {
-  return NextResponse.json({ status: 'Socket.io server runs via custom server' })
+  return NextResponse.json({ status: "Socket.io server runs via custom server" })
 }

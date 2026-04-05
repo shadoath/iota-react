@@ -18,21 +18,25 @@ Browser → Supabase Auth (anonymous / Google / GitHub)
 ## Phase 1: Supabase Setup
 
 ### 1.1 Create Supabase Project
+
 - Create project at supabase.com
 - Note: `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 
 ### 1.2 Install Dependencies
+
 ```bash
 npm install @supabase/supabase-js @supabase/ssr
 ```
 
 ### 1.3 Create Supabase Client
+
 ```
 src/lib/supabase.ts         — browser client
 src/lib/supabase-server.ts  — server client (for API routes)
 ```
 
 ### 1.4 Environment Variables
+
 ```env
 NEXT_PUBLIC_SUPABASE_URL=https://xxx.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJ...
@@ -111,6 +115,7 @@ CREATE TABLE user_achievements (
 ```
 
 ### Row-Level Security
+
 ```sql
 -- Users can only read/write their own data
 ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
@@ -136,12 +141,14 @@ CREATE POLICY "Users can insert own scores" ON daily_scores FOR INSERT WITH CHEC
 ## Phase 3: Authentication
 
 ### 3.1 Anonymous-First Flow
+
 1. User opens the game → auto-creates anonymous Supabase session
 2. All game data saved under anonymous user ID
 3. Prompt to "Save your progress" after 3rd game
 4. User signs in with Google/GitHub → anonymous account upgraded, data preserved
 
 ### 3.2 Auth Provider Component
+
 ```
 src/context/AuthContext.tsx
 - Manages Supabase auth state
@@ -151,12 +158,15 @@ src/context/AuthContext.tsx
 ```
 
 ### 3.3 Sign-In UI
+
 - Small profile icon in mode select header
 - Click → modal with "Sign in with Google" / "Sign in with GitHub"
 - After sign-in: display name, profile in sidebar
 
 ### 3.4 Data Migration
+
 When a user signs in for the first time:
+
 1. Read localStorage stats and achievements
 2. Bulk insert into Supabase tables
 3. Mark localStorage as "synced"
@@ -165,40 +175,45 @@ When a user signs in for the first time:
 ## Phase 4: Elo Rating System
 
 ### 4.1 Elo Calculation
+
 ```typescript
 function calculateElo(
   playerRating: number,
   opponentRating: number,
-  result: 'win' | 'loss' | 'draw',
+  result: "win" | "loss" | "draw",
   kFactor: number = 32
 ): { newPlayerRating: number; newOpponentRating: number }
 ```
 
 Standard Elo formula:
+
 - Expected score: `E = 1 / (1 + 10^((Ro - Rp) / 400))`
 - New rating: `R' = R + K * (S - E)` where S = 1 (win), 0 (loss), 0.5 (draw)
 - K-factor: 32 for new players (<30 games), 24 for established, 16 for rated >2400
 
 ### 4.2 AI Elo Assignments
+
 | Difficulty | Fixed Elo |
-|-----------|-----------|
-| Easy | 800 |
-| Medium | 1200 |
-| Hard | 1600 |
+| ---------- | --------- |
+| Easy       | 800       |
+| Medium     | 1200      |
+| Hard       | 1600      |
 
 Playing against AI adjusts your Elo but doesn't change the AI's.
 
 ### 4.3 Rank Tiers
-| Rating | Tier |
-|--------|------|
-| < 900 | Novice |
-| 900-1100 | Apprentice |
-| 1100-1300 | Strategist |
-| 1300-1500 | Expert |
-| 1500-1800 | Master |
-| > 1800 | Grandmaster |
+
+| Rating    | Tier        |
+| --------- | ----------- |
+| < 900     | Novice      |
+| 900-1100  | Apprentice  |
+| 1100-1300 | Strategist  |
+| 1300-1500 | Expert      |
+| 1500-1800 | Master      |
+| > 1800    | Grandmaster |
 
 ### 4.4 Leaderboard
+
 - `/leaderboard` page (new Next.js route)
 - Global top 50 by Elo rating
 - Daily challenge top 50 by score
@@ -207,16 +222,19 @@ Playing against AI adjusts your Elo but doesn't change the AI's.
 ## Phase 5: Cloud-Synced Features
 
 ### 5.1 Stats Service Upgrade
+
 - `statsService.ts` gets a Supabase variant
 - Writes to both localStorage (instant) and Supabase (async)
 - Reads from Supabase if authenticated, localStorage if offline
 - Conflict resolution: Supabase is source of truth
 
 ### 5.2 Achievement Sync
+
 - On sign-in: merge localStorage achievements with cloud
 - New unlocks go to both immediately
 
 ### 5.3 Daily Challenge Leaderboard
+
 - After completing daily, score submitted to `daily_scores`
 - Leaderboard component shows top 50 for today
 - "Your rank" indicator
