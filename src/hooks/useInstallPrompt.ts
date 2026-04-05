@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
+import { trackPwaInstallPrompted } from "../analytics/posthog"
 
 interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>
@@ -29,6 +30,7 @@ export function useInstallPrompt(): {
 
   const promptInstall = useCallback(() => {
     if (!deferredPrompt) return
+    trackPwaInstallPrompted()
     deferredPrompt.prompt()
     deferredPrompt.userChoice.then(() => {
       setDeferredPrompt(null)

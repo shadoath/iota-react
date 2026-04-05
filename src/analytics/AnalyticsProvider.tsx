@@ -1,13 +1,11 @@
 'use client'
 
 import { useEffect } from 'react'
-import { initAnalytics, trackError } from './posthog'
+import { trackError } from './posthog'
 
 export function AnalyticsProvider() {
   useEffect(() => {
-    initAnalytics()
-
-    // Global error tracking
+    // Global error tracking (supplements PostHog capture_exceptions)
     const handleError = (event: ErrorEvent) => {
       trackError(event.message, {
         filename: event.filename,

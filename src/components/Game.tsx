@@ -38,7 +38,7 @@ import { recordDailyResult } from '../stats/dailyChallenge'
 import {
   trackGameStart, trackGameEnd, trackTurnComplete,
   trackModeSelected, trackAchievementUnlocked, trackDailyChallenge,
-  trackHelperToggled, trackError,
+  trackHelperToggled, trackError, trackReplayStarted,
 } from '../analytics/posthog'
 import styles from './Game.module.css'
 
@@ -548,7 +548,7 @@ function GameInner() {
           initialBoard={initialBoardRef.current}
           onPlayAgain={handlePlayAgain}
           onNewSetup={() => dispatch({ type: 'SHOW_MENU' })}
-          onReplay={() => setShowReplay(true)}
+          onReplay={() => { trackReplayStarted(); setShowReplay(true) }}
         />
       )}
 

@@ -42,3 +42,4 @@ public/sw.js
 # Astro cache (marketing site)
 .astro/
 marketing/node_modules/
+.env.local
