@@ -1,7 +1,33 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <rect width="512" height="512" rx="64" fill="#1a1a1a"/>
-  <text x="256" y="320" text-anchor="middle" font-family="sans-serif" font-size="280" font-weight="bold" fill="#22c55e">I</text>
-  <circle cx="256" cy="400" r="20" fill="#ef4444"/>
-  <rect x="220" y="380" width="20" height="20" rx="2" fill="#3b82f6"/>
-  <polygon points="290,400 310,380 270,380" fill="#eab308"/>
+  <!-- Background -->
+  <rect width="512" height="512" rx="96" fill="#1a1a1a"/>
+
+  <!-- Central nexus node -->
+  <circle cx="256" cy="256" r="36" fill="#e5e5e5"/>
+
+  <!-- Four colored nodes representing the 4 attributes -->
+  <!-- Top: Red triangle -->
+  <circle cx="256" cy="128" r="44" fill="#ef4444"/>
+  <polygon points="256,104 276,148 236,148" fill="#1a1a1a"/>
+
+  <!-- Right: Blue circle -->
+  <circle cx="384" cy="256" r="44" fill="#3b82f6"/>
+  <circle cx="384" cy="256" r="18" fill="#1a1a1a"/>
+
+  <!-- Bottom: Yellow square -->
+  <circle cx="256" cy="384" r="44" fill="#eab308"/>
+  <rect x="240" y="368" width="32" height="32" rx="4" fill="#1a1a1a"/>
+
+  <!-- Left: Green cross -->
+  <circle cx="128" cy="256" r="44" fill="#22c55e"/>
+  <path d="M118,248 h8 v-8 h4 v8 h8 v4 h-8 v8 h-4 v-8 h-8z" fill="#1a1a1a" transform="scale(2.5) translate(-26.8, -52.8)"/>
+
+  <!-- Connection lines (nexus) -->
+  <line x1="256" y1="172" x2="256" y2="220" stroke="#e5e5e5" stroke-width="3" stroke-linecap="round" opacity="0.5"/>
+  <line x1="340" y1="256" x2="292" y2="256" stroke="#e5e5e5" stroke-width="3" stroke-linecap="round" opacity="0.5"/>
+  <line x1="256" y1="348" x2="256" y2="292" stroke="#e5e5e5" stroke-width="3" stroke-linecap="round" opacity="0.5"/>
+  <line x1="172" y1="256" x2="220" y2="256" stroke="#e5e5e5" stroke-width="3" stroke-linecap="round" opacity="0.5"/>
+
+  <!-- "NN" text -->
+  <text x="256" y="268" text-anchor="middle" font-family="system-ui, sans-serif" font-size="32" font-weight="900" fill="#1a1a1a" letter-spacing="-1">NN</text>
 </svg>
