@@ -32,6 +32,9 @@
 .cellValid {
   background-color: var(--color-valid);
   cursor: pointer;
+  /* Larger touch target on mobile */
+  min-width: 44px;
+  min-height: 44px;
 }
 
 .cellValid:hover {
