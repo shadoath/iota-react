@@ -121,6 +121,12 @@ export const ModeSelect: React.FC<ModeSelectProps> = ({
             </button>
           </>
         )}
+
+        <div className={styles.legal}>
+          <a href='/privacy' className={styles.legalLink}>Privacy Policy</a>
+          <span className={styles.legalDot}>&middot;</span>
+          <a href='/terms' className={styles.legalLink}>Terms of Service</a>
+        </div>
       </div>
     </div>
   )

@@ -135,3 +135,27 @@
 .installBtn:hover {
   opacity: 0.9;
 }
+
+.legal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  margin-top: var(--space-sm);
+}
+
+.legalLink {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  text-decoration: none;
+}
+
+.legalLink:hover {
+  color: var(--color-info);
+  text-decoration: underline;
+}
+
+.legalDot {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
