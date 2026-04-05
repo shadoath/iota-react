@@ -3,6 +3,7 @@ import { useState, useCallback } from 'react'
 import { useTheme } from '../hooks/useTheme'
 import { useCardTheme, CARD_THEMES, BOARD_THEMES } from '../hooks/useCardTheme'
 import type { HelpersConfig } from '../hooks/useHelpers'
+import type { SoundConfig } from '../hooks/useSound'
 import styles from './Sidebar.module.css'
 
 interface SidebarProps {
@@ -16,6 +17,9 @@ interface SidebarProps {
   onUndoLast: () => void
   helpers: HelpersConfig
   onToggleHelper: (key: keyof HelpersConfig) => void
+  soundConfig: SoundConfig
+  onSoundToggle: (enabled: boolean) => void
+  onSoundVolume: (volume: number) => void
 }
 
 const HELPER_OPTIONS: Array<{ key: keyof HelpersConfig; label: string; desc: string }> = [
@@ -32,6 +36,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onNewGame,
   helpers,
   onToggleHelper,
+  soundConfig,
+  onSoundToggle,
+  onSoundVolume,
 }) => {
   const [open, setOpen] = useState(false)
 
@@ -121,6 +128,36 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <button className={styles.themeBtn} onClick={toggleTheme}>
           {themeIcon} Theme: {themeLabel}
         </button>
+
+        {/* Sound controls */}
+        <div className={styles.themeSection}>
+          <div className={styles.statLabel}>Sound</div>
+          <label className={styles.helperToggle}>
+            <input
+              type='checkbox'
+              checked={soundConfig.enabled}
+              onChange={() => onSoundToggle(!soundConfig.enabled)}
+              className={styles.helperCheckbox}
+            />
+            <span className={styles.helperLabel}>
+              {soundConfig.enabled ? 'On' : 'Off'}
+            </span>
+          </label>
+          {soundConfig.enabled && (
+            <div className={styles.volumeRow}>
+              <span className={styles.volumeLabel}>Vol</span>
+              <input
+                type='range'
+                min={0}
+                max={100}
+                value={Math.round(soundConfig.volume * 100)}
+                onChange={(e) => onSoundVolume(Number(e.target.value) / 100)}
+                className={styles.volumeSlider}
+              />
+              <span className={styles.volumeValue}>{Math.round(soundConfig.volume * 100)}%</span>
+            </div>
+          )}
+        </div>
 
         <div className={styles.themeSection}>
           <div className={styles.statLabel}>Card Colors</div>
