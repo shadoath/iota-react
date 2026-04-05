@@ -2,7 +2,6 @@ import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { PWAProvider } from "../src/components/PWAProvider";
-import { AnalyticsProvider } from "../src/analytics/AnalyticsProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -49,7 +48,6 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <PWAProvider />
-        <AnalyticsProvider />
         {children}
       </body>
     </html>

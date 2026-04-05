@@ -1,46 +1,14 @@
 /**
  * PostHog analytics wrapper.
+ * PostHog is initialized via instrumentation-client.ts (Next.js 15.3+).
  * Env var NEXT_PUBLIC_POSTHOG_KEY must be set for tracking to activate.
- * No tracking occurs without the key (safe for dev).
  */
 
 import posthog from 'posthog-js'
 
-const POSTHOG_KEY = process.env.NEXT_PUBLIC_POSTHOG_KEY ?? ''
-const POSTHOG_HOST = process.env.NEXT_PUBLIC_POSTHOG_HOST ?? 'https://us.i.posthog.com'
-
-let initialized = false
-
-export function initAnalytics(): void {
-  if (typeof window === 'undefined') return
-  if (initialized) return
-  if (!POSTHOG_KEY) {
-    console.debug('[analytics] No POSTHOG_KEY — tracking disabled')
-    return
-  }
-
-  posthog.init(POSTHOG_KEY, {
-    api_host: POSTHOG_HOST,
-    person_profiles: 'identified_only',
-    capture_pageview: true,
-    capture_pageleave: true,
-    autocapture: false, // we track custom events
-    persistence: 'localStorage+cookie',
-    loaded: (ph) => {
-      // Opt out of session replay by default (privacy)
-      if (process.env.NODE_ENV === 'development') {
-        ph.opt_out_capturing()
-      }
-    },
-  })
-
-  initialized = true
-}
-
 // --- Event tracking ---
 
 export function trackEvent(event: string, properties?: Record<string, unknown>): void {
-  if (!initialized || !POSTHOG_KEY) return
   posthog.capture(event, properties)
 }
 
@@ -107,14 +75,20 @@ export function trackError(error: string, context?: Record<string, unknown>): vo
   trackEvent('client_error', { error, ...context })
 }
 
+export function trackPwaInstallPrompted(): void {
+  trackEvent('pwa_install_prompted')
+}
+
+export function trackReplayStarted(): void {
+  trackEvent('replay_started')
+}
+
 // --- User identification ---
 
 export function identifyUser(userId: string, properties?: Record<string, unknown>): void {
-  if (!initialized || !POSTHOG_KEY) return
   posthog.identify(userId, properties)
 }
 
 export function resetUser(): void {
-  if (!initialized || !POSTHOG_KEY) return
   posthog.reset()
 }
