@@ -31,6 +31,7 @@ import { PatternTrainer } from './PatternTrainer'
 import { useOnlineStatus } from '../hooks/useOnlineStatus'
 import { useInstallPrompt } from '../hooks/useInstallPrompt'
 import { useHelpers } from '../hooks/useHelpers'
+import { useSound } from '../hooks/useSound'
 import { findLotCompletingCards, findBestMove, getAttributeHint } from '../utils/helpers'
 import { DailyChallenge } from './DailyChallenge'
 import { recordDailyResult } from '../stats/dailyChallenge'
@@ -55,6 +56,7 @@ function GameInner() {
   const { isOnline } = useOnlineStatus()
   const { canInstall, promptInstall } = useInstallPrompt()
   const { helpers, toggleHelper } = useHelpers()
+  const sound = useSound()
 
   const currentPlayer = game.players[game.currentPlayerIndex]
   const isHumanTurn = currentPlayer?.type === 'human'
@@ -90,14 +92,22 @@ function GameInner() {
     if (lastActionResult && lastActionResult !== lastResultRef.current) {
       if (lastActionResult.type === 'success') {
         toast.success(lastActionResult.message)
+        // Sound for turn complete
+        if (lastActionResult.message.includes('points')) {
+          sound.playTurnComplete()
+        }
       } else if (lastActionResult.type === 'error') {
         toast.error(lastActionResult.message)
+        sound.playInvalidMove()
+      } else if (lastActionResult.message === 'Placement undone') {
+        toast(lastActionResult.message)
+        sound.playUndo()
       } else {
         toast(lastActionResult.message)
       }
     }
     lastResultRef.current = lastActionResult
-  }, [lastActionResult])
+  }, [lastActionResult, sound])
 
   // --- Record game result when game ends ---
   useEffect(() => {
@@ -127,6 +137,7 @@ function GameInner() {
     }
 
     recordGame(result)
+    sound.playGameOver()
 
     // Record daily challenge result
     if (game.gameMode === 'daily') {
@@ -142,6 +153,7 @@ function GameInner() {
     for (const id of newAchievements) {
       const achievement = ACHIEVEMENTS.find(a => a.id === id)
       if (achievement) {
+        sound.playAchievement()
         toast.success(`Achievement unlocked: ${achievement.icon} ${achievement.name}`, {
           duration: 4000,
         })
@@ -247,8 +259,10 @@ function GameInner() {
     }
 
     dispatch({ type: 'PLACE_CARD', card: selectedCard, position })
+    sound.playCardPlace()
 
     if (game.pendingPlacements.length + 1 >= MAX_LINE_LENGTH) {
+      sound.playLotBonus()
       toast('Maximum 4 cards per turn!', { icon: '⚠️' })
     }
   }
@@ -445,6 +459,9 @@ function GameInner() {
         onUndoLast={() => dispatch({ type: 'UNDO_PLACEMENT' })}
         helpers={helpers}
         onToggleHelper={toggleHelper}
+        soundConfig={sound.config}
+        onSoundToggle={sound.setEnabled}
+        onSoundVolume={sound.setVolume}
       />
 
       {/* Multi-player scoreboard */}
