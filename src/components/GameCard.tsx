@@ -46,6 +46,27 @@ function Cross({ color, size }: { color: string; size: number }) {
   )
 }
 
+function Star({ color, size }: { color: string; size: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" aria-label="Star" role="img">
+      <polygon points="12,1 15,9 23,9 17,14 19,23 12,18 5,23 7,14 1,9 9,9" fill={color} />
+    </svg>
+  )
+}
+
+function SpecialIcon({ type, size }: { type: string; size: number }) {
+  const icons: Record<string, string> = {
+    remove: "\u{1F5D1}",
+    steal: "\u{1F4E5}",
+    swap: "\u{1F500}",
+  }
+  return (
+    <span style={{ fontSize: size * 0.7, lineHeight: 1 }} role="img" aria-label={type}>
+      {icons[type] ?? "?"}
+    </span>
+  )
+}
+
 function WildIcon({ size }: { size: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" aria-label="Wild" role="img">
@@ -77,6 +98,7 @@ const shapeMap: Record<string, React.FC<{ color: string; size: number }>> = {
   square: Square,
   circle: Circle,
   cross: Cross,
+  star: Star,
 }
 
 // --- Shape count layout ---
@@ -126,13 +148,14 @@ export const GameCard: React.FC<GameCardProps> = ({
   placed = false,
 }) => {
   const isWild = card.isWild
-  const color = isWild ? "var(--color-wild)" : COLOR_MAP[card.color]
+  const isSpecial = "isSpecial" in card && card.isSpecial
+  const color = isWild || isSpecial ? "var(--color-wild)" : COLOR_MAP[card.color]
 
   const classNames = [
     styles.card,
     selected && styles.selected,
     disabled && styles.disabled,
-    isWild && styles.wild,
+    (isWild || isSpecial) && styles.wild,
     boardCard && styles.boardCard,
     placed && styles.placed,
   ]
@@ -156,7 +179,12 @@ export const GameCard: React.FC<GameCardProps> = ({
             }
       }
     >
-      {isWild ? (
+      {isSpecial && "specialType" in card ? (
+        <>
+          <SpecialIcon type={card.specialType} size={boardCard ? 24 : 28} />
+          <span className={styles.wildLabel}>{card.specialType}</span>
+        </>
+      ) : isWild ? (
         <>
           <WildIcon size={boardCard ? 24 : 28} />
           <span className={styles.wildLabel}>wild</span>
