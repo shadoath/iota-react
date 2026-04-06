@@ -17,7 +17,7 @@ export const Lobby: React.FC<LobbyProps> = ({ socket, onBack }) => {
   const [maxPlayers, setMaxPlayers] = useState<2 | 3 | 4>(2)
   const [loading, setLoading] = useState(false)
 
-  const { connected, roomState, error } = socket
+  const { connected, connecting, roomState, error } = socket
 
   const handleCreate = useCallback(async () => {
     if (!playerName.trim()) return
@@ -63,7 +63,7 @@ export const Lobby: React.FC<LobbyProps> = ({ socket, onBack }) => {
             className={styles.playerDot}
             style={{ background: connected ? "var(--color-success)" : "var(--color-error)" }}
           />
-          {connected ? "Connected" : "Connecting..."}
+          {connected ? "Connected" : connecting ? "Connecting..." : "Not connected"}
         </div>
 
         <div className={styles.tabs}>

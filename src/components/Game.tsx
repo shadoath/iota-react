@@ -485,13 +485,22 @@ function GameInner() {
           socket={socket}
           onLeave={() => {
             socket.leaveRoom()
+            socket.disconnect()
             setShowMultiplayer(false)
           }}
         />
       )
     }
     // Otherwise show lobby
-    return <Lobby socket={socket} onBack={() => setShowMultiplayer(false)} />
+    return (
+      <Lobby
+        socket={socket}
+        onBack={() => {
+          socket.disconnect()
+          setShowMultiplayer(false)
+        }}
+      />
+    )
   }
 
   // --- Tutorial ---
@@ -519,7 +528,10 @@ function GameInner() {
       <ModeSelect
         onSelectMode={handleSelectMode}
         onTutorial={() => setShowTutorial(true)}
-        onMultiplayer={() => setShowMultiplayer(true)}
+        onMultiplayer={() => {
+          socket.connect()
+          setShowMultiplayer(true)
+        }}
         onDailyChallenge={() => setShowDaily(true)}
         onTrainer={() => setShowTrainer(true)}
         onStats={() => setShowStats(true)}
