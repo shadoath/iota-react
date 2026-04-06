@@ -17,6 +17,8 @@ interface AuthState {
 interface AuthContextValue extends AuthState {
   signInWithGoogle: () => Promise<void>
   signInWithGithub: () => Promise<void>
+  signInWithEmail: (email: string, password: string) => Promise<{ error: string | null }>
+  signUpWithEmail: (email: string, password: string) => Promise<{ error: string | null }>
   signOut: () => Promise<void>
 }
 
@@ -100,6 +102,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     })
   }, [])
 
+  const signInWithEmail = useCallback(async (email: string, password: string): Promise<{ error: string | null }> => {
+    if (!SUPABASE_CONFIGURED) return { error: "Auth not configured" }
+    const supabase = createClient()
+    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    if (error) return { error: error.message }
+    return { error: null }
+  }, [])
+
+  const signUpWithEmail = useCallback(async (email: string, password: string): Promise<{ error: string | null }> => {
+    if (!SUPABASE_CONFIGURED) return { error: "Auth not configured" }
+    const supabase = createClient()
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
+      },
+    })
+    if (error) return { error: error.message }
+    return { error: null }
+  }, [])
+
   const signOut = useCallback(async () => {
     if (!SUPABASE_CONFIGURED) return
     const supabase = createClient()
@@ -120,6 +144,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         ...state,
         signInWithGoogle,
         signInWithGithub,
+        signInWithEmail,
+        signUpWithEmail,
         signOut,
       }}
     >

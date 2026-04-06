@@ -1,15 +1,14 @@
 import { NextResponse } from "next/server"
-import { createClient } from "../../../src/lib/supabase"
+import { createServerSupabaseClient } from "../../../src/lib/supabase-server"
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get("code")
 
   if (code) {
-    const supabase = createClient()
+    const supabase = await createServerSupabaseClient()
     await supabase.auth.exchangeCodeForSession(code)
   }
 
-  // Redirect back to the game
   return NextResponse.redirect(origin)
 }

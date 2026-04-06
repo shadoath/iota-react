@@ -1,6 +1,6 @@
 "use client"
 
-import React from "react"
+import React, { useState } from "react"
 import { useAuth, SUPABASE_CONFIGURED } from "../context/AuthContext"
 import styles from "./SignInModal.module.css"
 
@@ -9,7 +9,44 @@ interface SignInModalProps {
 }
 
 export const SignInModal: React.FC<SignInModalProps> = ({ onClose }) => {
-  const { isAuthenticated, loading, displayName, avatarUrl, user, signInWithGoogle, signInWithGithub, signOut } = useAuth()
+  const {
+    isAuthenticated,
+    loading,
+    displayName,
+    avatarUrl,
+    user,
+    signInWithGoogle,
+    signInWithGithub,
+    signInWithEmail,
+    signUpWithEmail,
+    signOut,
+  } = useAuth()
+
+  const [mode, setMode] = useState<"signin" | "signup">("signin")
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [error, setError] = useState<string | null>(null)
+  const [submitting, setSubmitting] = useState(false)
+  const [signUpSuccess, setSignUpSuccess] = useState(false)
+
+  const handleEmailSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setError(null)
+    setSubmitting(true)
+
+    const result =
+      mode === "signin"
+        ? await signInWithEmail(email, password)
+        : await signUpWithEmail(email, password)
+
+    setSubmitting(false)
+
+    if (result.error) {
+      setError(result.error)
+    } else if (mode === "signup") {
+      setSignUpSuccess(true)
+    }
+  }
 
   return (
     <div className={styles.overlay} onClick={onClose}>
@@ -54,11 +91,22 @@ export const SignInModal: React.FC<SignInModalProps> = ({ onClose }) => {
               Sign Out
             </button>
           </>
+        ) : signUpSuccess ? (
+          <>
+            <div style={{ fontSize: 48 }}>&#x2709;</div>
+            <h3 className={styles.title}>Check Your Email</h3>
+            <p className={styles.subtitle}>
+              We sent a confirmation link to <strong>{email}</strong>. Click the link to activate
+              your account.
+            </p>
+          </>
         ) : (
           <>
-            <h3 className={styles.title}>Sign In</h3>
+            <h3 className={styles.title}>{mode === "signin" ? "Sign In" : "Create Account"}</h3>
             <p className={styles.subtitle}>
-              Sign in to save your progress, sync across devices, and appear on leaderboards.
+              {mode === "signin"
+                ? "Sign in to save your progress, sync across devices, and appear on leaderboards."
+                : "Create an account to track your stats and compete on leaderboards."}
             </p>
             <div className={styles.divider} />
             <button type="button" className={styles.providerBtn} onClick={signInWithGoogle}>
@@ -92,11 +140,52 @@ export const SignInModal: React.FC<SignInModalProps> = ({ onClose }) => {
               </span>
               Continue with GitHub
             </button>
+            <div className={styles.orDivider}>
+              <span className={styles.orText}>or</span>
+            </div>
+            <form className={styles.emailForm} onSubmit={handleEmailSubmit}>
+              <input
+                type="email"
+                className={styles.input}
+                placeholder="Email address"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                autoComplete="email"
+              />
+              <input
+                type="password"
+                className={styles.input}
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                minLength={6}
+                autoComplete={mode === "signin" ? "current-password" : "new-password"}
+              />
+              {error && <p className={styles.error}>{error}</p>}
+              <button type="submit" className={styles.emailBtn} disabled={submitting}>
+                {submitting ? "..." : mode === "signin" ? "Sign In" : "Sign Up"}
+              </button>
+            </form>
+            <p className={styles.toggleMode}>
+              {mode === "signin" ? "Don't have an account?" : "Already have an account?"}{" "}
+              <button
+                type="button"
+                className={styles.toggleBtn}
+                onClick={() => {
+                  setMode(mode === "signin" ? "signup" : "signin")
+                  setError(null)
+                }}
+              >
+                {mode === "signin" ? "Sign up" : "Sign in"}
+              </button>
+            </p>
           </>
         )}
 
         <button type="button" className={styles.closeBtn} onClick={onClose}>
-          {isAuthenticated ? "Done" : "Close"}
+          {isAuthenticated || signUpSuccess ? "Done" : "Close"}
         </button>
       </div>
     </div>
