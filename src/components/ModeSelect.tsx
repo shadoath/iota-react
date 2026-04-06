@@ -1,5 +1,7 @@
 import React, { useState } from "react"
 import type { GameMode } from "../types/game"
+import { useAuth, SUPABASE_CONFIGURED } from "../context/AuthContext"
+import { SignInModal } from "./SignInModal"
 import styles from "./ModeSelect.module.css"
 
 interface ModeSelectProps {
@@ -47,6 +49,7 @@ export const ModeSelect: React.FC<ModeSelectProps> = ({
   onInstall,
 }) => {
   const [showSignIn, setShowSignIn] = useState(false)
+  const { isAuthenticated, displayName, avatarUrl } = useAuth()
 
   return (
     <div className={styles.container}>
@@ -55,72 +58,23 @@ export const ModeSelect: React.FC<ModeSelectProps> = ({
           <h1 className={styles.title}>NodusNexus</h1>
           <button
             className={styles.tutorialBtn}
-            style={{ padding: "4px 12px", fontSize: 11 }}
+            style={{ padding: "4px 12px", fontSize: 11, display: "flex", alignItems: "center", gap: 4 }}
             onClick={() => setShowSignIn(true)}
           >
-            Sign In
+            {isAuthenticated && avatarUrl ? (
+              /* eslint-disable-next-line @next/next/no-img-element */
+              <img
+                src={avatarUrl}
+                alt=""
+                style={{ width: 16, height: 16, borderRadius: "50%" }}
+              />
+            ) : null}
+            {isAuthenticated ? displayName ?? "Profile" : "Sign In"}
           </button>
         </div>
         <p className={styles.subtitle}>The card game of matching patterns</p>
 
-        {/* Sign-in coming soon modal */}
-        {showSignIn && (
-          <div
-            style={{
-              position: "fixed",
-              inset: 0,
-              background: "rgba(0,0,0,0.4)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              zIndex: 500,
-              padding: 16,
-            }}
-            onClick={() => setShowSignIn(false)}
-          >
-            <div
-              style={{
-                background: "var(--color-surface)",
-                borderRadius: 12,
-                padding: 24,
-                maxWidth: 360,
-                width: "100%",
-                textAlign: "center",
-              }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div style={{ fontSize: 48, marginBottom: 12 }}>&#x1F510;</div>
-              <h3 style={{ marginBottom: 8, fontSize: 18 }}>Sign In Coming Soon</h3>
-              <p
-                style={{
-                  color: "var(--color-text-muted)",
-                  fontSize: 14,
-                  lineHeight: 1.5,
-                  marginBottom: 16,
-                }}
-              >
-                Account sign-in with Google and GitHub is being built. Your stats and achievements
-                are safely stored locally and will sync to your account once sign-in launches.
-              </p>
-              <button
-                type="button"
-                style={{
-                  padding: "8px 24px",
-                  background: "var(--color-info)",
-                  color: "white",
-                  border: "none",
-                  borderRadius: 8,
-                  fontSize: 14,
-                  fontWeight: "bold",
-                  cursor: "pointer",
-                }}
-                onClick={() => setShowSignIn(false)}
-              >
-                Got it
-              </button>
-            </div>
-          </div>
-        )}
+        {showSignIn && <SignInModal onClose={() => setShowSignIn(false)} />}
 
         <div className={styles.modes}>
           {modes.map((mode) => (
