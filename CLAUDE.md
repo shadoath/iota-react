@@ -59,3 +59,17 @@ npm run test:run     # Run tests once
 - Dark mode uses `data-theme` attribute + `prefers-color-scheme` media query
 - localStorage keys are prefixed with `nodusnexus-`
 - Prefer `for...of` loops over `forEach` for iteration
+
+## Common Pitfalls
+
+- Game logic must stay pure in `src/utils/` — no UI or framework imports
+- GameContext is the single source of truth — components dispatch actions, never mutate state directly
+- CSS Modules only — no CSS-in-JS or global styles outside `src/styles/`
+- Multiplayer is server-authoritative — clients send actions, server validates and broadcasts
+- Dark mode uses `data-theme` attribute — test both themes when changing UI
+- localStorage keys are prefixed with `nodusnexus-` — match this convention
+
+## When to Ask vs Proceed
+
+Proceed: Bug fixes, UI improvements, AI difficulty tuning, test additions.
+Ask: Multiplayer protocol changes, new game modes, deployment, dependency changes.

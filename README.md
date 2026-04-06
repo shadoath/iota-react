@@ -138,3 +138,7 @@ src/
 ## License
 
 MIT
+
+---
+
+A [Whiteboard Works](https://whiteboardworks.com) project.
