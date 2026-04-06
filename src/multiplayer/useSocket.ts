@@ -54,7 +54,15 @@ export function useSocket(): UseSocketReturn {
 
     // Dynamic import to avoid loading socket.io-client on every page load
     import("socket.io-client").then(({ io }) => {
-      const socket: TypedSocket = io({
+      // In production, NEXT_PUBLIC_SOCKET_URL points to the standalone
+      // multiplayer server. In dev, falls back to localhost:3001.
+      const socketUrl =
+        process.env.NEXT_PUBLIC_SOCKET_URL ||
+        (typeof window !== "undefined" && window.location.hostname === "localhost"
+          ? "http://localhost:3001"
+          : undefined)
+
+      const socket: TypedSocket = io(socketUrl ?? "/", {
         path: "/api/socket",
         transports: ["websocket", "polling"],
         timeout: 10000,

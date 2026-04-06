@@ -1,6 +1,9 @@
 /**
  * Custom Next.js server with Socket.io for multiplayer.
  * Run with: npx tsx server.ts
+ *
+ * Socket.io runs on a separate HTTP server (port 3001) to avoid
+ * conflicts with Next.js/Turbopack's WebSocket handling.
  */
 
 import { createServer } from "http"
@@ -11,11 +14,13 @@ import { initSocketServer } from "./src/multiplayer/server"
 const dev = process.env.NODE_ENV !== "production"
 const hostname = "localhost"
 const port = parseInt(process.env.PORT || "3000", 10)
+const socketPort = parseInt(process.env.SOCKET_PORT || "3001", 10)
 
 const app = next({ dev, hostname, port })
 const handle = app.getRequestHandler()
 
 app.prepare().then(() => {
+  // Next.js HTTP server
   const httpServer = createServer(async (req, res) => {
     try {
       const parsedUrl = parse(req.url!, true)
@@ -27,10 +32,16 @@ app.prepare().then(() => {
     }
   })
 
-  initSocketServer(httpServer)
+  // Separate HTTP server for Socket.io to avoid conflicts with
+  // Next.js/Turbopack WebSocket handling in dev mode.
+  const socketServer = createServer()
+  initSocketServer(socketServer, "*")
 
   httpServer.listen(port, () => {
     console.log(`> Ready on http://${hostname}:${port}`)
-    console.log(`> Socket.io server attached at /api/socket`)
+  })
+
+  socketServer.listen(socketPort, () => {
+    console.log(`> Socket.io server on http://${hostname}:${socketPort}`)
   })
 })
