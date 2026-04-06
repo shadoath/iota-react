@@ -38,6 +38,7 @@ next-env.d.ts
 
 # generated service worker
 public/sw.js
+public/sw.unbundled.js
 
 # Astro cache (marketing site)
 .astro/

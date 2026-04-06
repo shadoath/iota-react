@@ -1,8 +1,10 @@
 /**
- * Post-build script: injects the precache manifest into the service worker.
+ * Post-build script: injects the precache manifest into the service worker
+ * and bundles it into a single file (no bare ES imports in output).
  * Run after `next build` via: node scripts/build-sw.mjs
  */
 import { injectManifest } from "workbox-build"
+import { build as esbuild } from "esbuild"
 import { readFileSync, existsSync } from "fs"
 import { createHash } from "crypto"
 import { resolve, dirname } from "path"
@@ -35,9 +37,11 @@ async function buildServiceWorker() {
     { url: "/icons/icon-512.png", revision: fileHash(resolve(root, "public/icons/icon-512.png")) },
   ]
 
+  // Step 1: Inject the precache manifest (outputs unbundled ES module)
+  const swIntermediate = resolve(root, "public/sw.unbundled.js")
   const { count, size, warnings } = await injectManifest({
     swSrc: resolve(root, "src/sw/service-worker.js"),
-    swDest: resolve(root, "public/sw.js"),
+    swDest: swIntermediate,
     globDirectory: resolve(root, ".next/static"),
     globPatterns: ["**/*.{js,css,woff2}"],
     modifyURLPrefix: { "": "/_next/static/" },
@@ -49,6 +53,20 @@ async function buildServiceWorker() {
     console.warn("Workbox warnings:")
     warnings.forEach((w) => console.warn("  ", w))
   }
+
+  // Step 2: Bundle into a single IIFE so the browser can load it as a classic script
+  await esbuild({
+    entryPoints: [swIntermediate],
+    bundle: true,
+    outfile: resolve(root, "public/sw.js"),
+    format: "iife",
+    minify: true,
+    sourcemap: false,
+  })
+
+  // Clean up intermediate file
+  const { unlinkSync } = await import("fs")
+  try { unlinkSync(swIntermediate) } catch { /* ignore */ }
 
   console.log(`Service worker built: ${count} files precached (${(size / 1024).toFixed(1)} KB)`)
 }
