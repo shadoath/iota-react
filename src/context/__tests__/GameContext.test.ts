@@ -62,7 +62,7 @@ function createTestState(overrides: Partial<GameState> = {}): AppState {
       turnHistory: [],
       turnTimeLimit: null,
       hintsEnabled: false,
-      customConfig: { size: 4, wildCount: 2, specialCards: { remove: 0, steal: 0, swap: 0, mirror: 0, double: 0 }, handSize: 4 },
+      customConfig: { size: 4, wildCount: 2, specialCards: { remove: 0, steal: 0, swap: 0 }, handSize: 4 },
       // Legacy compat
       playerHand: players[0].hand,
       score: players[0].score,

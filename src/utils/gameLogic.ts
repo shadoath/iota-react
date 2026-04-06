@@ -50,7 +50,7 @@ export function createDeck(config?: CustomGameConfig): Card[] {
   }
 
   // Add special cards
-  const specialTypes: SpecialCardType[] = ["remove", "steal", "swap", "mirror", "double"]
+  const specialTypes: SpecialCardType[] = ["remove", "steal", "swap"]
   for (const type of specialTypes) {
     const count = cfg.specialCards[type]
     for (let i = 0; i < count; i++) {
