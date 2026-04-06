@@ -67,9 +67,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const supabase = createClient()
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      handleSession(session)
-    })
+    // Handle OAuth PKCE code in URL (e.g. /?code=xxx after redirect)
+    const params = new URLSearchParams(window.location.search)
+    const code = params.get("code")
+    if (code) {
+      // Clean the code from the URL immediately
+      const cleanUrl = new URL(window.location.href)
+      cleanUrl.searchParams.delete("code")
+      window.history.replaceState({}, "", cleanUrl.toString())
+
+      supabase.auth.exchangeCodeForSession(code).then(({ data: { session } }) => {
+        handleSession(session)
+      })
+    } else {
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        handleSession(session)
+      })
+    }
 
     const {
       data: { subscription },
@@ -86,7 +100,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
+        redirectTo: window.location.origin,
       },
     })
   }, [])
@@ -97,7 +111,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await supabase.auth.signInWithOAuth({
       provider: "github",
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
+        redirectTo: window.location.origin,
       },
     })
   }, [])

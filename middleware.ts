@@ -2,16 +2,6 @@ import { type NextRequest, NextResponse } from "next/server"
 import { createServerClient } from "@supabase/ssr"
 
 export async function middleware(request: NextRequest) {
-  const { searchParams } = request.nextUrl
-
-  // If an auth code lands on a non-callback route, redirect to the callback handler
-  const code = searchParams.get("code")
-  if (code && !request.nextUrl.pathname.startsWith("/auth/callback")) {
-    const callbackUrl = request.nextUrl.clone()
-    callbackUrl.pathname = "/auth/callback"
-    return NextResponse.redirect(callbackUrl)
-  }
-
   // Refresh session on every request so cookies stay fresh
   const response = NextResponse.next({ request })
 
