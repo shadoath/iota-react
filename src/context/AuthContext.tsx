@@ -67,23 +67,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const supabase = createClient()
 
-    // Handle OAuth PKCE code in URL (e.g. /?code=xxx after redirect)
-    const params = new URLSearchParams(window.location.search)
-    const code = params.get("code")
-    if (code) {
-      // Clean the code from the URL immediately
-      const cleanUrl = new URL(window.location.href)
-      cleanUrl.searchParams.delete("code")
-      window.history.replaceState({}, "", cleanUrl.toString())
-
-      supabase.auth.exchangeCodeForSession(code).then(({ data: { session } }) => {
-        handleSession(session)
-      })
-    } else {
-      supabase.auth.getSession().then(({ data: { session } }) => {
-        handleSession(session)
-      })
-    }
+    // With implicit flow, onAuthStateChange automatically detects
+    // the session tokens in the URL hash after OAuth redirect
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      handleSession(session)
+    })
 
     const {
       data: { subscription },
@@ -131,7 +119,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       email,
       password,
       options: {
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
+        emailRedirectTo: window.location.origin,
       },
     })
     if (error) return { error: error.message }
