@@ -32,6 +32,9 @@
 .cellValid {
   background-color: var(--color-valid);
   cursor: pointer;
+  /* Larger touch target on mobile */
+  min-width: 44px;
+  min-height: 44px;
 }
 
 .cellValid:hover {
@@ -45,6 +48,33 @@
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.bestMovePlaceholder {
+  border-color: var(--color-warning) !important;
+  border-width: 3px !important;
+  background: rgba(245, 158, 11, 0.08);
+}
+
+.bestMoveStar {
+  font-size: 14px;
+  color: var(--color-warning);
+  line-height: 1;
+}
+
+.attrHint {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--color-info);
+  text-align: center;
+  line-height: 1.2;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  background: rgba(255, 255, 255, 0.8);
+  padding: 1px 4px;
+  border-radius: 4px;
 }
 
 .scoreHint {

@@ -172,8 +172,12 @@
   flex-shrink: 0;
 }
 
-.dotConnected { background: var(--color-success); }
-.dotDisconnected { background: var(--color-error); }
+.dotConnected {
+  background: var(--color-success);
+}
+.dotDisconnected {
+  background: var(--color-error);
+}
 
 .playerItemName {
   flex: 1;

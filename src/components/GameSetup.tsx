@@ -1,8 +1,10 @@
-import React, { useState } from 'react'
-import type { AIDifficulty, GameMode, GameSettings } from '../types/game'
-import styles from './GameSetup.module.css'
+import React, { useState } from "react"
+import type { AIDifficulty, GameMode, GameSettings, CustomGameConfig } from "../types/game"
+import { DEFAULT_CUSTOM_CONFIG } from "../types/game"
+import { AdvancedSetup } from "./AdvancedSetup"
+import styles from "./GameSetup.module.css"
 
-const AI_NAMES = ['Dot', 'Dash', 'Pixel', 'Byte', 'Chip', 'Nova']
+const AI_NAMES = ["Dot", "Dash", "Pixel", "Byte", "Chip", "Nova"]
 
 interface AIPlayerConfig {
   name: string
@@ -16,21 +18,23 @@ interface GameSetupProps {
 }
 
 const TIMED_OPTIONS = [
-  { label: '15s', value: 15 },
-  { label: '30s', value: 30 },
-  { label: '60s', value: 60 },
+  { label: "15s", value: 15 },
+  { label: "30s", value: 30 },
+  { label: "60s", value: 60 },
 ]
 
 export const GameSetup: React.FC<GameSetupProps> = ({ mode, onStartGame, onBack }) => {
   const [aiPlayers, setAiPlayers] = useState<AIPlayerConfig[]>([
-    { name: AI_NAMES[0], difficulty: mode === 'practice' ? 'easy' : 'medium' },
+    { name: AI_NAMES[0], difficulty: mode === "practice" ? "easy" : "medium" },
   ])
+  const [showAdvanced, setShowAdvanced] = useState(false)
+  const [customConfig, setCustomConfig] = useState<CustomGameConfig>(DEFAULT_CUSTOM_CONFIG)
   const [turnTimeLimit, setTurnTimeLimit] = useState(30)
 
   const addAI = () => {
     if (aiPlayers.length >= 3) return
     const nextName = AI_NAMES[aiPlayers.length] || `AI ${aiPlayers.length + 1}`
-    setAiPlayers([...aiPlayers, { name: nextName, difficulty: 'medium' }])
+    setAiPlayers([...aiPlayers, { name: nextName, difficulty: "medium" }])
   }
 
   const removeAI = (index: number) => {
@@ -38,11 +42,11 @@ export const GameSetup: React.FC<GameSetupProps> = ({ mode, onStartGame, onBack 
   }
 
   const updateName = (index: number, name: string) => {
-    setAiPlayers(aiPlayers.map((p, i) => i === index ? { ...p, name } : p))
+    setAiPlayers(aiPlayers.map((p, i) => (i === index ? { ...p, name } : p)))
   }
 
   const updateDifficulty = (index: number, difficulty: AIDifficulty) => {
-    setAiPlayers(aiPlayers.map((p, i) => i === index ? { ...p, difficulty } : p))
+    setAiPlayers(aiPlayers.map((p, i) => (i === index ? { ...p, difficulty } : p)))
   }
 
   const handleStart = () => {
@@ -50,34 +54,43 @@ export const GameSetup: React.FC<GameSetupProps> = ({ mode, onStartGame, onBack 
       playerCount: 1 + aiPlayers.length,
       aiPlayers,
       mode,
-      turnTimeLimit: mode === 'timed' ? turnTimeLimit : undefined,
-      hintsEnabled: mode === 'practice',
+      turnTimeLimit: mode === "timed" ? turnTimeLimit : undefined,
+      hintsEnabled: mode === "practice",
+      customConfig: showAdvanced ? customConfig : undefined,
     })
   }
 
   const getDiffClass = (diff: AIDifficulty) => {
     switch (diff) {
-      case 'easy': return styles.diffEasy
-      case 'medium': return styles.diffMedium
-      case 'hard': return styles.diffHard
+      case "easy":
+        return styles.diffEasy
+      case "medium":
+        return styles.diffMedium
+      case "hard":
+        return styles.diffHard
     }
   }
 
-  const modeLabel = mode === 'classic' ? 'Classic Game'
-    : mode === 'practice' ? 'Practice Mode'
-    : 'Timed Mode'
+  const modeLabel =
+    mode === "classic" ? "Classic Game" : mode === "practice" ? "Practice Mode" : "Timed Mode"
 
   return (
     <div className={styles.container}>
       <div className={styles.card}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <button className={styles.removeBtn} onClick={onBack} style={{ border: '1px solid #ddd', color: '#666' }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <button
+            className={styles.removeBtn}
+            onClick={onBack}
+            style={{ border: "1px solid #ddd", color: "#666" }}
+          >
             &larr;
           </button>
-          <h1 className={styles.title} style={{ flex: 1, textAlign: 'center', marginRight: 28 }}>{modeLabel}</h1>
+          <h1 className={styles.title} style={{ flex: 1, textAlign: "center", marginRight: 28 }}>
+            {modeLabel}
+          </h1>
         </div>
 
-        {mode === 'practice' && (
+        {mode === "practice" && (
           <p className={styles.subtitle}>
             Hints enabled — valid positions always shown with score previews
           </p>
@@ -121,30 +134,26 @@ export const GameSetup: React.FC<GameSetupProps> = ({ mode, onStartGame, onBack 
             </div>
           ))}
 
-          <button
-            className={styles.addBtn}
-            onClick={addAI}
-            disabled={aiPlayers.length >= 3}
-          >
+          <button className={styles.addBtn} onClick={addAI} disabled={aiPlayers.length >= 3}>
             + Add Opponent {aiPlayers.length < 3 && `(${3 - aiPlayers.length} remaining)`}
           </button>
         </div>
 
-        {mode === 'timed' && (
+        {mode === "timed" && (
           <>
             <div className={styles.divider} />
             <div className={styles.section}>
               <span className={styles.label}>Turn Time Limit</span>
-              <div style={{ display: 'flex', gap: '8px' }}>
-                {TIMED_OPTIONS.map(opt => (
+              <div style={{ display: "flex", gap: "8px" }}>
+                {TIMED_OPTIONS.map((opt) => (
                   <button
                     key={opt.value}
                     className={styles.addBtn}
                     style={{
                       flex: 1,
-                      borderStyle: turnTimeLimit === opt.value ? 'solid' : 'dashed',
-                      borderColor: turnTimeLimit === opt.value ? 'var(--color-info)' : '#ccc',
-                      color: turnTimeLimit === opt.value ? 'var(--color-info)' : undefined,
+                      borderStyle: turnTimeLimit === opt.value ? "solid" : "dashed",
+                      borderColor: turnTimeLimit === opt.value ? "var(--color-info)" : "#ccc",
+                      color: turnTimeLimit === opt.value ? "var(--color-info)" : undefined,
                       fontWeight: turnTimeLimit === opt.value ? 700 : undefined,
                     }}
                     onClick={() => setTurnTimeLimit(opt.value)}
@@ -155,6 +164,20 @@ export const GameSetup: React.FC<GameSetupProps> = ({ mode, onStartGame, onBack 
               </div>
             </div>
           </>
+        )}
+
+        <div className={styles.divider} />
+
+        <button
+          className={styles.addBtn}
+          onClick={() => setShowAdvanced((prev) => !prev)}
+          style={{ borderStyle: showAdvanced ? "solid" : "dashed", color: showAdvanced ? "var(--color-info)" : undefined }}
+        >
+          {showAdvanced ? "Hide" : "Show"} Advanced Options
+        </button>
+
+        {showAdvanced && (
+          <AdvancedSetup config={customConfig} onChange={setCustomConfig} />
         )}
 
         <button className={styles.startBtn} onClick={handleStart}>

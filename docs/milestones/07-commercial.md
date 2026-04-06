@@ -25,12 +25,14 @@ Make the game installable:
 ### 7.2 Performance Optimization
 
 Target metrics:
+
 - First Contentful Paint: < 1.5s
 - Largest Contentful Paint: < 2.5s
 - Time to Interactive: < 3.0s
 - Cumulative Layout Shift: < 0.1
 
 Actions:
+
 - Code splitting: game modes loaded lazily
 - Image optimization: use `next/image` for any raster assets
 - Font subsetting: only load needed glyphs

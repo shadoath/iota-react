@@ -35,3 +35,18 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# generated service worker
+public/sw.js
+
+# Astro cache (marketing site)
+.astro/
+marketing/node_modules/
+.env.local
+
+# Sentry Config File
+.env.sentry-build-plugin
+
+# MCP config
+.mcp.json
+.cursor/

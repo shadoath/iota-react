@@ -1,7 +1,7 @@
-'use client'
+"use client"
 
-import React, { Component, type ReactNode } from 'react'
-import styles from './ErrorBoundary.module.css'
+import React, { Component, type ReactNode } from "react"
+import styles from "./ErrorBoundary.module.css"
 
 interface Props {
   children: ReactNode
@@ -22,7 +22,7 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.error('ErrorBoundary caught:', error, errorInfo)
+    console.error("ErrorBoundary caught:", error, errorInfo)
   }
 
   handleRetry = () => {
@@ -36,8 +36,7 @@ export class ErrorBoundary extends Component<Props, State> {
           <div className={styles.icon}>:(</div>
           <h1 className={styles.title}>Something went wrong</h1>
           <p className={styles.message}>
-            An unexpected error occurred. Your game progress may be lost,
-            but you can try reloading.
+            An unexpected error occurred. Your game progress may be lost, but you can try reloading.
           </p>
           <button className={styles.retryBtn} onClick={this.handleRetry}>
             Try Again

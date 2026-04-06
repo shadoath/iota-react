@@ -1,0 +1,87 @@
+---
+const modes = [
+  {
+    name: 'Classic',
+    tagline: 'The core experience',
+    description: 'Face 1-3 AI opponents across Easy, Medium, and Hard difficulty. The Hard AI searches every possible combination to find the highest-scoring move. Can you beat it?',
+    icon: `<svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M11.42 15.17l-5.1-5.1m0 0L3.3 7.04a1.35 1.35 0 011.73-1.73l3.03 3.02m-4.76 4.77l5.1 5.1m0 0l3.03 3.02a1.35 1.35 0 001.73-1.73l-3.03-3.02m-4.73 4.73l9.92-9.92m-3.02-3.03L19.7 3.3a1.35 1.35 0 011.73 1.73L18.4 8.05m-3.02 3.03l-3.03 3.03" /></svg>`,
+    color: 'brand-blue',
+    gradient: 'from-blue-600/20 to-blue-900/20',
+  },
+  {
+    name: 'Practice',
+    tagline: 'Learn with hints',
+    description: 'See every valid position highlighted on the board. Preview your score before committing. The perfect way to build intuition before going competitive.',
+    icon: `<svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M4.26 10.147a60.438 60.438 0 00-.491 6.347A48.62 48.62 0 0112 20.904a48.62 48.62 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.636 50.636 0 00-2.658-.813A59.906 59.906 0 0112 3.493a59.903 59.903 0 0110.399 5.84" /></svg>`,
+    color: 'brand-green',
+    gradient: 'from-green-600/20 to-green-900/20',
+  },
+  {
+    name: 'Timed',
+    tagline: 'Race the clock',
+    description: 'Choose 15, 30, or 60-second turn timers. Think fast, play smart. Perfect for sharpening quick-decision skills and adding tension to every play.',
+    icon: `<svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`,
+    color: 'brand-yellow',
+    gradient: 'from-yellow-600/20 to-yellow-900/20',
+  },
+  {
+    name: 'Daily Challenge',
+    tagline: 'Same puzzle, global competition',
+    description: 'Every day a new seeded puzzle. Everyone gets the same deck. Track your streak, compare scores on the leaderboard, and climb the ranks.',
+    icon: `<svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" /></svg>`,
+    color: 'brand-red',
+    gradient: 'from-red-600/20 to-red-900/20',
+  },
+  {
+    name: 'Multiplayer',
+    tagline: 'Challenge friends online',
+    description: 'Create a room, share the code, play in real-time. Server-validated moves keep it fair. Nothing beats the thrill of outscoring a real opponent.',
+    icon: `<svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" /></svg>`,
+    color: 'brand-purple',
+    gradient: 'from-purple-600/20 to-purple-900/20',
+  },
+];
+---
+
+<section id="modes" class="py-24 lg:py-32 relative">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Section header -->
+    <div class="text-center mb-16 reveal">
+      <span class="inline-block px-4 py-1 rounded-full bg-brand-purple/10 text-brand-purple text-sm font-medium mb-4">
+        Never Get Bored
+      </span>
+      <h2 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white mb-4">
+        Five Ways to Play
+      </h2>
+      <p class="text-gray-400 text-lg max-w-2xl mx-auto">
+        Whether you want a quiet solo session or a heated rivalry with friends,
+        there's a mode that fits your mood.
+      </p>
+    </div>
+
+    <!-- Modes grid -->
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {modes.map((mode, i) => (
+        <div class={`reveal reveal-delay-${(i % 4) + 1} group relative overflow-hidden p-6 rounded-2xl bg-gradient-to-br ${mode.gradient} border border-white/5 hover:border-${mode.color}/30 transition-all duration-300 ${i === 4 ? 'md:col-span-2 lg:col-span-1' : ''}`}>
+          <!-- Glow effect on hover -->
+          <div class={`absolute -top-20 -right-20 w-40 h-40 bg-${mode.color}/10 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500`}></div>
+
+          <div class="relative">
+            <div class={`w-14 h-14 rounded-xl bg-${mode.color}/15 flex items-center justify-center text-${mode.color} mb-5 group-hover:scale-110 transition-transform`}>
+              <Fragment set:html={mode.icon} />
+            </div>
+
+            <div class="flex items-center gap-3 mb-2">
+              <h3 class="text-xl font-bold text-white">{mode.name}</h3>
+              <span class={`text-xs px-2 py-0.5 rounded-full bg-${mode.color}/10 text-${mode.color}`}>
+                {mode.tagline}
+              </span>
+            </div>
+
+            <p class="text-gray-400 text-sm leading-relaxed">{mode.description}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>

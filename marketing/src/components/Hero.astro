@@ -1,0 +1,147 @@
+---
+// Hero section with floating card visuals
+---
+
+<section class="relative min-h-screen flex items-center justify-center pt-16 overflow-hidden">
+  <!-- Background glow effects -->
+  <div class="absolute inset-0 overflow-hidden">
+    <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-brand-blue/10 rounded-full blur-[128px] animate-pulse-glow"></div>
+    <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-brand-purple/10 rounded-full blur-[128px] animate-pulse-glow" style="animation-delay: 1.5s;"></div>
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-brand-red/5 rounded-full blur-[128px]"></div>
+  </div>
+
+  <!-- Grid pattern overlay -->
+  <div class="absolute inset-0 opacity-[0.03]" style="background-image: linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px); background-size: 60px 60px;"></div>
+
+  <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-32">
+    <div class="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+      <!-- Left: Copy -->
+      <div class="text-center lg:text-left">
+        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-sm text-gray-400 mb-6">
+          <span class="w-2 h-2 rounded-full bg-brand-green animate-pulse"></span>
+          Free to play &mdash; no account needed
+        </div>
+
+        <h1 class="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-extrabold leading-[1.1] tracking-tight mb-6">
+          <span class="text-white">Train Your</span><br />
+          <span class="gradient-text">Pattern Brain</span>
+        </h1>
+
+        <p class="text-lg sm:text-xl text-gray-400 max-w-xl mx-auto lg:mx-0 mb-8 leading-relaxed">
+          NodusNexus is a strategic card game where every move sharpens your mind.
+          Match colors, shapes, and numbers to outscore AI opponents or challenge friends online.
+        </p>
+
+        <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+          <a
+            href="https://game.nodusnexus.com"
+            class="group px-8 py-4 bg-brand-blue hover:bg-blue-600 text-white font-bold text-lg rounded-full transition-all hover:shadow-xl hover:shadow-blue-500/25 hover:-translate-y-0.5 flex items-center justify-center gap-2"
+          >
+            Play Now
+            <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+            </svg>
+          </a>
+          <a
+            href="#how-it-works"
+            class="px-8 py-4 bg-white/5 hover:bg-white/10 text-white font-semibold text-lg rounded-full transition-all border border-white/10 hover:border-white/20 flex items-center justify-center"
+          >
+            See How It Works
+          </a>
+        </div>
+
+        <!-- Social proof -->
+        <div class="mt-10 flex flex-wrap items-center gap-6 justify-center lg:justify-start text-sm text-gray-500">
+          <div class="flex items-center gap-1.5">
+            <div class="flex -space-x-1">
+              {[...Array(5)].map(() => (
+                <svg class="w-4 h-4 text-brand-yellow" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                </svg>
+              ))}
+            </div>
+            <span>4.8/5 rating</span>
+          </div>
+          <div class="w-px h-4 bg-gray-700"></div>
+          <span>Works on any device</span>
+          <div class="w-px h-4 bg-gray-700"></div>
+          <span>Plays offline</span>
+        </div>
+      </div>
+
+      <!-- Right: Floating cards visual -->
+      <div class="relative h-[400px] lg:h-[500px] hidden sm:block">
+        <!-- Card: Blue Circle 3 -->
+        <div class="absolute top-8 left-1/2 -translate-x-1/2 animate-float">
+          <div class="game-card game-card-lg bg-gradient-to-br from-gray-900 to-gray-800 shadow-2xl shadow-brand-blue/20">
+            <div class="absolute top-2 left-3 text-brand-blue text-lg font-bold">3</div>
+            <svg class="w-12 h-12" viewBox="0 0 48 48">
+              <circle cx="24" cy="24" r="16" fill="none" stroke="#3b82f6" stroke-width="3" />
+            </svg>
+            <div class="absolute bottom-2 right-3 text-brand-blue text-lg font-bold rotate-180">3</div>
+          </div>
+        </div>
+
+        <!-- Card: Red Triangle 1 -->
+        <div class="absolute top-32 left-8 lg:left-4 animate-float-delayed">
+          <div class="game-card game-card-lg bg-gradient-to-br from-gray-900 to-gray-800 shadow-2xl shadow-brand-red/20">
+            <div class="absolute top-2 left-3 text-brand-red text-lg font-bold">1</div>
+            <svg class="w-12 h-12" viewBox="0 0 48 48">
+              <polygon points="24,6 42,42 6,42" fill="none" stroke="#ef4444" stroke-width="3" />
+            </svg>
+            <div class="absolute bottom-2 right-3 text-brand-red text-lg font-bold rotate-180">1</div>
+          </div>
+        </div>
+
+        <!-- Card: Green Square 4 -->
+        <div class="absolute top-24 right-8 lg:right-4 animate-float-slow">
+          <div class="game-card game-card-lg bg-gradient-to-br from-gray-900 to-gray-800 shadow-2xl shadow-brand-green/20">
+            <div class="absolute top-2 left-3 text-brand-green text-lg font-bold">4</div>
+            <svg class="w-12 h-12" viewBox="0 0 48 48">
+              <rect x="8" y="8" width="32" height="32" fill="none" stroke="#22c55e" stroke-width="3" />
+            </svg>
+            <div class="absolute bottom-2 right-3 text-brand-green text-lg font-bold rotate-180">4</div>
+          </div>
+        </div>
+
+        <!-- Card: Yellow Cross 2 -->
+        <div class="absolute bottom-16 left-1/4 animate-float">
+          <div class="game-card game-card-lg bg-gradient-to-br from-gray-900 to-gray-800 shadow-2xl shadow-brand-yellow/20" style="animation-delay: 0.5s;">
+            <div class="absolute top-2 left-3 text-brand-yellow text-lg font-bold">2</div>
+            <svg class="w-12 h-12" viewBox="0 0 48 48">
+              <path d="M24 6v36M6 24h36" fill="none" stroke="#eab308" stroke-width="3" stroke-linecap="round" />
+            </svg>
+            <div class="absolute bottom-2 right-3 text-brand-yellow text-lg font-bold rotate-180">2</div>
+          </div>
+        </div>
+
+        <!-- Card: Purple Wild -->
+        <div class="absolute bottom-24 right-1/4 animate-float-delayed" style="animation-delay: 1s;">
+          <div class="game-card game-card-lg bg-gradient-to-br from-purple-900/80 to-gray-900 shadow-2xl shadow-brand-purple/20 border-brand-purple/30">
+            <div class="absolute top-2 left-3 text-brand-purple text-sm font-bold">W</div>
+            <svg class="w-12 h-12" viewBox="0 0 48 48">
+              <path d="M24 8l4.5 9.27L38 18.86l-7 6.82 1.65 9.63L24 30.77l-8.65 4.54L17 25.68l-7-6.82 9.5-1.59z" fill="none" stroke="#a855f7" stroke-width="2.5" />
+            </svg>
+            <div class="absolute bottom-2 right-3 text-brand-purple text-sm font-bold rotate-180">W</div>
+          </div>
+        </div>
+
+        <!-- Connection lines (subtle) -->
+        <svg class="absolute inset-0 w-full h-full opacity-10" viewBox="0 0 500 500">
+          <line x1="250" y1="70" x2="80" y2="220" stroke="white" stroke-width="1" stroke-dasharray="4 4" />
+          <line x1="250" y1="70" x2="420" y2="180" stroke="white" stroke-width="1" stroke-dasharray="4 4" />
+          <line x1="80" y1="220" x2="170" y2="380" stroke="white" stroke-width="1" stroke-dasharray="4 4" />
+          <line x1="420" y1="180" x2="330" y2="350" stroke="white" stroke-width="1" stroke-dasharray="4 4" />
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scroll indicator -->
+  <div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-gray-500 text-sm">
+    <span>Scroll to explore</span>
+    <svg class="w-5 h-5 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+    </svg>
+  </div>
+</section>

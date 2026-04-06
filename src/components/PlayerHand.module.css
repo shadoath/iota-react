@@ -35,7 +35,9 @@
   font-size: var(--font-size-md);
   font-weight: var(--font-weight-bold);
   cursor: pointer;
-  transition: background-color var(--transition-fast), transform var(--transition-fast);
+  transition:
+    background-color var(--transition-fast),
+    transform var(--transition-fast);
 }
 
 .btnComplete:hover:not(:disabled) {
@@ -68,13 +70,104 @@
   cursor: not-allowed;
 }
 
+.cardSlot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.swapSelected {
+  position: relative;
+}
+
+.swapSelected::before {
+  content: 'SWAP';
+  position: absolute;
+  top: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--color-warning);
+  color: white;
+  font-size: 8px;
+  font-weight: 800;
+  padding: 1px 6px;
+  border-radius: var(--radius-pill);
+  z-index: 2;
+}
+
+.swapBtn {
+  padding: var(--space-xs) var(--space-md);
+  background: transparent;
+  color: var(--color-text-muted);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-xs);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.swapBtn:hover {
+  border-color: var(--color-warning);
+  color: var(--color-warning);
+}
+
+.lotGlow {
+  position: relative;
+}
+
+.lotGlow::after {
+  content: "";
+  position: absolute;
+  inset: 4px;
+  border-radius: var(--radius-md);
+  border: 2px solid var(--color-warning);
+  pointer-events: none;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.lotBadge {
+  position: absolute;
+  top: 16px;
+  right: -4px;
+  background: var(--color-warning);
+  color: white;
+  font-size: 9px;
+  font-weight: 800;
+  padding: 1px 4px;
+  border-radius: var(--radius-pill);
+  z-index: 1;
+}
+
+.keyHint {
+  font-size: 10px;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-muted);
+  background: var(--color-surface-alt);
+  width: 18px;
+  height: 18px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-variant-numeric: tabular-nums;
+  border: 1px solid var(--color-border);
+}
+
 @media (max-width: 768px) {
   .hand {
     padding: var(--space-sm) var(--space-md);
     gap: var(--space-sm);
+    /* Safe area for phones with bottom bars */
+    padding-bottom: max(var(--space-sm), env(safe-area-inset-bottom));
   }
 
   .turnActions {
-    bottom: 84px;
+    bottom: 90px;
+  }
+
+  .keyHint {
+    display: none; /* hide keyboard hints on touch devices */
   }
 }

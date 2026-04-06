@@ -3,11 +3,23 @@
  * Runs in the Node.js Socket.io server.
  */
 
-import type { Card, PlacedCard, PendingPlacement, GridPosition } from '../types/game'
-import type { RoomState, RoomSettings, RoomPlayer, MultiplayerGameState, MultiplayerPlayerView } from './protocol'
-import { createDeck, isValidPlacement, calculateScore, getValidPlacements, shuffleDeck } from '../utils/gameLogic'
-import { isPlacementInSameLineAsPending } from '../utils/turnValidation'
-import { HAND_SIZE, MAX_LINE_LENGTH } from '../constants/game'
+import type { Card, PlacedCard, PendingPlacement, GridPosition } from "../types/game"
+import type {
+  RoomState,
+  RoomSettings,
+  RoomPlayer,
+  MultiplayerGameState,
+  MultiplayerPlayerView,
+} from "./protocol"
+import {
+  createDeck,
+  isValidPlacement,
+  calculateScore,
+  getValidPlacements,
+  shuffleDeck,
+} from "../utils/gameLogic"
+import { isPlacementInSameLineAsPending } from "../utils/turnValidation"
+import { HAND_SIZE, MAX_LINE_LENGTH } from "../constants/game"
 
 // --- Internal game state (server-only, includes hidden info) ---
 
@@ -29,14 +41,14 @@ interface ServerGameState {
   pendingPlacements: PendingPlacement[]
   turnInProgress: boolean
   lastTurnScore: number | null
-  gamePhase: 'playing' | 'ended'
+  gamePhase: "playing" | "ended"
 }
 
 interface Room {
   code: string
   hostId: string
   settings: RoomSettings
-  status: 'lobby' | 'playing' | 'ended'
+  status: "lobby" | "playing" | "ended"
   players: RoomPlayer[]
   game: ServerGameState | null
   // Map socketId → playerId for reconnection
@@ -46,8 +58,8 @@ interface Room {
 // --- Room code generation ---
 
 function generateRoomCode(): string {
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789' // no ambiguous chars
-  let code = ''
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789" // no ambiguous chars
+  let code = ""
   for (let i = 0; i < 6; i++) {
     code += chars[Math.floor(Math.random() * chars.length)]
   }
@@ -59,7 +71,11 @@ function generateRoomCode(): string {
 export class RoomManager {
   private rooms = new Map<string, Room>()
 
-  createRoom(hostSocketId: string, settings: RoomSettings, playerName: string): { code: string; playerId: string } {
+  createRoom(
+    hostSocketId: string,
+    settings: RoomSettings,
+    playerName: string
+  ): { code: string; playerId: string } {
     let code: string
     do {
       code = generateRoomCode()
@@ -71,13 +87,15 @@ export class RoomManager {
       code,
       hostId: playerId,
       settings,
-      status: 'lobby',
-      players: [{
-        id: playerId,
-        name: playerName,
-        connected: true,
-        lastSeen: Date.now(),
-      }],
+      status: "lobby",
+      players: [
+        {
+          id: playerId,
+          name: playerName,
+          connected: true,
+          lastSeen: Date.now(),
+        },
+      ],
       game: null,
       socketToPlayer: new Map([[hostSocketId, playerId]]),
     }
@@ -86,11 +104,15 @@ export class RoomManager {
     return { code, playerId }
   }
 
-  joinRoom(code: string, socketId: string, playerName: string): { ok: boolean; playerId?: string; error?: string } {
+  joinRoom(
+    code: string,
+    socketId: string,
+    playerName: string
+  ): { ok: boolean; playerId?: string; error?: string } {
     const room = this.rooms.get(code)
-    if (!room) return { ok: false, error: 'Room not found' }
-    if (room.status !== 'lobby') return { ok: false, error: 'Game already in progress' }
-    if (room.players.length >= room.settings.maxPlayers) return { ok: false, error: 'Room is full' }
+    if (!room) return { ok: false, error: "Room not found" }
+    if (room.status !== "lobby") return { ok: false, error: "Game already in progress" }
+    if (room.players.length >= room.settings.maxPlayers) return { ok: false, error: "Room is full" }
 
     const playerId = `p-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`
 
@@ -114,8 +136,8 @@ export class RoomManager {
 
     room.socketToPlayer.delete(socketId)
 
-    if (room.status === 'lobby') {
-      room.players = room.players.filter(p => p.id !== playerId)
+    if (room.status === "lobby") {
+      room.players = room.players.filter((p) => p.id !== playerId)
       if (room.players.length === 0) {
         this.rooms.delete(code)
         return { playerId, roomDeleted: true }
@@ -126,7 +148,7 @@ export class RoomManager {
       }
     } else {
       // During game, mark as disconnected
-      const player = room.players.find(p => p.id === playerId)
+      const player = room.players.find((p) => p.id === playerId)
       if (player) {
         player.connected = false
         player.lastSeen = Date.now()
@@ -140,7 +162,7 @@ export class RoomManager {
     const room = this.rooms.get(code)
     if (!room) return false
 
-    const player = room.players.find(p => p.id === playerId)
+    const player = room.players.find((p) => p.id === playerId)
     if (!player) return false
 
     player.connected = true
@@ -149,7 +171,7 @@ export class RoomManager {
 
     // Update server game state if in progress
     if (room.game) {
-      const serverPlayer = room.game.players.find(p => p.id === playerId)
+      const serverPlayer = room.game.players.find((p) => p.id === playerId)
       if (serverPlayer) {
         serverPlayer.socketId = socketId
         serverPlayer.connected = true
@@ -161,11 +183,11 @@ export class RoomManager {
 
   startGame(code: string, socketId: string): { ok: boolean; error?: string } {
     const room = this.rooms.get(code)
-    if (!room) return { ok: false, error: 'Room not found' }
+    if (!room) return { ok: false, error: "Room not found" }
 
     const playerId = room.socketToPlayer.get(socketId)
-    if (playerId !== room.hostId) return { ok: false, error: 'Only the host can start the game' }
-    if (room.players.length < 2) return { ok: false, error: 'Need at least 2 players' }
+    if (playerId !== room.hostId) return { ok: false, error: "Only the host can start the game" }
+    if (room.players.length < 2) return { ok: false, error: "Need at least 2 players" }
 
     const deck = createDeck()
     const players: ServerPlayer[] = []
@@ -175,7 +197,7 @@ export class RoomManager {
       const socketEntry = Array.from(room.socketToPlayer.entries()).find(([, pid]) => pid === rp.id)
       players.push({
         id: rp.id,
-        socketId: socketEntry?.[0] ?? '',
+        socketId: socketEntry?.[0] ?? "",
         name: rp.name,
         hand: deck.splice(0, HAND_SIZE),
         score: 0,
@@ -195,32 +217,39 @@ export class RoomManager {
       pendingPlacements: [],
       turnInProgress: false,
       lastTurnScore: null,
-      gamePhase: 'playing',
+      gamePhase: "playing",
     }
-    room.status = 'playing'
+    room.status = "playing"
 
     return { ok: true }
   }
 
   // --- Game actions ---
 
-  placeCard(code: string, socketId: string, cardId: string, position: GridPosition): { ok: boolean; error?: string } {
+  placeCard(
+    code: string,
+    socketId: string,
+    cardId: string,
+    position: GridPosition
+  ): { ok: boolean; error?: string } {
     const { game, playerId } = this.getGameAndPlayer(code, socketId)
-    if (!game || !playerId) return { ok: false, error: 'Not in a game' }
-    if (game.players[game.currentPlayerIndex].id !== playerId) return { ok: false, error: 'Not your turn' }
-    if (game.pendingPlacements.length >= MAX_LINE_LENGTH) return { ok: false, error: 'Maximum 4 cards per turn' }
+    if (!game || !playerId) return { ok: false, error: "Not in a game" }
+    if (game.players[game.currentPlayerIndex].id !== playerId)
+      return { ok: false, error: "Not your turn" }
+    if (game.pendingPlacements.length >= MAX_LINE_LENGTH)
+      return { ok: false, error: "Maximum 4 cards per turn" }
 
     const player = game.players[game.currentPlayerIndex]
-    const card = player.hand.find(c => c.id === cardId)
-    if (!card) return { ok: false, error: 'Card not in hand' }
+    const card = player.hand.find((c) => c.id === cardId)
+    if (!card) return { ok: false, error: "Card not in hand" }
 
     if (!isPlacementInSameLineAsPending(position, game.pendingPlacements)) {
-      return { ok: false, error: 'Must place in same row or column' }
+      return { ok: false, error: "Must place in same row or column" }
     }
 
     const allPlacements = [...game.board, ...game.pendingPlacements]
     if (!isValidPlacement(card, position, allPlacements)) {
-      return { ok: false, error: 'Invalid placement' }
+      return { ok: false, error: "Invalid placement" }
     }
 
     const pending: PendingPlacement = {
@@ -229,7 +258,7 @@ export class RoomManager {
     }
 
     game.pendingPlacements.push(pending)
-    player.hand = player.hand.filter(c => c.id !== cardId)
+    player.hand = player.hand.filter((c) => c.id !== cardId)
     game.turnInProgress = true
 
     return { ok: true }
@@ -237,12 +266,13 @@ export class RoomManager {
 
   undoPlacement(code: string, socketId: string): { ok: boolean; error?: string } {
     const { game, playerId } = this.getGameAndPlayer(code, socketId)
-    if (!game || !playerId) return { ok: false, error: 'Not in a game' }
-    if (game.players[game.currentPlayerIndex].id !== playerId) return { ok: false, error: 'Not your turn' }
-    if (game.pendingPlacements.length === 0) return { ok: false, error: 'Nothing to undo' }
+    if (!game || !playerId) return { ok: false, error: "Not in a game" }
+    if (game.players[game.currentPlayerIndex].id !== playerId)
+      return { ok: false, error: "Not your turn" }
+    if (game.pendingPlacements.length === 0) return { ok: false, error: "Nothing to undo" }
 
     const last = game.pendingPlacements.pop()!
-    const originalCard = { ...last.card, id: last.card.id.replace('pending-', '') }
+    const originalCard = { ...last.card, id: last.card.id.replace("pending-", "") }
     game.players[game.currentPlayerIndex].hand.push(originalCard)
     game.turnInProgress = game.pendingPlacements.length > 0
 
@@ -251,9 +281,10 @@ export class RoomManager {
 
   completeTurn(code: string, socketId: string): { ok: boolean; error?: string; score?: number } {
     const { game, playerId } = this.getGameAndPlayer(code, socketId)
-    if (!game || !playerId) return { ok: false, error: 'Not in a game' }
-    if (game.players[game.currentPlayerIndex].id !== playerId) return { ok: false, error: 'Not your turn' }
-    if (game.pendingPlacements.length === 0) return { ok: false, error: 'Place at least one card' }
+    if (!game || !playerId) return { ok: false, error: "Not in a game" }
+    if (game.players[game.currentPlayerIndex].id !== playerId)
+      return { ok: false, error: "Not your turn" }
+    if (game.pendingPlacements.length === 0) return { ok: false, error: "Place at least one card" }
 
     const score = calculateScore(game.pendingPlacements, game.board)
     game.board.push(...game.pendingPlacements)
@@ -272,10 +303,10 @@ export class RoomManager {
     game.currentPlayerIndex = (game.currentPlayerIndex + 1) % game.players.length
 
     // Check game end
-    if (game.deck.length === 0 && game.players.every(p => p.hand.length === 0)) {
-      game.gamePhase = 'ended'
+    if (game.deck.length === 0 && game.players.every((p) => p.hand.length === 0)) {
+      game.gamePhase = "ended"
       const room = this.rooms.get(code)
-      if (room) room.status = 'ended'
+      if (room) room.status = "ended"
     }
 
     return { ok: true, score }
@@ -283,17 +314,18 @@ export class RoomManager {
 
   swapCards(code: string, socketId: string, cardIds: string[]): { ok: boolean; error?: string } {
     const { game, playerId } = this.getGameAndPlayer(code, socketId)
-    if (!game || !playerId) return { ok: false, error: 'Not in a game' }
-    if (game.players[game.currentPlayerIndex].id !== playerId) return { ok: false, error: 'Not your turn' }
+    if (!game || !playerId) return { ok: false, error: "Not in a game" }
+    if (game.players[game.currentPlayerIndex].id !== playerId)
+      return { ok: false, error: "Not your turn" }
 
     const player = game.players[game.currentPlayerIndex]
-    const toSwap = player.hand.filter(c => cardIds.includes(c.id))
-    if (toSwap.length === 0) return { ok: false, error: 'No valid cards to swap' }
+    const toSwap = player.hand.filter((c) => cardIds.includes(c.id))
+    if (toSwap.length === 0) return { ok: false, error: "No valid cards to swap" }
 
-    player.hand = player.hand.filter(c => !cardIds.includes(c.id))
+    player.hand = player.hand.filter((c) => !cardIds.includes(c.id))
     game.deck.push(...toSwap)
 
-    // Shuffle deck using imported shuffleDeck
+    // Shuffle deck
     game.deck = shuffleDeck(game.deck)
 
     // Draw same number
@@ -310,16 +342,19 @@ export class RoomManager {
 
   // --- View generation ---
 
-  getGameStateForPlayer(code: string, playerId: string): { gameState: MultiplayerGameState; hand: Card[] } | null {
+  getGameStateForPlayer(
+    code: string,
+    playerId: string
+  ): { gameState: MultiplayerGameState; hand: Card[] } | null {
     const room = this.rooms.get(code)
     if (!room?.game) return null
 
     const game = room.game
     const isCurrentPlayer = game.players[game.currentPlayerIndex].id === playerId
-    const player = game.players.find(p => p.id === playerId)
+    const player = game.players.find((p) => p.id === playerId)
     if (!player) return null
 
-    const playerViews: MultiplayerPlayerView[] = game.players.map(p => ({
+    const playerViews: MultiplayerPlayerView[] = game.players.map((p) => ({
       id: p.id,
       name: p.name,
       cardCount: p.hand.length,
@@ -370,7 +405,10 @@ export class RoomManager {
 
   // --- Helpers ---
 
-  private getGameAndPlayer(code: string, socketId: string): { game: ServerGameState | null; playerId: string | null } {
+  private getGameAndPlayer(
+    code: string,
+    socketId: string
+  ): { game: ServerGameState | null; playerId: string | null } {
     const room = this.rooms.get(code)
     if (!room?.game) return { game: null, playerId: null }
     const playerId = room.socketToPlayer.get(socketId) ?? null

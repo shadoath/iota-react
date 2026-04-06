@@ -94,8 +94,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 64px;
-  height: 80px;
+  width: 68px;
+  height: 68px;
   border-radius: var(--radius-sm);
 }
 
@@ -170,7 +170,7 @@
   }
 
   .miniCell {
-    width: 52px;
-    height: 68px;
+    width: 56px;
+    height: 56px;
   }
 }

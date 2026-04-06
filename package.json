@@ -5,15 +5,18 @@
   "scripts": {
     "dev": "next dev",
     "dev:mp": "npx tsx server.ts",
-    "build": "next build",
+    "build": "next build && node scripts/build-sw.mjs",
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "vitest",
     "test:run": "vitest run",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "dependencies": {
+    "@types/workbox-routing": "^4.3.1",
     "next": "^16.2.2",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
@@ -24,12 +27,14 @@
   "devDependencies": {
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
+    "@types/eslint-config-prettier": "^6.11.3",
     "@types/node": "^20",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.1",
     "eslint": "^9.39.4",
     "eslint-config-next": "^16.2.2",
+    "eslint-config-prettier": "^10.1.8",
     "jsdom": "^29.0.1",
     "typescript": "^5.9.3",
     "vitest": "^4.1.2"

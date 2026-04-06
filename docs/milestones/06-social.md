@@ -16,12 +16,14 @@
 Keep it simple. Players want to play, not fill out forms.
 
 **Options (pick one):**
+
 - **Anonymous + upgrade**: Start playing immediately with a generated name. Optionally sign in later to save progress permanently. Best for conversion.
 - **Social login only**: Google / Apple / GitHub sign-in. No passwords to manage.
 
 **Recommendation**: Anonymous-first with optional social login upgrade.
 
 Implementation:
+
 - NextAuth.js (or Auth.js) for the auth layer
 - Session stored in cookie
 - Guest sessions stored in localStorage, migrated to account on sign-in
@@ -32,15 +34,18 @@ Implementation:
 Lightweight data needs. Two options:
 
 **Option A: Supabase (Postgres + Auth + Realtime)**
+
 - Free tier covers early growth
 - Row-level security for multiplayer data
 - Built-in auth (could replace NextAuth)
 
 **Option B: PlanetScale / Neon (serverless Postgres) + Prisma**
+
 - More control, standard stack
 - Prisma for type-safe queries
 
 **Data models:**
+
 ```
 User { id, name, avatar, createdAt }
 GameResult { id, date, mode, players[], scores[], winner, duration, turnCount }
@@ -90,27 +95,32 @@ Leaderboard updates in near real-time for daily challenges.
 Rewarding milestones that encourage different play styles:
 
 **Beginner:**
+
 - "First Move" — Complete your first game
 - "Student" — Complete the tutorial
 - "Daily Player" — Complete a daily challenge
 
 **Skill:**
+
 - "Four of a Kind" — Play all 4 cards in a single turn
 - "Line Master" — Complete a line of 4
 - "Century" — Score 100+ in a single game
 - "Perfect Line" — Score 16 in a single line (4+4+4+4)
 
 **Dedication:**
+
 - "Week Warrior" — 7-day daily challenge streak
 - "Centurion" — Play 100 games
 - "Veteran" — Play 500 games
 
 **Social:**
+
 - "Friendly" — Play 10 multiplayer games
 - "Rival" — Play 5 games against the same person
 - "Champion" — Win a game against Hard AI
 
 **Secret:**
+
 - "Wild Thing" — Win a game using both wild cards
 - "Minimalist" — Win while never playing more than 1 card per turn
 - "Speedster" — Win a blitz game with 30+ seconds remaining

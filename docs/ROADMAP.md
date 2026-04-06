@@ -33,16 +33,16 @@ All 8 foundation milestones have been completed:
 
 ## Completed Milestones
 
-| # | Milestone | Status |
-|---|-----------|--------|
-| 1 | [Foundation](milestones/01-foundation.md) — Cleanup, testing, state management | Done |
-| 2 | [Core UI](milestones/02-core-ui.md) — Card design, board UX, CSS Modules | Done |
-| 3 | [Solo Play](milestones/03-solo-play.md) — AI opponents, difficulty levels | Done |
-| 4 | [Game Modes](milestones/04-game-modes.md) — Tutorial, timed, practice modes | Done |
-| 5 | [Multiplayer](milestones/05-multiplayer.md) — Online play, lobbies, matchmaking | Done |
-| 6 | [Social](milestones/06-social.md) — Stats, achievements, dashboard | Done |
-| 7 | [Commercial](milestones/07-commercial.md) — PWA, dark mode, a11y, error boundary | Done |
-| 8 | [Digital Features](milestones/08-wild-cards.md) — Replay, heatmap, pattern trainer | Done |
+| #   | Milestone                                                                          | Status |
+| --- | ---------------------------------------------------------------------------------- | ------ |
+| 1   | [Foundation](milestones/01-foundation.md) — Cleanup, testing, state management     | Done   |
+| 2   | [Core UI](milestones/02-core-ui.md) — Card design, board UX, CSS Modules           | Done   |
+| 3   | [Solo Play](milestones/03-solo-play.md) — AI opponents, difficulty levels          | Done   |
+| 4   | [Game Modes](milestones/04-game-modes.md) — Tutorial, timed, practice modes        | Done   |
+| 5   | [Multiplayer](milestones/05-multiplayer.md) — Online play, lobbies, matchmaking    | Done   |
+| 6   | [Social](milestones/06-social.md) — Stats, achievements, dashboard                 | Done   |
+| 7   | [Commercial](milestones/07-commercial.md) — PWA, dark mode, a11y, error boundary   | Done   |
+| 8   | [Digital Features](milestones/08-wild-cards.md) — Replay, heatmap, pattern trainer | Done   |
 
 ## What's Next
 

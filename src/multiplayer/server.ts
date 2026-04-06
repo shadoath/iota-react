@@ -3,10 +3,10 @@
  * Attached to the Next.js HTTP server via a custom server or API route.
  */
 
-import { Server as SocketIOServer } from 'socket.io'
-import type { Server as HTTPServer } from 'http'
-import type { ClientToServerEvents, ServerToClientEvents } from './protocol'
-import { RoomManager } from './RoomManager'
+import { Server as SocketIOServer } from "socket.io"
+import type { Server as HTTPServer } from "http"
+import type { ClientToServerEvents, ServerToClientEvents } from "./protocol"
+import { RoomManager } from "./RoomManager"
 
 const roomManager = new RoomManager()
 
@@ -15,15 +15,15 @@ setInterval(() => roomManager.cleanup(), 5 * 60 * 1000)
 
 export function initSocketServer(httpServer: HTTPServer): SocketIOServer {
   const io = new SocketIOServer<ClientToServerEvents, ServerToClientEvents>(httpServer, {
-    cors: { origin: '*' },
-    path: '/api/socket',
+    cors: { origin: "*" },
+    path: "/api/socket",
   })
 
-  io.on('connection', (socket) => {
+  io.on("connection", (socket) => {
     let currentRoom: string | null = null
     let currentPlayerId: string | null = null
 
-    socket.on('room:create', (settings, playerName, callback) => {
+    socket.on("room:create", (settings, playerName, callback) => {
       const { code, playerId } = roomManager.createRoom(socket.id, settings, playerName)
       currentRoom = code
       currentPlayerId = playerId
@@ -32,13 +32,13 @@ export function initSocketServer(httpServer: HTTPServer): SocketIOServer {
       const roomState = roomManager.getRoomState(code)
       if (roomState) {
         callback({ ok: true, code })
-        socket.emit('room:state', roomState)
+        socket.emit("room:state", roomState)
       } else {
-        callback({ ok: false, error: 'Failed to create room' })
+        callback({ ok: false, error: "Failed to create room" })
       }
     })
 
-    socket.on('room:join', (code, playerName, callback) => {
+    socket.on("room:join", (code, playerName, callback) => {
       const result = roomManager.joinRoom(code.toUpperCase(), socket.id, playerName)
       if (!result.ok) {
         callback({ ok: false, error: result.error })
@@ -52,11 +52,11 @@ export function initSocketServer(httpServer: HTTPServer): SocketIOServer {
       const roomState = roomManager.getRoomState(currentRoom)
       if (roomState) {
         callback({ ok: true })
-        io.to(currentRoom).emit('room:state', roomState)
+        io.to(currentRoom).emit("room:state", roomState)
       }
     })
 
-    socket.on('room:leave', () => {
+    socket.on("room:leave", () => {
       if (!currentRoom) return
       const { playerId, roomDeleted } = roomManager.leaveRoom(currentRoom, socket.id)
       socket.leave(currentRoom)
@@ -64,20 +64,20 @@ export function initSocketServer(httpServer: HTTPServer): SocketIOServer {
       if (!roomDeleted && playerId) {
         const roomState = roomManager.getRoomState(currentRoom)
         if (roomState) {
-          io.to(currentRoom).emit('room:state', roomState)
+          io.to(currentRoom).emit("room:state", roomState)
         }
-        io.to(currentRoom).emit('player:left', playerId)
+        io.to(currentRoom).emit("player:left", playerId)
       }
 
       currentRoom = null
       currentPlayerId = null
     })
 
-    socket.on('game:start', () => {
+    socket.on("game:start", () => {
       if (!currentRoom) return
       const result = roomManager.startGame(currentRoom, socket.id)
       if (!result.ok) {
-        socket.emit('game:error', result.error!)
+        socket.emit("game:error", result.error!)
         return
       }
 
@@ -85,54 +85,54 @@ export function initSocketServer(httpServer: HTTPServer): SocketIOServer {
       broadcastGameState(currentRoom)
     })
 
-    socket.on('game:place_card', (cardId, position) => {
+    socket.on("game:place_card", (cardId, position) => {
       if (!currentRoom) return
       const result = roomManager.placeCard(currentRoom, socket.id, cardId, position)
       if (!result.ok) {
-        socket.emit('game:error', result.error!)
+        socket.emit("game:error", result.error!)
         return
       }
       broadcastGameState(currentRoom)
     })
 
-    socket.on('game:undo', () => {
+    socket.on("game:undo", () => {
       if (!currentRoom) return
       const result = roomManager.undoPlacement(currentRoom, socket.id)
       if (!result.ok) {
-        socket.emit('game:error', result.error!)
+        socket.emit("game:error", result.error!)
         return
       }
       broadcastGameState(currentRoom)
     })
 
-    socket.on('game:complete_turn', () => {
+    socket.on("game:complete_turn", () => {
       if (!currentRoom) return
       const result = roomManager.completeTurn(currentRoom, socket.id)
       if (!result.ok) {
-        socket.emit('game:error', result.error!)
+        socket.emit("game:error", result.error!)
         return
       }
       broadcastGameState(currentRoom)
     })
 
-    socket.on('game:swap_cards', (cardIds) => {
+    socket.on("game:swap_cards", (cardIds) => {
       if (!currentRoom) return
       const result = roomManager.swapCards(currentRoom, socket.id, cardIds)
       if (!result.ok) {
-        socket.emit('game:error', result.error!)
+        socket.emit("game:error", result.error!)
         return
       }
       broadcastGameState(currentRoom)
     })
 
-    socket.on('disconnect', () => {
+    socket.on("disconnect", () => {
       if (!currentRoom || !currentPlayerId) return
       const { roomDeleted } = roomManager.leaveRoom(currentRoom, socket.id)
       if (!roomDeleted) {
-        io.to(currentRoom).emit('player:disconnected', currentPlayerId)
+        io.to(currentRoom).emit("player:disconnected", currentPlayerId)
         const roomState = roomManager.getRoomState(currentRoom)
         if (roomState) {
-          io.to(currentRoom).emit('room:state', roomState)
+          io.to(currentRoom).emit("room:state", roomState)
         }
       }
     })
@@ -141,7 +141,7 @@ export function initSocketServer(httpServer: HTTPServer): SocketIOServer {
   function broadcastGameState(roomCode: string) {
     const roomState = roomManager.getRoomState(roomCode)
     if (roomState) {
-      io.to(roomCode).emit('room:state', roomState)
+      io.to(roomCode).emit("room:state", roomState)
     }
 
     // Send personalized game state to each player
@@ -159,8 +159,8 @@ export function initSocketServer(httpServer: HTTPServer): SocketIOServer {
 
       const playerSocket = io.sockets.sockets.get(socketId)
       if (playerSocket) {
-        playerSocket.emit('game:state', view.gameState)
-        playerSocket.emit('game:your_hand', view.hand)
+        playerSocket.emit("game:state", view.gameState)
+        playerSocket.emit("game:your_hand", view.hand)
       }
     }
   }

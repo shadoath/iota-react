@@ -1,0 +1,30 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Nav from '../components/Nav.astro';
+import Hero from '../components/Hero.astro';
+import HowItWorks from '../components/HowItWorks.astro';
+import Benefits from '../components/Benefits.astro';
+import GameModes from '../components/GameModes.astro';
+import ForEveryone from '../components/ForEveryone.astro';
+import Features from '../components/Features.astro';
+import CTA from '../components/CTA.astro';
+import Footer from '../components/Footer.astro';
+import '../styles/global.css';
+---
+
+<Layout
+  title="NodusNexus — The Strategic Card Game That Trains Your Brain"
+  description="Play NodusNexus, a free strategic card game where you match colors, shapes, and numbers to outscore AI opponents or friends online. Fun for kids and adults. No download, no account, works on any device."
+>
+  <Nav />
+  <main>
+    <Hero />
+    <HowItWorks />
+    <Benefits />
+    <GameModes />
+    <ForEveryone />
+    <Features />
+    <CTA />
+  </main>
+  <Footer />
+</Layout>

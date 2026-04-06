@@ -1,5 +1,5 @@
-import React, { useEffect, useState, useRef } from 'react'
-import styles from './TurnTimer.module.css'
+import React, { useEffect, useState, useRef } from "react"
+import styles from "./TurnTimer.module.css"
 
 interface TurnTimerProps {
   timeLimit: number // seconds
@@ -11,11 +11,7 @@ interface TurnTimerProps {
 /**
  * Inner component that resets via key prop (avoids setState in effect).
  */
-function TurnTimerInner({
-  timeLimit,
-  onTimeout,
-  isActive,
-}: Omit<TurnTimerProps, 'resetKey'>) {
+function TurnTimerInner({ timeLimit, onTimeout, isActive }: Omit<TurnTimerProps, "resetKey">) {
   const [remaining, setRemaining] = useState(timeLimit)
   const onTimeoutRef = useRef(onTimeout)
 
@@ -28,7 +24,7 @@ function TurnTimerInner({
     if (!isActive || isExpired) return
 
     const interval = setInterval(() => {
-      setRemaining(prev => {
+      setRemaining((prev) => {
         const next = prev - 1
         if (next <= 0) {
           clearInterval(interval)
@@ -48,9 +44,7 @@ function TurnTimerInner({
 
   return (
     <div className={styles.timer}>
-      <span className={`${styles.timeText} ${isUrgent ? styles.urgent : ''}`}>
-        {remaining}s
-      </span>
+      <span className={`${styles.timeText} ${isUrgent ? styles.urgent : ""}`}>{remaining}s</span>
       <div className={styles.bar}>
         <div
           className={`${styles.barFill} ${colorClass}`}
@@ -62,9 +56,6 @@ function TurnTimerInner({
 }
 
 /** Wrapper that remounts the timer via key to reset it. */
-export const TurnTimer: React.FC<TurnTimerProps> = ({
-  resetKey,
-  ...props
-}) => {
+export const TurnTimer: React.FC<TurnTimerProps> = ({ resetKey, ...props }) => {
   return <TurnTimerInner key={resetKey} {...props} />
 }

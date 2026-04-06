@@ -4,9 +4,9 @@
  * and compute the average potential score.
  */
 
-import type { Card, PlacedCard, GridPosition } from '../types/game'
-import { getValidPlacements, isValidPlacement, calculateScore } from './gameLogic'
-import { CARD_NUMBERS, CARD_COLORS, CARD_SHAPES } from '../constants/game'
+import type { Card, PlacedCard, GridPosition } from "../types/game"
+import { getValidPlacements, isValidPlacement, calculateScore } from "./gameLogic"
+import { CARD_NUMBERS, CARD_COLORS, CARD_SHAPES } from "../constants/game"
 
 export interface HeatmapCell {
   position: GridPosition
