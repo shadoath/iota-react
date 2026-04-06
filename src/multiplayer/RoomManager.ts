@@ -66,6 +66,25 @@ function generateRoomCode(): string {
   return code
 }
 
+// --- Input validation ---
+
+const MAX_PLAYER_NAME_LENGTH = 20
+const PLAYER_NAME_PATTERN = /^[\w\s\-'.]+$/
+
+function sanitizePlayerName(name: unknown): string {
+  if (typeof name !== "string") return "Player"
+  const trimmed = name.trim().slice(0, MAX_PLAYER_NAME_LENGTH)
+  if (trimmed.length === 0) return "Player"
+  if (!PLAYER_NAME_PATTERN.test(trimmed)) {
+    // Strip invalid characters, keep what's left
+    const cleaned = trimmed.replace(/[^\w\s\-'.]/g, "").trim()
+    return cleaned.length > 0 ? cleaned : "Player"
+  }
+  return trimmed
+}
+
+const ROOM_CODE_PATTERN = /^[A-HJ-NP-Z2-9]{6}$/
+
 // --- Room Manager ---
 
 export class RoomManager {
@@ -82,6 +101,7 @@ export class RoomManager {
     } while (this.rooms.has(code))
 
     const playerId = `p-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`
+    const safeName = sanitizePlayerName(playerName)
 
     const room: Room = {
       code,
@@ -91,7 +111,7 @@ export class RoomManager {
       players: [
         {
           id: playerId,
-          name: playerName,
+          name: safeName,
           connected: true,
           lastSeen: Date.now(),
         },
@@ -109,16 +129,19 @@ export class RoomManager {
     socketId: string,
     playerName: string
   ): { ok: boolean; playerId?: string; error?: string } {
+    if (!ROOM_CODE_PATTERN.test(code)) return { ok: false, error: "Invalid room code" }
+
     const room = this.rooms.get(code)
     if (!room) return { ok: false, error: "Room not found" }
     if (room.status !== "lobby") return { ok: false, error: "Game already in progress" }
     if (room.players.length >= room.settings.maxPlayers) return { ok: false, error: "Room is full" }
 
     const playerId = `p-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`
+    const safeName = sanitizePlayerName(playerName)
 
     room.players.push({
       id: playerId,
-      name: playerName,
+      name: safeName,
       connected: true,
       lastSeen: Date.now(),
     })
@@ -411,7 +434,9 @@ export class RoomManager {
   ): { game: ServerGameState | null; playerId: string | null } {
     const room = this.rooms.get(code)
     if (!room?.game) return { game: null, playerId: null }
-    const playerId = room.socketToPlayer.get(socketId) ?? null
+    const playerId = room.socketToPlayer.get(socketId)
+    // Reject sockets that aren't registered in this room
+    if (!playerId) return { game: null, playerId: null }
     return { game: room.game, playerId }
   }
 

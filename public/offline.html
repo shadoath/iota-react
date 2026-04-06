@@ -102,8 +102,13 @@
       <p>
         You're currently offline. Check your internet connection and try again to load the game.
       </p>
-      <button onclick="window.location.reload()">Try Again</button>
+      <button id="retry-btn">Try Again</button>
       <p class="hint">If you've played before, the game may be cached and available offline.</p>
     </div>
+    <script>
+      document.getElementById("retry-btn").addEventListener("click", function () {
+        window.location.reload();
+      });
+    </script>
   </body>
 </html>

@@ -13,9 +13,37 @@ const roomManager = new RoomManager()
 // Periodic cleanup
 setInterval(() => roomManager.cleanup(), 5 * 60 * 1000)
 
+// --- Per-socket rate limiting ---
+
+const RATE_LIMIT_WINDOW_MS = 1000
+const RATE_LIMIT_MAX_EVENTS = 15
+
+class RateLimiter {
+  private counters = new Map<string, { count: number; resetAt: number }>()
+
+  check(socketId: string): boolean {
+    const now = Date.now()
+    const entry = this.counters.get(socketId)
+
+    if (!entry || now >= entry.resetAt) {
+      this.counters.set(socketId, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS })
+      return true
+    }
+
+    entry.count++
+    return entry.count <= RATE_LIMIT_MAX_EVENTS
+  }
+
+  remove(socketId: string): void {
+    this.counters.delete(socketId)
+  }
+}
+
+const rateLimiter = new RateLimiter()
+
 export function initSocketServer(
   httpServer: HTTPServer,
-  corsOrigin: string | string[] = "*"
+  corsOrigin: string | string[] = "https://nodusnexus.com"
 ): SocketIOServer {
   const io = new SocketIOServer<ClientToServerEvents, ServerToClientEvents>(httpServer, {
     cors: { origin: corsOrigin },
@@ -25,6 +53,15 @@ export function initSocketServer(
   io.on("connection", (socket) => {
     let currentRoom: string | null = null
     let currentPlayerId: string | null = null
+
+    // Rate-limit middleware for all incoming events
+    socket.use((_event, next) => {
+      if (!rateLimiter.check(socket.id)) {
+        next(new Error("Rate limit exceeded"))
+        return
+      }
+      next()
+    })
 
     socket.on("room:create", (settings, playerName, callback) => {
       const { code, playerId } = roomManager.createRoom(socket.id, settings, playerName)
@@ -129,6 +166,7 @@ export function initSocketServer(
     })
 
     socket.on("disconnect", () => {
+      rateLimiter.remove(socket.id)
       if (!currentRoom || !currentPlayerId) return
       const { roomDeleted } = roomManager.leaveRoom(currentRoom, socket.id)
       if (!roomDeleted) {

@@ -78,9 +78,9 @@ export function useSocket(): UseSocketReturn {
 
       socket.on("disconnect", () => setConnected(false))
 
-      socket.on("connect_error", (err) => {
+      socket.on("connect_error", () => {
         setConnecting(false)
-        setError(`Connection failed: ${err.message}. Make sure the multiplayer server is running (npm run dev:mp).`)
+        setError("Connection failed. Make sure the multiplayer server is running.")
       })
 
       socket.on("room:state", (state) => setRoomState(state))
