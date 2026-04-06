@@ -1,6 +1,9 @@
-export type CardNumber = 1 | 2 | 3 | 4
-export type CardColor = "red" | "green" | "blue" | "yellow"
-export type CardShape = "triangle" | "square" | "circle" | "cross"
+export type CardNumber = 1 | 2 | 3 | 4 | 5
+export type CardColor = "red" | "green" | "blue" | "yellow" | "purple"
+export type CardShape = "triangle" | "square" | "circle" | "cross" | "star"
+
+// Special card actions
+export type SpecialCardType = "remove" | "steal" | "swap" | "mirror" | "double"
 
 export interface RegularCard {
   id: string
@@ -8,6 +11,7 @@ export interface RegularCard {
   color: CardColor
   shape: CardShape
   isWild?: false
+  isSpecial?: false
 }
 
 export interface WildCard {
@@ -16,9 +20,20 @@ export interface WildCard {
   color: CardColor
   shape: CardShape
   isWild: true
+  isSpecial?: false
 }
 
-export type Card = RegularCard | WildCard
+export interface SpecialCard {
+  id: string
+  number: CardNumber
+  color: CardColor
+  shape: CardShape
+  isWild?: false
+  isSpecial: true
+  specialType: SpecialCardType
+}
+
+export type Card = RegularCard | WildCard | SpecialCard
 
 export interface GridPosition {
   row: number
@@ -58,6 +73,32 @@ export type GamePhase = "menu" | "setup" | "playing" | "ended"
 
 export type GameMode = "classic" | "practice" | "timed" | "daily"
 
+// --- Configurable game size ---
+
+export type GameSize = 3 | 4 | 5
+
+export interface SpecialCardConfig {
+  remove: number // how many "remove" cards to add
+  steal: number
+  swap: number
+  mirror: number
+  double: number
+}
+
+export interface CustomGameConfig {
+  size: GameSize // 3, 4, or 5 attributes per dimension
+  wildCount: number
+  specialCards: SpecialCardConfig
+  handSize: number
+}
+
+export const DEFAULT_CUSTOM_CONFIG: CustomGameConfig = {
+  size: 4,
+  wildCount: 2,
+  specialCards: { remove: 0, steal: 0, swap: 0, mirror: 0, double: 0 },
+  handSize: 4,
+}
+
 export interface GameSettings {
   playerCount: number
   aiPlayers: Array<{ name: string; difficulty: AIDifficulty }>
@@ -65,6 +106,7 @@ export interface GameSettings {
   turnTimeLimit?: number // seconds, for timed mode
   hintsEnabled?: boolean // for practice mode
   prebuiltDeck?: Card[] // for daily challenge (seeded deck)
+  customConfig?: CustomGameConfig // for advanced game options
 }
 
 export interface GameState {
@@ -80,6 +122,7 @@ export interface GameState {
   turnHistory: TurnRecord[]
   turnTimeLimit: number | null // seconds, null = untimed
   hintsEnabled: boolean
+  customConfig: CustomGameConfig
 
   // Legacy single-player compat (derived from players[0])
   playerHand: Card[]
