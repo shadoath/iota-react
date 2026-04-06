@@ -1,5 +1,7 @@
 import React, { useState } from "react"
-import type { AIDifficulty, GameMode, GameSettings } from "../types/game"
+import type { AIDifficulty, GameMode, GameSettings, CustomGameConfig } from "../types/game"
+import { DEFAULT_CUSTOM_CONFIG } from "../types/game"
+import { AdvancedSetup } from "./AdvancedSetup"
 import styles from "./GameSetup.module.css"
 
 const AI_NAMES = ["Dot", "Dash", "Pixel", "Byte", "Chip", "Nova"]
@@ -26,6 +28,8 @@ export const GameSetup: React.FC<GameSetupProps> = ({ mode, onStartGame, onBack 
     { name: AI_NAMES[0], difficulty: mode === "practice" ? "easy" : "medium" },
   ])
   const [turnTimeLimit, setTurnTimeLimit] = useState(30)
+  const [showAdvanced, setShowAdvanced] = useState(false)
+  const [customConfig, setCustomConfig] = useState<CustomGameConfig>(DEFAULT_CUSTOM_CONFIG)
 
   const addAI = () => {
     if (aiPlayers.length >= 3) return
@@ -52,6 +56,7 @@ export const GameSetup: React.FC<GameSetupProps> = ({ mode, onStartGame, onBack 
       mode,
       turnTimeLimit: mode === "timed" ? turnTimeLimit : undefined,
       hintsEnabled: mode === "practice",
+      customConfig: showAdvanced ? customConfig : undefined,
     })
   }
 
@@ -160,6 +165,21 @@ export const GameSetup: React.FC<GameSetupProps> = ({ mode, onStartGame, onBack 
             </div>
           </>
         )}
+
+        <div className={styles.divider} />
+
+        <button
+          className={styles.addBtn}
+          onClick={() => setShowAdvanced((prev) => !prev)}
+          style={{
+            borderStyle: showAdvanced ? "solid" : "dashed",
+            color: showAdvanced ? "var(--color-info)" : undefined,
+          }}
+        >
+          {showAdvanced ? "Hide" : "Show"} Advanced Options
+        </button>
+
+        {showAdvanced && <AdvancedSetup config={customConfig} onChange={setCustomConfig} />}
 
         <button className={styles.startBtn} onClick={handleStart}>
           Start Game

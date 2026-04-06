@@ -1,10 +1,21 @@
-import { Card, CardColor, CardNumber, CardShape, PlacedCard, GridPosition } from "../types/game"
-import { CARD_NUMBERS, CARD_COLORS, CARD_SHAPES, MAX_LINE_LENGTH } from "../constants/game"
+import type {
+  Card,
+  CardColor,
+  CardNumber,
+  CardShape,
+  PlacedCard,
+  GridPosition,
+  CustomGameConfig,
+  SpecialCardType,
+} from "../types/game"
+import { DEFAULT_CUSTOM_CONFIG } from "../types/game"
+import { CARD_NUMBERS, CARD_COLORS, CARD_SHAPES, MAX_LINE_LENGTH, getNumbers, getColors, getShapes } from "../constants/game"
 
-export function createDeck(): Card[] {
-  const numbers: CardNumber[] = [...CARD_NUMBERS]
-  const colors: CardColor[] = [...CARD_COLORS]
-  const shapes: CardShape[] = [...CARD_SHAPES]
+export function createDeck(config?: CustomGameConfig): Card[] {
+  const cfg = config ?? DEFAULT_CUSTOM_CONFIG
+  const numbers = getNumbers(cfg.numberCount)
+  const colors = getColors(cfg.colorCount)
+  const shapes = getShapes(cfg.shapeCount)
 
   const deck: Card[] = []
   let id = 0
@@ -22,21 +33,32 @@ export function createDeck(): Card[] {
     }
   }
 
-  // Add 2 wild cards (can match any attribute, worth 0 points)
-  deck.push({
-    id: `wild-1`,
-    number: 0 as CardNumber,
-    color: "wild" as CardColor,
-    shape: "wild" as CardShape,
-    isWild: true,
-  } as Card)
-  deck.push({
-    id: `wild-2`,
-    number: 0 as CardNumber,
-    color: "wild" as CardColor,
-    shape: "wild" as CardShape,
-    isWild: true,
-  } as Card)
+  // Add wild cards
+  for (let i = 0; i < cfg.wildCount; i++) {
+    deck.push({
+      id: `wild-${i + 1}`,
+      number: 0 as CardNumber,
+      color: "wild" as CardColor,
+      shape: "wild" as CardShape,
+      isWild: true,
+    } as Card)
+  }
+
+  // Add special cards
+  const specialTypes: SpecialCardType[] = ["remove", "steal", "swap"]
+  for (const type of specialTypes) {
+    const count = cfg.specialCards[type]
+    for (let i = 0; i < count; i++) {
+      deck.push({
+        id: `special-${type}-${i + 1}`,
+        number: 0 as CardNumber,
+        color: "wild" as CardColor,
+        shape: "wild" as CardShape,
+        isSpecial: true,
+        specialType: type,
+      } as Card)
+    }
+  }
 
   return shuffleDeck(deck)
 }
