@@ -11,7 +11,7 @@ interface AdvancedSetupProps {
 }
 
 const SIZES: GameSize[] = [3, 4, 5]
-const SPECIAL_TYPES: SpecialCardType[] = ["remove", "steal", "swap", "mirror", "double"]
+const SPECIAL_TYPES: SpecialCardType[] = ["remove", "steal", "swap"]
 
 export const AdvancedSetup: React.FC<AdvancedSetupProps> = ({ config, onChange }) => {
   const updateSize = (size: GameSize) => {

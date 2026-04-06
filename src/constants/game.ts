@@ -54,8 +54,6 @@ export const SPECIAL_CARD_INFO: Record<string, { icon: string; name: string; des
   remove: { icon: "\u{1F5D1}", name: "Remove", description: "Remove any card from the board" },
   steal: { icon: "\u{1F4E5}", name: "Steal", description: "Take a board card into your hand" },
   swap: { icon: "\u{1F500}", name: "Swap", description: "Exchange a board card with one in your hand" },
-  mirror: { icon: "\u{1FA9E}", name: "Mirror", description: "Copies attributes of an adjacent card" },
-  double: { icon: "\u{2728}", name: "Double", description: "Doubles the score of the line it joins" },
 }
 
 // Game size labels
