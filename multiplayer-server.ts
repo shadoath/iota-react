@@ -13,7 +13,7 @@ import { initSocketServer } from "./src/multiplayer/server"
 const port = parseInt(process.env.PORT || "3001", 10)
 const corsOrigin = process.env.CORS_ORIGIN
   ? process.env.CORS_ORIGIN.split(",").map((s) => s.trim())
-  : "*"
+  : "https://nodusnexus.com"
 
 const httpServer = createServer((req, res) => {
   // Health check endpoint

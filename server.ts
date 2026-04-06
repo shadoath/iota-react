@@ -35,7 +35,8 @@ app.prepare().then(() => {
   // Separate HTTP server for Socket.io to avoid conflicts with
   // Next.js/Turbopack WebSocket handling in dev mode.
   const socketServer = createServer()
-  initSocketServer(socketServer, "*")
+  const devOrigins = [`http://localhost:${port}`, `http://${hostname}:${port}`]
+  initSocketServer(socketServer, devOrigins)
 
   httpServer.listen(port, () => {
     console.log(`> Ready on http://${hostname}:${port}`)
