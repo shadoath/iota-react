@@ -58,3 +58,4 @@ npm run test:run     # Run tests once
 - No MUI or CSS-in-JS dependencies — all styling is CSS Modules
 - Dark mode uses `data-theme` attribute + `prefers-color-scheme` media query
 - localStorage keys are prefixed with `nodusnexus-`
+- Prefer `for...of` loops over `forEach` for iteration
