@@ -16,19 +16,26 @@
     "format:check": "prettier --check ."
   },
   "dependencies": {
-    "@types/workbox-routing": "^4.3.1",
+    "@sentry/nextjs": "^10.47.0",
     "next": "^16.2.2",
+    "posthog-js": "^1.364.7",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "react-hot-toast": "^2.6.0",
     "socket.io": "^4.8.3",
-    "socket.io-client": "^4.8.3"
+    "socket.io-client": "^4.8.3",
+    "workbox-cacheable-response": "^7.4.0",
+    "workbox-expiration": "^7.4.0",
+    "workbox-precaching": "^7.4.0",
+    "workbox-routing": "^7.4.0",
+    "workbox-strategies": "^7.4.0"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@types/eslint-config-prettier": "^6.11.3",
-    "@types/node": "^20",
+    "@types/node": "^20.19.39",
+    "@types/prettier": "^2.7.3",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.1",
@@ -36,7 +43,10 @@
     "eslint-config-next": "^16.2.2",
     "eslint-config-prettier": "^10.1.8",
     "jsdom": "^29.0.1",
+    "prettier": "^3.8.1",
+    "sharp": "^0.34.5",
     "typescript": "^5.9.3",
-    "vitest": "^4.1.2"
+    "vitest": "^4.1.2",
+    "workbox-build": "^7.4.0"
   }
 }
