@@ -71,6 +71,10 @@ npm run test         # Vitest in watch mode
 npm run test:run     # Run tests once
 ```
 
+### Code Style Notes
+
+- Prefer `for...of` loops over `forEach` for iteration.
+
 ## Project Structure
 
 ```

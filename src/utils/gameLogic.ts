@@ -113,19 +113,19 @@ export function getValidPlacements(
   const validPositions = new Set<string>()
   const occupiedPositions = new Set<string>()
 
-  allPlacements.forEach((placed) => {
+  for (const placed of allPlacements) {
     occupiedPositions.add(`${placed.position.row},${placed.position.col}`)
-  })
+  }
 
-  allPlacements.forEach((placed) => {
+  for (const placed of allPlacements) {
     const adjacent = getAdjacentPositions(placed.position)
-    adjacent.forEach((pos) => {
+    for (const pos of adjacent) {
       const key = `${pos.row},${pos.col}`
       if (!occupiedPositions.has(key)) {
         validPositions.add(key)
       }
-    })
-  })
+    }
+  }
 
   // If there are pending placements, filter to only positions in the same line
   if (pendingPlacements.length > 0) {
@@ -139,7 +139,7 @@ export function getValidPlacements(
     const firstCol = pendingPlacements[0].position.col
     const allSameCol = pendingPlacements.every((p) => p.position.col === firstCol)
 
-    validPositions.forEach((key) => {
+    for (const key of validPositions) {
       const [row, col] = key.split(",").map(Number)
 
       if (allSameRow && row === firstRow) {
@@ -152,7 +152,7 @@ export function getValidPlacements(
           filteredPositions.add(key)
         }
       }
-    })
+    }
 
     return Array.from(filteredPositions).map((key) => {
       const [row, col] = key.split(",").map(Number)
@@ -309,7 +309,7 @@ export function calculateScore(placements: PlacedCard[], board: PlacedCard[]): n
   const scoredLines = new Set<string>()
 
   // For each placed card, find all lines it's part of
-  placements.forEach((placement) => {
+  for (const placement of placements) {
     // Check horizontal line
     const horizontalLine = getCardsInLine(placement.position, allCards, "horizontal")
     if (horizontalLine.length >= 2) {
@@ -334,7 +334,7 @@ export function calculateScore(placements: PlacedCard[], board: PlacedCard[]): n
     if (horizontalLine.length < 2 && verticalLine.length < 2) {
       totalScore += placement.card.isWild ? 0 : placement.card.number
     }
-  })
+  }
 
   return totalScore
 }
