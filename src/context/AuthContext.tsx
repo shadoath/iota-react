@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useEffect, useState, useCallback, type ReactNode } from "react"
 import type { User, Session } from "@supabase/supabase-js"
 import { createClient } from "../lib/supabase"
+import { identifyUser, resetUser } from "../analytics/posthog"
 
 interface AuthState {
   user: User | null
@@ -36,18 +37,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const handleSession = useCallback((session: Session | null) => {
     const user = session?.user ?? null
+    const name =
+      user?.user_metadata?.full_name ??
+      user?.user_metadata?.name ??
+      user?.email?.split("@")[0] ??
+      null
+
     setState({
       user,
       session,
       loading: false,
       isAuthenticated: !!user,
-      displayName:
-        user?.user_metadata?.full_name ??
-        user?.user_metadata?.name ??
-        user?.email?.split("@")[0] ??
-        null,
+      displayName: name,
       avatarUrl: user?.user_metadata?.avatar_url ?? null,
     })
+
+    // Identify user in analytics
+    if (user) {
+      identifyUser(user.id, { name, email: user.email })
+    } else {
+      resetUser()
+    }
   }, [])
 
   useEffect(() => {

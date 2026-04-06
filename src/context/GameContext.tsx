@@ -12,9 +12,6 @@ import type {
   GameMode,
   TurnRecord,
   CustomGameConfig,
-  CardNumber,
-  CardColor,
-  CardShape,
 } from "../types/game"
 import { DEFAULT_CUSTOM_CONFIG } from "../types/game"
 import { createDeck, calculateScore, shuffleDeck } from "../utils/gameLogic"
@@ -57,12 +54,12 @@ const AI_NAMES = ["Dot", "Dash", "Pixel", "Byte", "Chip", "Nova"]
 
 // --- Helpers ---
 
-function dealHands(deck: Card[], playerCount: number): { hands: Card[][]; remaining: Card[] } {
+function dealHands(deck: Card[], playerCount: number, handSize: number = HAND_SIZE): { hands: Card[][]; remaining: Card[] } {
   const hands: Card[][] = []
   let remaining = [...deck]
   for (let i = 0; i < playerCount; i++) {
-    hands.push(remaining.slice(0, HAND_SIZE))
-    remaining = remaining.slice(HAND_SIZE)
+    hands.push(remaining.slice(0, handSize))
+    remaining = remaining.slice(handSize)
   }
   return { hands, remaining }
 }
@@ -99,7 +96,7 @@ function initializeGame(settings: GameSettings): GameState {
   const customConfig = settings.customConfig ?? DEFAULT_CUSTOM_CONFIG
   const deck = settings.prebuiltDeck ?? createDeck(customConfig)
   const totalPlayers = 1 + settings.aiPlayers.length
-  const { hands, remaining } = dealHands(deck, totalPlayers)
+  const { hands, remaining } = dealHands(deck, totalPlayers, customConfig.handSize)
 
   // Place initial card
   const initialCard = remaining[0]
@@ -140,7 +137,8 @@ function syncLegacyFields(game: GameState): GameState {
 
 function drawCards(game: GameState, playerIndex: number): GameState {
   const player = game.players[playerIndex]
-  const cardsNeeded = HAND_SIZE - player.hand.length
+  const handSize = game.customConfig?.handSize ?? HAND_SIZE
+  const cardsNeeded = handSize - player.hand.length
   if (cardsNeeded <= 0 || game.deck.length === 0) return game
 
   const drawn = game.deck.slice(0, cardsNeeded)
@@ -557,40 +555,6 @@ export function gameReducer(state: AppState, action: GameAction): AppState {
               : p
           )
           message = "Swapped a card!"
-          break
-        }
-        case "mirror": {
-          // Placed as a wild — it copies whatever is needed
-          if (!action.targetPosition) {
-            return { ...state, lastActionResult: { type: "error", message: "Select where to place the mirror" } }
-          }
-          // Place it as a wild card at the target position
-          const mirrorCard: Card = {
-            id: specialCard.id,
-            number: 0 as CardNumber,
-            color: "wild" as CardColor,
-            shape: "wild" as CardShape,
-            isWild: true,
-          } as Card
-          newBoard = [...newBoard, { card: mirrorCard, position: action.targetPosition }]
-          message = "Mirror card placed — adapts to any pattern!"
-          break
-        }
-        case "double": {
-          // Placed on the board — the line it joins gets double score on next turn
-          if (!action.targetPosition) {
-            return { ...state, lastActionResult: { type: "error", message: "Select where to place the double card" } }
-          }
-          // Place as a wild with double marker
-          const doubleCard: Card = {
-            id: specialCard.id,
-            number: 0 as CardNumber,
-            color: "wild" as CardColor,
-            shape: "wild" as CardShape,
-            isWild: true,
-          } as Card
-          newBoard = [...newBoard, { card: doubleCard, position: action.targetPosition }]
-          message = "Double card placed — line score doubled!"
           break
         }
         default:

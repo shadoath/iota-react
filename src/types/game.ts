@@ -1,9 +1,9 @@
 export type CardNumber = 1 | 2 | 3 | 4 | 5
-export type CardColor = "red" | "green" | "blue" | "yellow" | "purple"
-export type CardShape = "triangle" | "square" | "circle" | "cross" | "star"
+export type CardColor = "red" | "green" | "blue" | "yellow" | "purple" | "wild"
+export type CardShape = "triangle" | "square" | "circle" | "cross" | "star" | "wild"
 
 // Special card actions
-export type SpecialCardType = "remove" | "steal" | "swap" | "mirror" | "double"
+export type SpecialCardType = "remove" | "steal" | "swap"
 
 export interface RegularCard {
   id: string
@@ -77,25 +77,17 @@ export type GameMode = "classic" | "practice" | "timed" | "daily"
 
 export type GameSize = 3 | 4 | 5
 
-export interface SpecialCardConfig {
-  remove: number // how many "remove" cards to add
-  steal: number
-  swap: number
-  mirror: number
-  double: number
-}
-
 export interface CustomGameConfig {
   size: GameSize // 3, 4, or 5 attributes per dimension
   wildCount: number
-  specialCards: SpecialCardConfig
+  specialCards: { remove: number; steal: number; swap: number }
   handSize: number
 }
 
 export const DEFAULT_CUSTOM_CONFIG: CustomGameConfig = {
   size: 4,
   wildCount: 2,
-  specialCards: { remove: 0, steal: 0, swap: 0, mirror: 0, double: 0 },
+  specialCards: { remove: 0, steal: 0, swap: 0 },
   handSize: 4,
 }
 
