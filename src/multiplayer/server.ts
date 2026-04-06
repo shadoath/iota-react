@@ -13,9 +13,12 @@ const roomManager = new RoomManager()
 // Periodic cleanup
 setInterval(() => roomManager.cleanup(), 5 * 60 * 1000)
 
-export function initSocketServer(httpServer: HTTPServer): SocketIOServer {
+export function initSocketServer(
+  httpServer: HTTPServer,
+  corsOrigin: string | string[] = "*"
+): SocketIOServer {
   const io = new SocketIOServer<ClientToServerEvents, ServerToClientEvents>(httpServer, {
-    cors: { origin: "*" },
+    cors: { origin: corsOrigin },
     path: "/api/socket",
   })
 
