@@ -49,6 +49,9 @@ export const COLOR_MAP: Record<string, string> = {
   purple: "#a855f7",
 }
 
+// Player accent colors (indexed by player position 0–3)
+export const PLAYER_COLORS = ["#3b82f6", "#f97316", "#a855f7", "#14b8a6"] as const
+
 // Special card display info
 export const SPECIAL_CARD_INFO: Record<string, { icon: string; name: string; description: string }> = {
   remove: { icon: "\u{1F5D1}", name: "Remove", description: "Remove any card from the board" },

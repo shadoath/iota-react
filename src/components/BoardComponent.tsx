@@ -20,6 +20,7 @@ interface BoardComponentProps {
   attributeHints?: Record<string, string> | null
   showCardValidMoves?: boolean
   onInvalidClick?: (reason: string) => void
+  lastOpponentPlacements?: { row: number; col: number; color: string }[]
 }
 
 export const BoardComponent: React.FC<BoardComponentProps> = ({
@@ -34,6 +35,7 @@ export const BoardComponent: React.FC<BoardComponentProps> = ({
   attributeHints,
   showCardValidMoves,
   onInvalidClick,
+  lastOpponentPlacements,
 }) => {
   const viewportRef = useRef<HTMLDivElement>(null)
   const [isMobile, setIsMobile] = useState(false)
@@ -301,6 +303,10 @@ export const BoardComponent: React.FC<BoardComponentProps> = ({
             (p) => p.position.row === row && p.position.col === col
           )
 
+          const opponentHighlight = lastOpponentPlacements?.find(
+            (p) => p.row === row && p.col === col
+          )
+
           const cellClass = [styles.cell, valid && selectedCard && !impossible && styles.cellValid]
             .filter(Boolean)
             .join(" ")
@@ -346,7 +352,15 @@ export const BoardComponent: React.FC<BoardComponentProps> = ({
               }}
             >
               {placedCard && (
-                <GameCard card={placedCard.card} disabled boardCard placed={isPending} />
+                <>
+                  <GameCard card={placedCard.card} disabled boardCard placed={isPending} />
+                  {opponentHighlight && (
+                    <div
+                      className={styles.opponentHighlight}
+                      style={{ borderColor: opponentHighlight.color }}
+                    />
+                  )}
+                </>
               )}
               {!placedCard &&
                 valid &&

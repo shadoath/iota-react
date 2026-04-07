@@ -164,8 +164,14 @@ function advanceTurn(game: GameState): GameState {
 
 function checkGameEnd(game: GameState): GameState {
   if (game.deck.length === 0) {
+    // End if all players have empty hands
     const allEmpty = game.players.every((p) => p.hand.length === 0)
     if (allEmpty) {
+      return { ...game, gamePhase: "ended" }
+    }
+    // End if the current player has no cards left (they can't take a turn)
+    const currentPlayer = game.players[game.currentPlayerIndex]
+    if (currentPlayer && currentPlayer.hand.length === 0) {
       return { ...game, gamePhase: "ended" }
     }
   }

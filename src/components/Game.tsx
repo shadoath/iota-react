@@ -5,7 +5,7 @@ import toast, { Toaster } from "react-hot-toast"
 import { GameLog, LotCelebration, KeyboardHints, type LogEntry } from "./GameLog"
 import type { Card, GridPosition, GameSettings, GameMode, PlacedCard } from "../types/game"
 import { calculateScore, getValidPlacements, isValidPlacement } from "../utils/gameLogic"
-import { MAX_LINE_LENGTH } from "../constants/game"
+import { MAX_LINE_LENGTH, PLAYER_COLORS } from "../constants/game"
 import { isPlacementInSameLineAsPending } from "../utils/turnValidation"
 import { getDetailedValidationError } from "../utils/validationMessages"
 import { computeAIMove } from "../ai/engine"
@@ -452,6 +452,22 @@ function GameInner() {
     return hints
   }, [helpers.attributeGuide, selectedCard, isHumanTurn, game.board, game.pendingPlacements])
 
+  // --- Opponent last-move highlights ---
+  const lastOpponentPlacements = React.useMemo(() => {
+    if (game.turnHistory.length === 0) return []
+    // Find the most recent turn by an opponent (non-current-human player)
+    const humanId = game.players.find((p) => p.type === "human")?.id
+    for (let i = game.turnHistory.length - 1; i >= 0; i--) {
+      const turn = game.turnHistory[i]
+      if (turn.playerId !== humanId) {
+        const playerIndex = game.players.findIndex((p) => p.id === turn.playerId)
+        const color = PLAYER_COLORS[playerIndex % PLAYER_COLORS.length]
+        return turn.placements.map((pl) => ({ row: pl.position.row, col: pl.position.col, color }))
+      }
+    }
+    return []
+  }, [game.turnHistory, game.players])
+
   // --- Pattern Trainer ---
   // --- Daily Challenge ---
   if (showDaily) {
@@ -639,6 +655,7 @@ function GameInner() {
           attributeHints={attributeHints}
           showCardValidMoves={helpers.showCardValidMoves}
           onInvalidClick={(reason) => toast.error(reason, { id: "invalid-click" })}
+          lastOpponentPlacements={lastOpponentPlacements}
         />
       </div>
 
