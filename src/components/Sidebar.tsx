@@ -26,6 +26,11 @@ const HELPER_OPTIONS: Array<{ key: keyof HelpersConfig; label: string; desc: str
   { key: "setCompletion", label: "Lot Indicator", desc: "Glow on cards that complete a line of 4" },
   { key: "bestMove", label: "Best Move", desc: "Highlight the highest-scoring position" },
   { key: "attributeGuide", label: "Attribute Guide", desc: "Show what's needed at each position" },
+  {
+    key: "showCardValidMoves",
+    label: "Valid Moves",
+    desc: "Highlight only positions where your selected card can actually be placed",
+  },
 ]
 
 export const Sidebar: React.FC<SidebarProps> = ({

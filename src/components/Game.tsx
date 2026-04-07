@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useEffect, useRef, useState, useCallback } from "react"
-import toast from "react-hot-toast"
+import toast, { Toaster } from "react-hot-toast"
 import { GameLog, LotCelebration, KeyboardHints, type LogEntry } from "./GameLog"
 import type { Card, GridPosition, GameSettings, GameMode, PlacedCard } from "../types/game"
 import { calculateScore, getValidPlacements, isValidPlacement } from "../utils/gameLogic"
@@ -558,6 +558,7 @@ function GameInner() {
 
   return (
     <div className={styles.layout} role="main">
+      <Toaster position="top-center" toastOptions={{ duration: 2500 }} />
       {/* Game log (replaces toasts) */}
       <GameLog entries={logEntries} />
       <KeyboardHints />
@@ -616,6 +617,12 @@ function GameInner() {
       {/* Practice mode hint badge */}
       {game.hintsEnabled && <div className={styles.hintBadge}>Practice Mode</div>}
 
+      {/* Deck indicator */}
+      <div className={styles.deckIndicator} aria-label={`${game.deck.length} cards remaining in deck`}>
+        <span className={styles.deckCount}>{game.deck.length}</span>
+        <span className={styles.deckLabel}>deck</span>
+      </div>
+
       {/* Board area */}
       <div className={styles.boardArea}>
         <BoardComponent
@@ -630,6 +637,8 @@ function GameInner() {
           scoreHints={scoreHints}
           bestMove={bestMoveData}
           attributeHints={attributeHints}
+          showCardValidMoves={helpers.showCardValidMoves}
+          onInvalidClick={(reason) => toast.error(reason, { id: "invalid-click" })}
         />
       </div>
 

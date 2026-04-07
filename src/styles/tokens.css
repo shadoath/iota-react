@@ -19,7 +19,7 @@
   --color-valid: #bbf7d0;
   --color-valid-hover: #86efac;
   --color-valid-border: #22c55e;
-  --color-impossible: #d4d0c8;
+  --color-impossible: #f87171;
 
   /* Card surface */
   --color-card-face: #1a1a1a;
@@ -101,7 +101,7 @@
   --color-valid: #064e3b;
   --color-valid-hover: #065f46;
   --color-valid-border: #10b981;
-  --color-impossible: #374151;
+  --color-impossible: #ef4444;
 
   --color-card-face: #0a0a0a;
   --color-card-face-wild: #1a1025;
@@ -131,7 +131,7 @@
     --color-valid: #064e3b;
     --color-valid-hover: #065f46;
     --color-valid-border: #10b981;
-    --color-impossible: #374151;
+    --color-impossible: #ef4444;
 
     --color-card-face: #0a0a0a;
     --color-card-face-wild: #1a1025;

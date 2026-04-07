@@ -6,6 +6,7 @@ export interface HelpersConfig {
   setCompletion: boolean // Highlight cards that can complete a line of 4
   bestMove: boolean // Star on the highest-scoring position
   attributeGuide: boolean // Show what attributes are needed at valid positions
+  showCardValidMoves: boolean // Only highlight positions where selected card can actually be placed
 }
 
 const STORAGE_KEY = "nodusnexus-helpers"
@@ -14,6 +15,7 @@ const DEFAULTS: HelpersConfig = {
   setCompletion: false,
   bestMove: false,
   attributeGuide: false,
+  showCardValidMoves: false,
 }
 
 function getStored(): HelpersConfig {

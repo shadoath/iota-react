@@ -45,6 +45,40 @@
   min-height: 0;
 }
 
+/* Deck indicator - fixed bottom left */
+.deckIndicator {
+  position: fixed;
+  bottom: calc(100px + var(--space-md));
+  left: var(--space-lg);
+  z-index: var(--z-controls);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-xs) var(--space-sm);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  box-shadow: var(--shadow-sm);
+  min-width: 36px;
+}
+
+.deckCount {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text);
+  line-height: 1;
+}
+
+.deckLabel {
+  font-size: 9px;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  line-height: 1;
+}
+
 /* Practice mode badge */
 .hintBadge {
   position: fixed;

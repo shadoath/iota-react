@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from "react"
 import type { PlacedCard, GridPosition, Card } from "../types/game"
 import { GameCard } from "./GameCard"
-import { getValidPlacements } from "../utils/gameLogic"
+import { getValidPlacements, isValidPlacement } from "../utils/gameLogic"
 import { isImpossibleSquare } from "../utils/impossibleSquares"
+import { isPlacementInSameLineAsPending } from "../utils/turnValidation"
 import { computeHeatmap, heatmapToMap } from "../utils/heatmap"
 import { MOBILE_BREAKPOINT, MIN_ZOOM, MAX_ZOOM, ZOOM_STEP } from "../constants/game"
 import styles from "./Board.module.css"
@@ -17,6 +18,8 @@ interface BoardComponentProps {
   scoreHints?: Record<string, number> | null
   bestMove?: { cardId: string; position: GridPosition; score: number } | null
   attributeHints?: Record<string, string> | null
+  showCardValidMoves?: boolean
+  onInvalidClick?: (reason: string) => void
 }
 
 export const BoardComponent: React.FC<BoardComponentProps> = ({
@@ -29,6 +32,8 @@ export const BoardComponent: React.FC<BoardComponentProps> = ({
   scoreHints,
   bestMove,
   attributeHints,
+  showCardValidMoves,
+  onInvalidClick,
 }) => {
   const viewportRef = useRef<HTMLDivElement>(null)
   const [isMobile, setIsMobile] = useState(false)
@@ -72,7 +77,13 @@ export const BoardComponent: React.FC<BoardComponentProps> = ({
     }
   }, [isNewGame])
 
-  const validPlacements = selectedCard ? getValidPlacements(board, pendingPlacements) : []
+  const validPlacements = useMemo(() => {
+    if (!selectedCard) return []
+    const positions = getValidPlacements(board, pendingPlacements)
+    if (!showCardValidMoves) return positions
+    const allPlacements = [...board, ...pendingPlacements]
+    return positions.filter((pos) => isValidPlacement(selectedCard, pos, allPlacements))
+  }, [selectedCard, board, pendingPlacements, showCardValidMoves])
 
   const cellSize = isMobile ? 62 : 68
   const gap = isMobile ? 3 : 4
@@ -310,7 +321,22 @@ export const BoardComponent: React.FC<BoardComponentProps> = ({
               tabIndex={isClickable ? 0 : undefined}
               aria-label={cellLabel}
               onClick={() => {
-                if (isClickable) handleCellClick(row, col)
+                if (isClickable) {
+                  handleCellClick(row, col)
+                } else if (selectedCard && !placedCard) {
+                  let reason = "Can't place here."
+                  if (impossible) {
+                    reason = "Permanently blocked — no card can ever legally be placed here."
+                  } else if (
+                    pendingPlacements.length > 0 &&
+                    !isPlacementInSameLineAsPending({ row, col }, pendingPlacements)
+                  ) {
+                    reason = "Must stay in the same row or column as your other cards this turn."
+                  } else if (!isValidPlacement(selectedCard, { row, col }, allPlacements)) {
+                    reason = "Your card's attributes conflict with the line here."
+                  }
+                  onInvalidClick?.(reason)
+                }
               }}
               onKeyDown={(e) => {
                 if (isClickable && (e.key === "Enter" || e.key === " ")) {

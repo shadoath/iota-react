@@ -179,6 +179,13 @@ export function isValidPlacement(card: Card, position: GridPosition, board: Plac
   const horizontalLine = getCardsInLine(position, board, "horizontal")
   const verticalLine = getCardsInLine(position, board, "vertical")
 
+  // Wild cards must join a line that already has at least one non-wild card
+  if (card.isWild) {
+    const hasNonWildInLine =
+      horizontalLine.some((p) => !p.card.isWild) || verticalLine.some((p) => !p.card.isWild)
+    if (!hasNonWildInLine) return false
+  }
+
   // Check horizontal line if it would have 2+ cards
   if (horizontalLine.length > 0) {
     if (!isValidLine([...horizontalLine, { card, position }])) {
