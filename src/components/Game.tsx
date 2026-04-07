@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState, useCallback } from "react"
 import toast, { Toaster } from "react-hot-toast"
 import { GameLog, LotCelebration, KeyboardHints, type LogEntry } from "./GameLog"
 import type { Card, GridPosition, GameSettings, GameMode, PlacedCard } from "../types/game"
-import { calculateScore, getValidPlacements, isValidPlacement } from "../utils/gameLogic"
+import { calculateScore, getValidPlacements, isValidPlacement, canReplaceWild } from "../utils/gameLogic"
 import { MAX_LINE_LENGTH, PLAYER_COLORS } from "../constants/game"
 import { isPlacementInSameLineAsPending } from "../utils/turnValidation"
 import { getDetailedValidationError } from "../utils/validationMessages"
@@ -452,6 +452,14 @@ function GameInner() {
     return hints
   }, [helpers.attributeGuide, selectedCard, isHumanTurn, game.board, game.pendingPlacements])
 
+  // --- Replaceable wild positions ---
+  const replaceableWilds = React.useMemo(() => {
+    if (!selectedCard || !isHumanTurn || selectedCard.isWild) return []
+    return game.board
+      .filter((p) => p.card.isWild && canReplaceWild(selectedCard, p.position, game.board))
+      .map((p) => p.position)
+  }, [selectedCard, isHumanTurn, game.board])
+
   // --- Opponent last-move highlights ---
   const lastOpponentPlacements = React.useMemo(() => {
     if (game.turnHistory.length === 0) return []
@@ -656,6 +664,12 @@ function GameInner() {
           showCardValidMoves={helpers.showCardValidMoves}
           onInvalidClick={(reason) => toast.error(reason, { id: "invalid-click" })}
           lastOpponentPlacements={lastOpponentPlacements}
+          replaceableWilds={replaceableWilds}
+          onReplaceWild={(position) => {
+            if (selectedCard) {
+              dispatch({ type: "REPLACE_WILD", handCardId: selectedCard.id, position })
+            }
+          }}
         />
       </div>
 

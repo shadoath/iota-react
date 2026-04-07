@@ -14,7 +14,7 @@ import type {
   CustomGameConfig,
 } from "../types/game"
 import { DEFAULT_CUSTOM_CONFIG } from "../types/game"
-import { createDeck, calculateScore, shuffleDeck } from "../utils/gameLogic"
+import { createDeck, calculateScore, shuffleDeck, canReplaceWild } from "../utils/gameLogic"
 import { arePlacementsContiguous } from "../utils/turnValidation"
 import { HAND_SIZE } from "../constants/game"
 
@@ -33,6 +33,7 @@ export type GameAction =
   | { type: "AI_TURN"; placements: PendingPlacement[] }
   | { type: "SWAP_CARDS"; cardIds: string[] }
   | { type: "USE_SPECIAL"; cardId: string; targetPosition?: GridPosition; swapCardId?: string }
+  | { type: "REPLACE_WILD"; handCardId: string; position: GridPosition }
   | { type: "SET_ZOOM"; zoom: number }
 
 // --- Extended state (includes UI state) ---
@@ -579,6 +580,49 @@ export function gameReducer(state: AppState, action: GameAction): AppState {
         selectedCardId: null,
         game: syncLegacyFields(newGame),
         lastActionResult: { type: "success" as const, message },
+      }
+    }
+
+    case "REPLACE_WILD": {
+      if (state.game.gamePhase !== "playing") return state
+      const currentIdx = state.game.currentPlayerIndex
+      const currentPlayer = state.game.players[currentIdx]
+      if (currentPlayer.type !== "human") return state
+
+      const handCard = currentPlayer.hand.find((c) => c.id === action.handCardId)
+      if (!handCard) return state
+
+      const wildPlacement = state.game.board.find(
+        (p) => p.position.row === action.position.row && p.position.col === action.position.col
+      )
+      if (!wildPlacement?.card.isWild) return state
+
+      if (!canReplaceWild(handCard, action.position, state.game.board)) {
+        return {
+          ...state,
+          lastActionResult: { type: "error", message: "That card can't legally replace the wild here." },
+        }
+      }
+
+      // Swap: place hand card on board, return wild to hand
+      const newBoard = state.game.board.map((p) =>
+        p.position.row === action.position.row && p.position.col === action.position.col
+          ? { card: handCard, position: action.position }
+          : p
+      )
+      const newHand = currentPlayer.hand
+        .filter((c) => c.id !== action.handCardId)
+        .concat(wildPlacement.card)
+
+      const newPlayers = state.game.players.map((p, i) =>
+        i === currentIdx ? { ...p, hand: newHand } : p
+      )
+
+      return {
+        ...state,
+        game: syncLegacyFields({ ...state.game, board: newBoard, players: newPlayers }),
+        selectedCardId: null,
+        lastActionResult: { type: "success", message: "Wild card collected!" },
       }
     }
 

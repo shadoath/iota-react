@@ -205,6 +205,32 @@ export function isValidPlacement(card: Card, position: GridPosition, board: Plac
   return adjacentCards.length > 0
 }
 
+/**
+ * Returns true if `card` from a player's hand can legally replace a wild card
+ * at `position` on the board. All lines through the position must remain valid
+ * after the swap.
+ */
+export function canReplaceWild(card: Card, position: GridPosition, board: PlacedCard[]): boolean {
+  const wildPlacement = board.find(
+    (p) => p.position.row === position.row && p.position.col === position.col
+  )
+  if (!wildPlacement?.card.isWild) return false
+  if (card.isWild) return false // can't replace a wild with another wild
+
+  // Build a board where the wild is replaced by `card`
+  const boardWithReplacement = board.map((p) =>
+    p.position.row === position.row && p.position.col === position.col ? { card, position } : p
+  )
+
+  const horizontalLine = getCardsInLine(position, boardWithReplacement, "horizontal")
+  const verticalLine = getCardsInLine(position, boardWithReplacement, "vertical")
+
+  if (horizontalLine.length > 1 && !isValidLine(horizontalLine)) return false
+  if (verticalLine.length > 1 && !isValidLine(verticalLine)) return false
+
+  return true
+}
+
 export function getCardsInLine(
   position: GridPosition,
   board: PlacedCard[],

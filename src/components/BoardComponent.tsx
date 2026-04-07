@@ -21,6 +21,8 @@ interface BoardComponentProps {
   showCardValidMoves?: boolean
   onInvalidClick?: (reason: string) => void
   lastOpponentPlacements?: { row: number; col: number; color: string }[]
+  replaceableWilds?: GridPosition[]
+  onReplaceWild?: (position: GridPosition) => void
 }
 
 export const BoardComponent: React.FC<BoardComponentProps> = ({
@@ -36,6 +38,8 @@ export const BoardComponent: React.FC<BoardComponentProps> = ({
   showCardValidMoves,
   onInvalidClick,
   lastOpponentPlacements,
+  replaceableWilds,
+  onReplaceWild,
 }) => {
   const viewportRef = useRef<HTMLDivElement>(null)
   const [isMobile, setIsMobile] = useState(false)
@@ -307,27 +311,39 @@ export const BoardComponent: React.FC<BoardComponentProps> = ({
             (p) => p.row === row && p.col === col
           )
 
-          const cellClass = [styles.cell, valid && selectedCard && !impossible && styles.cellValid]
+          const isReplaceableWild =
+            !!placedCard?.card.isWild &&
+            !!replaceableWilds?.some((p) => p.row === row && p.col === col)
+
+          const cellClass = [
+            styles.cell,
+            valid && selectedCard && !impossible && styles.cellValid,
+            isReplaceableWild && styles.wildReplaceable,
+          ]
             .filter(Boolean)
             .join(" ")
 
           const isClickable = valid && selectedCard && !impossible
-          const cellLabel = placedCard
-            ? `Card: ${placedCard.card.isWild ? "Wild" : `${placedCard.card.number} ${placedCard.card.color} ${placedCard.card.shape}`} at row ${row}, column ${col}`
-            : isClickable
-              ? `Place card at row ${row}, column ${col}${scoreHints?.[`${row},${col}`] ? ` for ${scoreHints[`${row},${col}`]} points` : ""}`
-              : undefined
+          const cellLabel = isReplaceableWild
+            ? `Collect wild at row ${row}, column ${col} — swap with your selected card`
+            : placedCard
+              ? `Card: ${placedCard.card.isWild ? "Wild" : `${placedCard.card.number} ${placedCard.card.color} ${placedCard.card.shape}`} at row ${row}, column ${col}`
+              : isClickable
+                ? `Place card at row ${row}, column ${col}${scoreHints?.[`${row},${col}`] ? ` for ${scoreHints[`${row},${col}`]} points` : ""}`
+                : undefined
 
           return (
             <div
               key={`${row}-${col}`}
               className={cellClass}
               style={{ width: cellSize, height: cellSize }}
-              role={isClickable ? "button" : undefined}
-              tabIndex={isClickable ? 0 : undefined}
+              role={isClickable || isReplaceableWild ? "button" : undefined}
+              tabIndex={isClickable || isReplaceableWild ? 0 : undefined}
               aria-label={cellLabel}
               onClick={() => {
-                if (isClickable) {
+                if (isReplaceableWild) {
+                  onReplaceWild?.({ row, col })
+                } else if (isClickable) {
                   handleCellClick(row, col)
                 } else if (selectedCard && !placedCard) {
                   let reason = "Can't place here."
@@ -345,7 +361,10 @@ export const BoardComponent: React.FC<BoardComponentProps> = ({
                 }
               }}
               onKeyDown={(e) => {
-                if (isClickable && (e.key === "Enter" || e.key === " ")) {
+                if ((e.key === "Enter" || e.key === " ") && isReplaceableWild) {
+                  e.preventDefault()
+                  onReplaceWild?.({ row, col })
+                } else if (isClickable && (e.key === "Enter" || e.key === " ")) {
                   e.preventDefault()
                   onPlaceCard({ row, col })
                 }
@@ -359,6 +378,9 @@ export const BoardComponent: React.FC<BoardComponentProps> = ({
                       className={styles.opponentHighlight}
                       style={{ borderColor: opponentHighlight.color }}
                     />
+                  )}
+                  {isReplaceableWild && (
+                    <div className={styles.wildReplaceOverlay}>⇄</div>
                   )}
                 </>
               )}

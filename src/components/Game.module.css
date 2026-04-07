@@ -40,7 +40,7 @@
 .boardArea {
   flex: 1;
   padding-top: 60px; /* room for score bar */
-  padding-bottom: 100px; /* room for hand */
+  padding-bottom: 120px; /* room for hand + action buttons */
   display: flex;
   min-height: 0;
 }
@@ -48,7 +48,7 @@
 /* Deck indicator - fixed bottom left */
 .deckIndicator {
   position: fixed;
-  bottom: calc(100px + var(--space-md));
+  bottom: calc(120px + var(--space-md));
   left: var(--space-lg);
   z-index: var(--z-controls);
   background: var(--color-surface);

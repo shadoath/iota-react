@@ -16,7 +16,7 @@
 
 .turnActions {
   position: fixed;
-  bottom: 100px;
+  bottom: 120px;
   left: 50%;
   transform: translateX(-50%);
   z-index: var(--z-hand);
@@ -164,7 +164,7 @@
   }
 
   .turnActions {
-    bottom: 90px;
+    bottom: 108px;
   }
 
   .keyHint {
